@@ -107,8 +107,7 @@ public abstract class MixinEntityFishHook extends MixinEntity implements FishHoo
             @At(value = "INVOKE", target = "Lnet/minecraft/entity/Entity;attackEntityFrom(Lnet/minecraft/util/DamageSource;F)Z")
         )
     public boolean onAttackEntityFrom(net.minecraft.entity.Entity entity, DamageSource damageSource, float damage) {
-        if (entity.worldObj.isRemote) {
-            EntitySnapshot fishHookSnapshot = ((FishHook) this).createSnapshot();
+            EntitySnapshot fishHookSnapshot = this.createSnapshot();
             EntitySnapshot hookedEntitySnapshot = ((Entity) entity).createSnapshot();
             FishingEvent.Hook event = SpongeEventFactory.createFishingEventHook(Sponge.getGame(), Cause.of(this.angler), fishHookSnapshot, (FishHook) this, hookedEntitySnapshot, Optional.ofNullable(
                     (Entity) entity), (Entity) entity);
@@ -118,7 +117,6 @@ public abstract class MixinEntityFishHook extends MixinEntity implements FishHoo
                 }
                 return entity.attackEntityFrom(damageSource, (float) this.getDamage());
             }
-        }
         return false;
     }
 
