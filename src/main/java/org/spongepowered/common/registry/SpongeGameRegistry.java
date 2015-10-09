@@ -442,6 +442,8 @@ import org.spongepowered.common.data.processor.value.DisplayNameValueProcessor;
 import org.spongepowered.common.data.processor.value.DisplayNameVisibleValueProcessor;
 import org.spongepowered.common.data.processor.value.ItemEnchantmentValueProcessor;
 import org.spongepowered.common.data.processor.value.SkullValueProcessor;
+import org.spongepowered.common.data.processor.value.entity.WalkingSpeedValueProcessor;
+import org.spongepowered.common.data.processor.value.entity.FlyingSpeedValueProcessor;
 import org.spongepowered.common.data.processor.value.entity.CareerValueProcessor;
 import org.spongepowered.common.data.processor.value.entity.FireDamageDelayValueProcessor;
 import org.spongepowered.common.data.processor.value.entity.FireTicksValueProcessor;
@@ -1985,6 +1987,8 @@ public abstract class SpongeGameRegistry implements GameRegistry {
         dataRegistry.registerValueProcessor(Keys.BOOK_PAGES, new BookPagesValueProcessor());
         dataRegistry.registerValueProcessor(Keys.IS_SNEAKING, new SneakingValueProcessor());
         dataRegistry.registerValueProcessor(Keys.GOLDEN_APPLE_TYPE, new GoldenAppleValueProcessor());
+        dataRegistry.registerValueProcessor(Keys.WALKING_SPEED, new WalkingSpeedValueProcessor());
+        dataRegistry.registerValueProcessor(Keys.FLYING_SPEED, new FlyingSpeedValueProcessor());
 
     }
 
