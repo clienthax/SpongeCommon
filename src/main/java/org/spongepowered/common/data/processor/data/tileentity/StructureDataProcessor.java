@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.tileentity.TileEntityStructure;
+import net.minecraft.tileentity.StructureBlockTileEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -46,19 +46,19 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-public final class StructureDataProcessor extends AbstractTileEntityDataProcessor<TileEntityStructure, StructureData, ImmutableStructureData> {
+public final class StructureDataProcessor extends AbstractTileEntityDataProcessor<StructureBlockTileEntity, StructureData, ImmutableStructureData> {
 
     public StructureDataProcessor() {
-        super(TileEntityStructure.class);
+        super(StructureBlockTileEntity.class);
     }
 
     @Override
-    protected boolean doesDataExist(TileEntityStructure container) {
+    protected boolean doesDataExist(StructureBlockTileEntity container) {
         return true;
     }
 
     @Override
-    protected boolean set(TileEntityStructure container, Map<Key<?>, Object> map) {
+    protected boolean set(StructureBlockTileEntity container, Map<Key<?>, Object> map) {
         @Nullable String author = (String) map.get(Keys.STRUCTURE_AUTHOR);
         if (author != null) {
             ((TileEntityStructureBridge) container).bridge$setAuthor(author);
@@ -100,7 +100,7 @@ public final class StructureDataProcessor extends AbstractTileEntityDataProcesso
     }
 
     @Override
-    protected Map<Key<?>, ?> getValues(TileEntityStructure container) {
+    protected Map<Key<?>, ?> getValues(StructureBlockTileEntity container) {
         ImmutableMap.Builder<Key<?>, Object> builder = ImmutableMap.builder();
         builder.put(Keys.STRUCTURE_AUTHOR, ((TileEntityStructureBridge) container).bridge$getAuthor());
         builder.put(Keys.STRUCTURE_IGNORE_ENTITIES, ((TileEntityStructureBridge) container).bridge$shouldIgnoreEntities());

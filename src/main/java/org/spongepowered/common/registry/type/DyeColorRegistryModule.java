@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Maps;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.DyeColor;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.data.type.DyeColors;
 import org.spongepowered.api.registry.CatalogRegistryModule;
@@ -62,14 +62,14 @@ public final class DyeColorRegistryModule implements CatalogRegistryModule<DyeCo
 
     @Override
     public void registerDefaults() {
-        for (EnumDyeColor dyeColor : EnumDyeColor.values()) {
+        for (DyeColor dyeColor : DyeColor.values()) {
             this.dyeColorMappings.put(dyeColor.getName().toLowerCase(Locale.ENGLISH), (DyeColor) (Object) dyeColor);
         }
     }
 
     @AdditionalRegistration
     public void registerAdditional() {
-        for (EnumDyeColor dyeColor : EnumDyeColor.values()) {
+        for (DyeColor dyeColor : DyeColor.values()) {
             if (!this.dyeColorMappings.containsValue(dyeColor)) {
                 this.dyeColorMappings.put(dyeColor.getName().toLowerCase(Locale.ENGLISH), (DyeColor) (Object) dyeColor);
             }
@@ -77,7 +77,7 @@ public final class DyeColorRegistryModule implements CatalogRegistryModule<DyeCo
     }
 
     public static Optional<DyeColor> fromId(int id) {
-        for (EnumDyeColor color : EnumDyeColor.values()) {
+        for (DyeColor color : DyeColor.values()) {
             if (color.getDyeDamage() == id) {
                 return Optional.of((DyeColor) (Object) color);
             }

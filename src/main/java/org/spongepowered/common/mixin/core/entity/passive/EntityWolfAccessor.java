@@ -24,11 +24,11 @@
  */
 package org.spongepowered.common.mixin.core.entity.passive;
 
-import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.entity.passive.WolfEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(EntityWolf.class)
+@Mixin(WolfEntity.class)
 public interface EntityWolfAccessor {
 
     @Accessor("isWet") boolean accessor$getIsWet();

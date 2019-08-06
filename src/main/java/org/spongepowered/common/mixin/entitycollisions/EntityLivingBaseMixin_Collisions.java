@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.entitycollisions;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -38,14 +38,14 @@ import org.spongepowered.common.mixin.plugin.entitycollisions.interfaces.Collisi
 
 import java.util.List;
 
-@Mixin(EntityLivingBase.class)
+@Mixin(LivingEntity.class)
 public abstract class EntityLivingBaseMixin_Collisions extends EntityMixin_Collisions {
 
     @Shadow protected abstract void collideWithEntity(Entity entityIn);
 
     private boolean runningCollideWithNearby = false;
 
-    @Inject(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/EntityLivingBase;collideWithNearbyEntities()V"))
+    @Inject(method = "onLivingUpdate", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/LivingEntity;collideWithNearbyEntities()V"))
     private void collisions$canUpdateCollisions(final CallbackInfo ci) {
         this.runningCollideWithNearby = true;
     }
@@ -53,7 +53,7 @@ public abstract class EntityLivingBaseMixin_Collisions extends EntityMixin_Colli
     @Inject(method = "onLivingUpdate",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/entity/EntityLivingBase;collideWithNearbyEntities()V",
+            target = "Lnet/minecraft/entity/LivingEntity;collideWithNearbyEntities()V",
             shift = Shift.AFTER))
     private void collisions$resetCanUpdateCollisions(final CallbackInfo ci) {
         this.runningCollideWithNearby = false;
@@ -69,7 +69,7 @@ public abstract class EntityLivingBaseMixin_Collisions extends EntityMixin_Colli
     private int collisions$collideWithNearbyUseOurCache(final List<Entity> list) {
         for (final Entity entity: list) {
             // ignore players and entities with parts (ex. EnderDragon)
-            if (this.world.isRemote || entity == null || entity instanceof EntityPlayer || entity.getParts() != null) {
+            if (this.world.isRemote || entity == null || entity instanceof PlayerEntity || entity.getParts() != null) {
                 continue;
             }
 

@@ -27,10 +27,10 @@ package org.spongepowered.common.data.processor.data;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.IWorldNameable;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.INameable;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -74,7 +74,7 @@ public class DisplayNameDataProcessor extends AbstractSingleDataProcessor<Text, 
 
     @Override
     public boolean supports(DataHolder holder) {
-        return holder instanceof Entity || holder instanceof ItemStack || holder instanceof IWorldNameable;
+        return holder instanceof Entity || holder instanceof ItemStack || holder instanceof INameable;
     }
 
     @Override
@@ -92,7 +92,7 @@ public class DisplayNameDataProcessor extends AbstractSingleDataProcessor<Text, 
             }
 
             if (stack.getItem() == Items.WRITTEN_BOOK) {
-                final NBTTagCompound compound = stack.getTagCompound();
+                final CompoundNBT compound = stack.getTagCompound();
                 if (compound == null) {
                     return Optional.empty(); // The book wasn't initialized.
                 }
@@ -100,14 +100,14 @@ public class DisplayNameDataProcessor extends AbstractSingleDataProcessor<Text, 
                 return Optional.of(new SpongeDisplayNameData(SpongeTexts.fromLegacy(compound.getString(Constants.Item.Book.ITEM_BOOK_TITLE))));
             }
 
-            final NBTTagCompound compound = ((ItemStack) holder).getSubCompound(Constants.Item.ITEM_DISPLAY);
+            final CompoundNBT compound = ((ItemStack) holder).getSubCompound(Constants.Item.ITEM_DISPLAY);
             if (compound != null && compound.hasKey(Constants.Item.ITEM_DISPLAY_NAME, Constants.NBT.TAG_STRING)) {
                 return Optional.of(new SpongeDisplayNameData(SpongeTexts.fromLegacy(compound.getString(Constants.Item.ITEM_DISPLAY_NAME))));
             }
             return Optional.empty();
-        } else if (holder instanceof IWorldNameable) {
-            if (((IWorldNameable) holder).hasCustomName()) {
-                final String customName = ((IWorldNameable) holder).getName();
+        } else if (holder instanceof INameable) {
+            if (((INameable) holder).hasCustomName()) {
+                final String customName = ((INameable) holder).getName();
                 final DisplayNameData data = new SpongeDisplayNameData(SpongeTexts.fromLegacy(customName));
                 return Optional.of(data);
             }

@@ -25,16 +25,16 @@
 package org.spongepowered.common.mixin.api.item.inventory;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.entity.item.EntityMinecartContainer;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.InventoryBasic;
-import net.minecraft.inventory.InventoryCraftResult;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.inventory.InventoryLargeChest;
-import net.minecraft.inventory.Slot;
-import net.minecraft.tileentity.TileEntityLockable;
+import net.minecraft.entity.item.minecart.ContainerMinecartEntity;
+import net.minecraft.entity.merchant.villager.VillagerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.CraftResultInventory;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.DoubleSidedInventory;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.tileentity.LockableTileEntity;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.InventoryArchetype;
@@ -73,15 +73,15 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 @Mixin(value = {
-    TileEntityLockable.class,
+    LockableTileEntity.class,
     SpongeUserInventory.class,
-    InventoryBasic.class,
-    InventoryCrafting.class,
-    InventoryCraftResult.class,
-    InventoryLargeChest.class,
-    InventoryPlayer.class,
-    EntityVillager.class,
-    EntityMinecartContainer.class,
+    Inventory.class,
+    CraftingInventory.class,
+    CraftResultInventory.class,
+    DoubleSidedInventory.class,
+    PlayerInventory.class,
+    VillagerEntity.class,
+    ContainerMinecartEntity.class,
     CustomInventory.class,
     Container.class,
     Slot.class

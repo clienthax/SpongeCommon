@@ -25,7 +25,7 @@
 package org.spongepowered.common.mixin.api.mcp.tileentity;
 
 import net.minecraft.command.ICommandSender;
-import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.tileentity.SignTileEntity;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.source.SignSource;
@@ -37,12 +37,12 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.bridge.command.CommandSenderBridge;
 import org.spongepowered.common.command.WrapperCommandSource;
 
-@Mixin(targets = "net/minecraft/tileentity/TileEntitySign$1")
-public abstract class TileEntitySign$1Mixin_API implements SignSource {
+@Mixin(targets = "net/minecraft/tileentity/SignTileEntity$1")
+public abstract class SignTileEntity$1Mixin_API implements SignSource {
 
     @Shadow(aliases = {"this$0", "field_174795_a"})
     @Final
-    private TileEntitySign field_174795_a;
+    private SignTileEntity field_174795_a;
 
     @SuppressWarnings({"ConstantConditions", "RedundantCast"}) // This is an ICommandSender anonymous class
     @Override

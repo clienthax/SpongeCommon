@@ -24,19 +24,19 @@
  */
 package org.spongepowered.common.mixin.core.entity.projectile;
 
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityXPOrb;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityFishHook;
-import net.minecraft.init.Items;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.ExperienceOrbEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.FishingBobberEntity;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.stats.StatList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.storage.loot.LootContext;
-import net.minecraft.world.storage.loot.LootTableList;
+import net.minecraft.world.storage.loot.LootTables;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
@@ -60,10 +60,10 @@ import java.util.stream.Collectors;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityFishHook.class)
+@Mixin(FishingBobberEntity.class)
 public abstract class EntityFishHookMixin extends EntityMixin {
 
-    @Shadow @Nullable private EntityPlayer angler;
+    @Shadow @Nullable private PlayerEntity angler;
     @Shadow @Nullable public net.minecraft.entity.Entity caughtEntity;
 
     @Shadow protected abstract void bringInHookedEntity();
@@ -98,9 +98,9 @@ public abstract class EntityFishHookMixin extends EntityMixin {
             List<Transaction<ItemStackSnapshot>> transactions;
             if (this.ticksCatchable > 0) {
                 // Moved from below
-                LootContext.Builder lootcontext$builder = new LootContext.Builder((WorldServer) this.world);
+                LootContext.Builder lootcontext$builder = new LootContext.Builder((ServerWorld) this.world);
                 lootcontext$builder.withLuck(this.luck + this.angler.getLuck());
-                transactions = this.world.getLootTableManager().getLootTableFromLocation(LootTableList.GAMEPLAY_FISHING)
+                transactions = this.world.getLootTableManager().getLootTableFromLocation(LootTables.GAMEPLAY_FISHING)
                         .generateLootForPools(this.rand, lootcontext$builder.build())
                         .stream()
                         .map(s -> {
@@ -121,12 +121,12 @@ public abstract class EntityFishHookMixin extends EntityMixin {
             if (this.caughtEntity != null) {
                 this.bringInHookedEntity();
                 this.world.setEntityState((net.minecraft.entity.Entity) (Object) this, (byte) 31);
-                i = this.caughtEntity instanceof EntityItem ? 3 : 5;
+                i = this.caughtEntity instanceof ItemEntity ? 3 : 5;
             } // Sponge: Remove else
 
             // Sponge start - Moved up to event call
             if (!transactions.isEmpty()) { // Sponge: Check if we have any transactions instead
-                //LootContext.Builder lootcontext$builder = new LootContext.Builder((WorldServer) this.world);
+                //LootContext.Builder lootcontext$builder = new LootContext.Builder((ServerWorld) this.world);
                 //lootcontext$builder.withLuck((float) this.field_191518_aw + this.angler.getLuck());
 
                 // Use transactions
@@ -137,7 +137,7 @@ public abstract class EntityFishHookMixin extends EntityMixin {
                     ItemStack itemstack = (ItemStack) transaction.getFinal().createStack();
                     // Sponge end
 
-                    EntityItem entityitem = new EntityItem(this.world, this.posX, this.posY, this.posZ, itemstack);
+                    ItemEntity entityitem = new ItemEntity(this.world, this.posX, this.posY, this.posZ, itemstack);
                     double d0 = this.angler.posX - this.posX;
                     double d1 = this.angler.posY - this.posY;
                     double d2 = this.angler.posZ - this.posZ;
@@ -147,12 +147,12 @@ public abstract class EntityFishHookMixin extends EntityMixin {
                     entityitem.motionY = d1 * 0.1D + MathHelper.sqrt(d3) * 0.08D;
                     entityitem.motionZ = d2 * 0.1D;
                     this.world.spawnEntity(entityitem);
-                    this.angler.world.spawnEntity(new EntityXPOrb(this.angler.world, this.angler.posX, this.angler.posY + 0.5D, this.angler.posZ + 0.5D,
+                    this.angler.world.spawnEntity(new ExperienceOrbEntity(this.angler.world, this.angler.posX, this.angler.posY + 0.5D, this.angler.posZ + 0.5D,
                             this.rand.nextInt(6) + 1));
                     Item item = itemstack.getItem();
 
                     if (item == Items.FISH || item == Items.COOKED_FISH) {
-                        this.angler.addStat(StatList.FISH_CAUGHT, 1);
+                        this.angler.addStat(Stats.FISH_CAUGHT, 1);
                     }
                 }
                 Sponge.getCauseStackManager().popCause();
@@ -172,13 +172,13 @@ public abstract class EntityFishHookMixin extends EntityMixin {
     }
 
     @Override
-    public void spongeImpl$readFromSpongeCompound(NBTTagCompound compound) {
+    public void spongeImpl$readFromSpongeCompound(CompoundNBT compound) {
         super.spongeImpl$readFromSpongeCompound(compound);
         ProjectileSourceSerializer.readSourceFromNbt(compound, ((FishHook) this));
     }
 
     @Override
-    public void spongeImpl$writeToSpongeCompound(NBTTagCompound compound) {
+    public void spongeImpl$writeToSpongeCompound(CompoundNBT compound) {
         super.spongeImpl$writeToSpongeCompound(compound);
         ProjectileSourceSerializer.writeSourceToNbt(compound, ((FishHook) this).getShooter(), this.angler);
     }

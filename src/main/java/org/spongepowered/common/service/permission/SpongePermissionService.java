@@ -26,7 +26,7 @@ package org.spongepowered.common.service.permission;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.server.management.UserListOps;
+import net.minecraft.server.management.OpList;
 import org.spongepowered.api.Game;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.plugin.PluginContainer;
@@ -97,7 +97,7 @@ public class SpongePermissionService implements PermissionService {
         this.defaultData = getDefaultCollection().get(SUBJECTS_DEFAULT);
     }
 
-    static UserListOps getOps() {
+    static OpList getOps() {
         return SpongeImpl.getServer().getPlayerList().getOppedPlayers();
     }
 

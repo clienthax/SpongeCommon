@@ -24,14 +24,14 @@
  */
 package org.spongepowered.common.mixin.api.mcp.scoreboard;
 
-import net.minecraft.scoreboard.IScoreCriteria;
+import net.minecraft.scoreboard.ScoreCriteria;
 import org.spongepowered.api.scoreboard.objective.displaymode.ObjectiveDisplayMode;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(IScoreCriteria.EnumRenderType.class)
-public abstract class IScoreCriteria$EnumRenderTypeMixin_API implements ObjectiveDisplayMode {
+@Mixin(ScoreCriteria.EnumRenderType.class)
+public abstract class ScoreCriteria$EnumRenderTypeMixin_API implements ObjectiveDisplayMode {
 
     @Shadow @Final private String renderType;
 

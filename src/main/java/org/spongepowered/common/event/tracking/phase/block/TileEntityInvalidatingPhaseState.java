@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.event.tracking.phase.block;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
@@ -54,7 +54,7 @@ public final class TileEntityInvalidatingPhaseState extends BlockPhaseState {
 
     @Override
     public boolean shouldCaptureBlockChangeOrSkip(GeneralizedContext phaseContext,
-        BlockPos pos, IBlockState currentState, IBlockState newState,
+        BlockPos pos, BlockState currentState, BlockState newState,
         BlockChangeFlag flags) {
         return false;
     }

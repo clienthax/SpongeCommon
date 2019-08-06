@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.processor.data.entity;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.entity.projectile.EntityTippedArrow;
+import net.minecraft.entity.projectile.ArrowEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.ImmutablePotionEffectData;
@@ -46,15 +46,15 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-public class TippedArrowPotionDataProcessor extends AbstractSingleDataSingleTargetProcessor<EntityTippedArrow, List<PotionEffect>,
+public class TippedArrowPotionDataProcessor extends AbstractSingleDataSingleTargetProcessor<ArrowEntity, List<PotionEffect>,
         ListValue<PotionEffect>, PotionEffectData, ImmutablePotionEffectData> {
 
     public TippedArrowPotionDataProcessor() {
-        super(Keys.POTION_EFFECTS, EntityTippedArrow.class);
+        super(Keys.POTION_EFFECTS, ArrowEntity.class);
     }
 
     @Override
-    protected boolean set(final EntityTippedArrow dataHolder, final List<PotionEffect> value) {
+    protected boolean set(final ArrowEntity dataHolder, final List<PotionEffect> value) {
         ((EntityTippedArrowAccessor) dataHolder).accessor$getCustomPotionEffects().clear();
         for (final PotionEffect effect : value) {
             final net.minecraft.potion.PotionEffect mcEffect = PotionUtil.copyToNative(effect);
@@ -64,7 +64,7 @@ public class TippedArrowPotionDataProcessor extends AbstractSingleDataSingleTarg
     }
 
     @Override
-    protected Optional<List<PotionEffect>> getVal(final EntityTippedArrow dataHolder) {
+    protected Optional<List<PotionEffect>> getVal(final ArrowEntity dataHolder) {
         final Set<net.minecraft.potion.PotionEffect> effects = ((EntityTippedArrowAccessor) dataHolder).accessor$getCustomPotionEffects();
         if (effects.isEmpty()) {
             return Optional.empty();
@@ -93,10 +93,10 @@ public class TippedArrowPotionDataProcessor extends AbstractSingleDataSingleTarg
 
     @Override
     public DataTransactionResult removeFrom(final ValueContainer<?> container) {
-        if (!(container instanceof EntityTippedArrow)) {
+        if (!(container instanceof ArrowEntity)) {
             return DataTransactionResult.failNoData();
         }
-        final Optional<List<PotionEffect>> effects = getVal((EntityTippedArrow) container);
+        final Optional<List<PotionEffect>> effects = getVal((ArrowEntity) container);
         if (effects.isPresent()) {
             ((EntityTippedArrowAccessor) container).accessor$getCustomPotionEffects().clear();
             return DataTransactionResult.successRemove(constructImmutableValue(effects.get()));

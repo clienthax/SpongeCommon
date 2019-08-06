@@ -26,7 +26,7 @@ package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockSandStone;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -45,7 +45,7 @@ public abstract class BlockSandStoneMixin extends BlockMixin {
 
     @SuppressWarnings("RedundantTypeArguments") // some JDK's can fail to compile without the explicit type generics
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getSandstoneTypeFor(blockState));
     }
 
@@ -56,7 +56,7 @@ public abstract class BlockSandStoneMixin extends BlockMixin {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableSandstoneData) {
             final BlockSandStone.EnumType sandstoneType = (BlockSandStone.EnumType) (Object) ((ImmutableSandstoneData) manipulator).type().get();
             return Optional.of((BlockState) blockState.withProperty(BlockSandStone.TYPE, sandstoneType));
@@ -65,7 +65,7 @@ public abstract class BlockSandStoneMixin extends BlockMixin {
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.SANDSTONE_TYPE)) {
             final BlockSandStone.EnumType sandstoneType = (BlockSandStone.EnumType) value;
             return Optional.of((BlockState) blockState.withProperty(BlockSandStone.TYPE, sandstoneType));
@@ -74,7 +74,7 @@ public abstract class BlockSandStoneMixin extends BlockMixin {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private ImmutableSandstoneData impl$getSandstoneTypeFor(final IBlockState blockState) {
+    private ImmutableSandstoneData impl$getSandstoneTypeFor(final BlockState blockState) {
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeSandstoneData.class,
                 (SandstoneType) (Object) blockState.getValue(BlockSandStone.TYPE));
     }

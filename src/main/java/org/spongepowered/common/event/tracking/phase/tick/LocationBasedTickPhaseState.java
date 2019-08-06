@@ -26,7 +26,7 @@ package org.spongepowered.common.event.tracking.phase.tick;
 
 import net.minecraft.block.Block;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.event.CauseStackManager;
@@ -61,7 +61,7 @@ abstract class LocationBasedTickPhaseState<T extends LocationBasedTickContext<T>
 
     @Override
     public void associateNeighborStateNotifier(T context, @Nullable BlockPos sourcePos, Block block, BlockPos notifyPos,
-                                               WorldServer minecraftWorld, PlayerTracker.Type notifier) {
+                                               ServerWorld minecraftWorld, PlayerTracker.Type notifier) {
         // If we do not have a notifier at this point then there is no need to attempt to retrieve one from the chunk
         context.applyNotifierIfAvailable(user -> {
             final ChunkBridge mixinChunk = (ChunkBridge) minecraftWorld.getChunk(notifyPos);

@@ -25,9 +25,9 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockHorizontal;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.HorizontalBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.Direction;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -42,7 +42,7 @@ import org.spongepowered.common.data.util.DirectionResolver;
 import java.util.List;
 import java.util.Optional;
 
-@Mixin(BlockHorizontal.class)
+@Mixin(HorizontalBlock.class)
 public abstract class BlockHorizontalMixin extends BlockMixin {
 
     @Override
@@ -51,30 +51,30 @@ public abstract class BlockHorizontalMixin extends BlockMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableDirectionalData) {
             final Direction direction = ((ImmutableDirectionalData) manipulator).direction().get();
-            final EnumFacing facing = DirectionResolver.getFor(direction);
-            return Optional.of((BlockState) blockState.withProperty(BlockHorizontal.FACING, facing));
+            final Direction facing = DirectionResolver.getFor(direction);
+            return Optional.of((BlockState) blockState.withProperty(HorizontalBlock.FACING, facing));
         }
         return super.bridge$getStateWithData(blockState, manipulator);
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.DIRECTION)) {
             final Direction direction = (Direction) value;
-            final EnumFacing facing = DirectionResolver.getFor(direction);
-            return Optional.of((BlockState) blockState.withProperty(BlockHorizontal.FACING, facing));
+            final Direction facing = DirectionResolver.getFor(direction);
+            return Optional.of((BlockState) blockState.withProperty(HorizontalBlock.FACING, facing));
         }
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
     @Override
-    public List<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public List<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>builder()
                 .addAll(super.bridge$getManipulators(blockState))
-                .add(new ImmutableSpongeDirectionalData(DirectionResolver.getFor(blockState.getValue(BlockHorizontal.FACING))))
+                .add(new ImmutableSpongeDirectionalData(DirectionResolver.getFor(blockState.getValue(HorizontalBlock.FACING))))
                 .build();
     }
 }

@@ -31,7 +31,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMultimap;
 import com.google.common.collect.Multimap;
-import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.merchant.villager.VillagerEntity;
 import org.spongepowered.api.data.type.Career;
 import org.spongepowered.api.item.merchant.TradeOfferListMutator;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
@@ -141,9 +141,9 @@ public final class SpongeVillagerRegistry implements VillagerRegistry {
         for (Career career: CareerRegistryModule.getInstance().getAll()) {
             SpongeCareer spongeCareer = (SpongeCareer) career;
 
-            EntityVillager.ITradeList[][] careerLevels = EntityVillager.DEFAULT_TRADE_LIST_MAP[((SpongeProfession) spongeCareer.getProfession()).type][spongeCareer.type];
+            VillagerEntity.ITradeList[][] careerLevels = VillagerEntity.DEFAULT_TRADE_LIST_MAP[((SpongeProfession) spongeCareer.getProfession()).type][spongeCareer.type];
             for (int level = 0; level < careerLevels.length; level++) {
-                EntityVillager.ITradeList[] offers = careerLevels[level];
+                VillagerEntity.ITradeList[] offers = careerLevels[level];
                 ImmutableList.Builder<TradeOfferListMutator> builder = ImmutableList.builder();
 
                 for (int i = 0; i < offers.length; i++) {
@@ -155,7 +155,7 @@ public final class SpongeVillagerRegistry implements VillagerRegistry {
         }
     }
 
-    private static TradeOfferListMutator generatorFor(EntityVillager.ITradeList iTradeList) {
+    private static TradeOfferListMutator generatorFor(VillagerEntity.ITradeList iTradeList) {
         return (TradeOfferListMutator) iTradeList;
     }
 

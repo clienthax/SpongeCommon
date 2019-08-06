@@ -28,27 +28,27 @@ import com.mojang.authlib.GameProfile;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.local.LocalAddress;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.play.ServerPlayNetHandler;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.network.play.server.SPacketCustomPayload;
-import net.minecraft.network.play.server.SPacketDisconnect;
-import net.minecraft.network.play.server.SPacketEntityEffect;
-import net.minecraft.network.play.server.SPacketHeldItemChange;
-import net.minecraft.network.play.server.SPacketJoinGame;
-import net.minecraft.network.play.server.SPacketPlayerAbilities;
-import net.minecraft.network.play.server.SPacketServerDifficulty;
-import net.minecraft.network.play.server.SPacketSpawnPosition;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.network.play.server.SCustomPayloadPlayPacket;
+import net.minecraft.network.play.server.SDisconnectPacket;
+import net.minecraft.network.play.server.SPlayEntityEffectPacket;
+import net.minecraft.network.play.server.SHeldItemChangePacket;
+import net.minecraft.network.play.server.SJoinGamePacket;
+import net.minecraft.network.play.server.SPlayerAbilitiesPacket;
+import net.minecraft.network.play.server.SServerDifficultyPacket;
+import net.minecraft.network.play.server.SSpawnPositionPacket;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.server.management.PlayerProfileCache;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.util.text.TextFormatting;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.chunk.storage.AnvilChunkLoader;
 import net.minecraft.world.storage.WorldInfo;
 import org.spongepowered.api.Server;
@@ -137,7 +137,7 @@ public final class NetworkUtil {
     }
 
     /**
-     * Specifically de-duplicated clone from {@link PlayerList#initializeConnectionToPlayer(NetworkManager, EntityPlayerMP)}
+     * Specifically de-duplicated clone from {@link PlayerList#initializeConnectionToPlayer(NetworkManager, ServerPlayerEntity)}
      * but because Forge changes the signature, we cannot provide the override in SpongeCommon, therefor we have to bridge
      * it through an overwrite in SpongeVanilla and one in SpongeForge.
      * @param playerList
@@ -145,7 +145,7 @@ public final class NetworkUtil {
      * @param playerIn
      * @param handler
      */
-    public static void initializeConnectionToPlayer(final PlayerList playerList, final NetworkManager netManager, final EntityPlayerMP playerIn, @Nullable NetHandlerPlayServer handler) {
+    public static void initializeConnectionToPlayer(final PlayerList playerList, final NetworkManager netManager, final ServerPlayerEntity playerIn, @Nullable ServerPlayNetHandler handler) {
         final GameProfile gameprofile = playerIn.getGameProfile();
         final PlayerProfileCache playerprofilecache = ((PlayerListAccessor) playerList).accessor$getPlayerListServer().getPlayerProfileCache();
         final GameProfile gameprofile1 = playerprofilecache.getProfileByUUID(gameprofile.getId());
@@ -161,8 +161,8 @@ public final class NetworkUtil {
         }
         // Sponge end
 
-        final NBTTagCompound nbttagcompound = playerList.readPlayerDataFromFile(playerIn);
-        WorldServer worldServer = ((PlayerListAccessor) playerList).accessor$getPlayerListServer().getWorld(playerIn.dimension);
+        final CompoundNBT nbttagcompound = playerList.readPlayerDataFromFile(playerIn);
+        ServerWorld worldServer = ((PlayerListAccessor) playerList).accessor$getPlayerListServer().getWorld(playerIn.dimension);
         final int actualDimensionId = ((WorldServerBridge) worldServer).bridge$getDimensionId();
         final BlockPos spawnPos;
         // Join data
@@ -213,12 +213,12 @@ public final class NetworkUtil {
                 if (message.isPresent()) {
                     reason = SpongeTexts.toComponent(message.get());
                 } else {
-                    reason = new TextComponentTranslation("disconnect.disconnected");
+                    reason = new TranslationTextComponent("disconnect.disconnected");
                 }
 
                 try {
                     ((PlayerListAccessor) playerList).accessor$getPlayerListLogger().info("Disconnecting " + (gameprofile != null ? gameprofile.toString() + " (" + netManager.getRemoteAddress().toString() + ")" : String.valueOf(netManager.getRemoteAddress() + ": " + reason.getUnformattedText())));
-                    netManager.sendPacket(new SPacketDisconnect(reason));
+                    netManager.sendPacket(new SDisconnectPacket(reason));
                     netManager.closeChannel(reason);
                 } catch (Exception exception) {
                     ((PlayerListAccessor) playerList).accessor$getPlayerListLogger().error("Error whilst disconnecting player", exception);
@@ -229,7 +229,7 @@ public final class NetworkUtil {
 
         // Sponge end
 
-        worldServer = (WorldServer) loginEvent.getToTransform().getExtent();
+        worldServer = (ServerWorld) loginEvent.getToTransform().getExtent();
         final double x = loginEvent.getToTransform().getPosition().getX();
         final double y = loginEvent.getToTransform().getPosition().getY();
         final double z = loginEvent.getToTransform().getPosition().getZ();
@@ -238,7 +238,7 @@ public final class NetworkUtil {
 
         playerIn.dimension = ((WorldServerBridge) worldServer).bridge$getDimensionId();
         playerIn.setWorld(worldServer);
-        playerIn.interactionManager.setWorld((WorldServer) playerIn.world);
+        playerIn.interactionManager.setWorld((ServerWorld) playerIn.world);
         playerIn.setPositionAndRotation(x, y, z, yaw, pitch);
         // make sure the chunk is loaded for login
         worldServer.getChunkProvider().loadChunk(loginEvent.getToTransform().getLocation().getChunkPosition().getX(), loginEvent.getToTransform().getLocation().getChunkPosition().getZ());
@@ -257,7 +257,7 @@ public final class NetworkUtil {
         // Sponge start
         if (handler == null) {
             // Create the handler here (so the player's gets set)
-            handler = new NetHandlerPlayServer(((PlayerListAccessor) playerList).accessor$getPlayerListServer(), netManager, playerIn);
+            handler = new ServerPlayNetHandler(((PlayerListAccessor) playerList).accessor$getPlayerListServer(), netManager, playerIn);
         }
         playerIn.connection = handler;
         SpongeImplHooks.fireServerConnectionEvent(netManager);
@@ -269,15 +269,15 @@ public final class NetworkUtil {
         // Send dimension registration
         WorldManager.sendDimensionRegistration(playerIn, worldServer.provider);
 
-        handler.sendPacket(new SPacketJoinGame(playerIn.getEntityId(), playerIn.interactionManager.getGameType(), worldinfo
+        handler.sendPacket(new SJoinGamePacket(playerIn.getEntityId(), playerIn.interactionManager.getGameType(), worldinfo
                 .isHardcoreModeEnabled(), dimensionId, worldServer.getDifficulty(), playerList.getMaxPlayers(), worldinfo
                 .getTerrainType(), worldServer.getGameRules().getBoolean("reducedDebugInfo")));
-        handler.sendPacket(new SPacketCustomPayload("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString(playerList
+        handler.sendPacket(new SCustomPayloadPlayPacket("MC|Brand", (new PacketBuffer(Unpooled.buffer())).writeString(playerList
                 .getServerInstance().getServerModName())));
-        handler.sendPacket(new SPacketServerDifficulty(worldinfo.getDifficulty(), worldinfo.isDifficultyLocked()));
-        handler.sendPacket(new SPacketSpawnPosition(spawnBlockPos));
-        handler.sendPacket(new SPacketPlayerAbilities(playerIn.capabilities));
-        handler.sendPacket(new SPacketHeldItemChange(playerIn.inventory.currentItem));
+        handler.sendPacket(new SServerDifficultyPacket(worldinfo.getDifficulty(), worldinfo.isDifficultyLocked()));
+        handler.sendPacket(new SSpawnPositionPacket(spawnBlockPos));
+        handler.sendPacket(new SPlayerAbilitiesPacket(playerIn.capabilities));
+        handler.sendPacket(new SHeldItemChangePacket(playerIn.inventory.currentItem));
         playerList.updatePermissionLevel(playerIn);
         playerIn.getStatFile().markAllDirty();
         playerIn.getRecipeBook().init(playerIn);
@@ -309,13 +309,13 @@ public final class NetworkUtil {
 
         ((EntityPlayerMPBridge) playerIn).bridge$initScoreboard();
 
-        for (final PotionEffect potioneffect : playerIn.getActivePotionEffects()) {
-            handler.sendPacket(new SPacketEntityEffect(playerIn.getEntityId(), potioneffect));
+        for (final EffectInstance potioneffect : playerIn.getActivePotionEffects()) {
+            handler.sendPacket(new SPlayEntityEffectPacket(playerIn.getEntityId(), potioneffect));
         }
 
         if (nbttagcompound != null) {
             if (nbttagcompound.hasKey("RootVehicle", 10)) {
-                final NBTTagCompound nbttagcompound1 = nbttagcompound.getCompoundTag("RootVehicle");
+                final CompoundNBT nbttagcompound1 = nbttagcompound.getCompoundTag("RootVehicle");
                 final Entity entity2 = AnvilChunkLoader.readWorldEntity(nbttagcompound1.getCompoundTag("Entity"), worldServer, true);
 
                 if (entity2 != null) {
@@ -352,15 +352,15 @@ public final class NetworkUtil {
 
         playerIn.addSelfToInternalCraftingInventory();
 
-        final TextComponentTranslation chatcomponenttranslation;
+        final TranslationTextComponent chatcomponenttranslation;
 
         if (!playerIn.getName().equalsIgnoreCase(s))
         {
-            chatcomponenttranslation = new TextComponentTranslation("multiplayer.player.joined.renamed", playerIn.getDisplayName(), s);
+            chatcomponenttranslation = new TranslationTextComponent("multiplayer.player.joined.renamed", playerIn.getDisplayName(), s);
         }
         else
         {
-            chatcomponenttranslation = new TextComponentTranslation("multiplayer.player.joined", playerIn.getDisplayName());
+            chatcomponenttranslation = new TranslationTextComponent("multiplayer.player.joined", playerIn.getDisplayName());
         }
 
         chatcomponenttranslation.getStyle().setColor(TextFormatting.YELLOW);

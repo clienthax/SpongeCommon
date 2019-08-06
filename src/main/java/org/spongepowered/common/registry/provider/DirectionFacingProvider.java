@@ -27,34 +27,34 @@ package org.spongepowered.common.registry.provider;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableBiMap;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.common.registry.TypeProvider;
 
 import java.util.Optional;
 
-public final class DirectionFacingProvider implements TypeProvider<Direction, EnumFacing> {
+public final class DirectionFacingProvider implements TypeProvider<Direction, Direction> {
 
     public static DirectionFacingProvider getInstance() {
         return Holder.INSTANCE;
     }
 
-    public static final ImmutableBiMap<Direction, EnumFacing> directionMap = ImmutableBiMap.<Direction, EnumFacing>builder()
-        .put(Direction.NORTH, EnumFacing.NORTH)
-        .put(Direction.EAST, EnumFacing.EAST)
-        .put(Direction.SOUTH, EnumFacing.SOUTH)
-        .put(Direction.WEST, EnumFacing.WEST)
-        .put(Direction.UP, EnumFacing.UP)
-        .put(Direction.DOWN, EnumFacing.DOWN)
+    public static final ImmutableBiMap<Direction, Direction> directionMap = ImmutableBiMap.<Direction, Direction>builder()
+        .put(Direction.NORTH, Direction.NORTH)
+        .put(Direction.EAST, Direction.EAST)
+        .put(Direction.SOUTH, Direction.SOUTH)
+        .put(Direction.WEST, Direction.WEST)
+        .put(Direction.UP, Direction.UP)
+        .put(Direction.DOWN, Direction.DOWN)
         .build();
 
     @Override
-    public Optional<EnumFacing> get(Direction key) {
+    public Optional<Direction> get(Direction key) {
         return Optional.ofNullable(directionMap.get(checkNotNull(key)));
     }
 
     @Override
-    public Optional<Direction> getKey(EnumFacing value) {
+    public Optional<Direction> getKey(Direction value) {
         return Optional.ofNullable(directionMap.inverse().get(checkNotNull(value)));
     }
 

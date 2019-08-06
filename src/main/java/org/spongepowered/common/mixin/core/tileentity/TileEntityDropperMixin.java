@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.core.tileentity;
 
-import net.minecraft.tileentity.TileEntityDropper;
+import net.minecraft.tileentity.DropperTileEntity;
 import org.spongepowered.api.item.inventory.transaction.SlotTransaction;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @NonnullByDefault
-@Mixin(TileEntityDropper.class)
+@Mixin(DropperTileEntity.class)
 public abstract class TileEntityDropperMixin extends TileEntityDispenserMixin implements TrackedInventoryBridge {
 
     public List<SlotTransaction> capturedTransactions = new ArrayList<>();

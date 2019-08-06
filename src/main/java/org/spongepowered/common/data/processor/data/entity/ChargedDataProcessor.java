@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.monster.EntityCreeper;
+import net.minecraft.entity.monster.CreeperEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableChargedData;
@@ -40,20 +40,20 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 import java.util.Optional;
 
 public class ChargedDataProcessor
-        extends AbstractEntitySingleDataProcessor<EntityCreeper, Boolean, Value<Boolean>, ChargedData, ImmutableChargedData> {
+        extends AbstractEntitySingleDataProcessor<CreeperEntity, Boolean, Value<Boolean>, ChargedData, ImmutableChargedData> {
 
     public ChargedDataProcessor() {
-        super(EntityCreeper.class, Keys.CREEPER_CHARGED);
+        super(CreeperEntity.class, Keys.CREEPER_CHARGED);
     }
 
     @Override
-    protected boolean set(EntityCreeper entity, Boolean value) {
-        entity.getDataManager().set(EntityCreeper.POWERED, value);
+    protected boolean set(CreeperEntity entity, Boolean value) {
+        entity.getDataManager().set(CreeperEntity.POWERED, value);
         return true;
     }
 
     @Override
-    protected Optional<Boolean> getVal(EntityCreeper entity) {
+    protected Optional<Boolean> getVal(CreeperEntity entity) {
         return Optional.of(entity.getPowered());
     }
 

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.entity;
 
-import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.AgeableEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -35,10 +35,10 @@ import org.spongepowered.common.data.value.SpongeValueFactory;
 
 import java.util.Optional;
 
-public class AgeableAgeValueProcessor extends AbstractSpongeValueProcessor<EntityAgeable, Integer, MutableBoundedValue<Integer>> {
+public class AgeableAgeValueProcessor extends AbstractSpongeValueProcessor<AgeableEntity, Integer, MutableBoundedValue<Integer>> {
 
     public AgeableAgeValueProcessor() {
-        super(EntityAgeable.class, Keys.AGE);
+        super(AgeableEntity.class, Keys.AGE);
     }
 
     @Override
@@ -52,13 +52,13 @@ public class AgeableAgeValueProcessor extends AbstractSpongeValueProcessor<Entit
     }
 
     @Override
-    protected boolean set(EntityAgeable container, Integer adult) {
+    protected boolean set(AgeableEntity container, Integer adult) {
         container.setGrowingAge(adult);
         return true;
     }
 
     @Override
-    protected Optional<Integer> getVal(EntityAgeable container) {
+    protected Optional<Integer> getVal(AgeableEntity container) {
         return Optional.of(container.getGrowingAge());
     }
 

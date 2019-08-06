@@ -26,7 +26,7 @@ package org.spongepowered.common.event.tracking.phase.generation;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
@@ -130,7 +130,7 @@ abstract class GeneralGenerationPhaseState<G extends GenerationContext<G>> imple
     }
 
     @Override
-    public boolean shouldCaptureBlockChangeOrSkip(G phaseContext, BlockPos pos, IBlockState currentState, IBlockState newState,
+    public boolean shouldCaptureBlockChangeOrSkip(G phaseContext, BlockPos pos, BlockState currentState, BlockState newState,
         BlockChangeFlag flags) {
         return false;
     }

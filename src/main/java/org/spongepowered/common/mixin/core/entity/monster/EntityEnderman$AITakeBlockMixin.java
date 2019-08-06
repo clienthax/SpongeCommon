@@ -24,10 +24,10 @@
  */
 package org.spongepowered.common.mixin.core.entity.monster;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.monster.EndermanEntity;
+import net.minecraft.block.Blocks;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -37,10 +37,10 @@ import org.spongepowered.common.bridge.entity.GrieferBridge;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityEnderman.AITakeBlock.class)
-public abstract class EntityEnderman$AITakeBlockMixin extends EntityAIBase {
+@Mixin(EndermanEntity.AITakeBlock.class)
+public abstract class EndermanEntity$AITakeBlockMixin extends Goal {
 
-    @Shadow @Final private EntityEnderman enderman; //enderman
+    @Shadow @Final private EndermanEntity enderman; //enderman
 
     /**
      * @author gabizou - April 13th, 2018
@@ -55,12 +55,12 @@ public abstract class EntityEnderman$AITakeBlockMixin extends EntityAIBase {
         method = "shouldExecute",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/entity/monster/EntityEnderman;getHeldBlockState()Lnet/minecraft/block/state/IBlockState;"
+            target = "Lnet/minecraft/entity/monster/EndermanEntity;getHeldBlockState()Lnet/minecraft/block/state/BlockState;"
         )
     )
     @Nullable
-    private IBlockState onCanGrief(final EntityEnderman entityEnderman) {
-        final IBlockState heldBlockState = entityEnderman.getHeldBlockState();
+    private BlockState onCanGrief(final EndermanEntity entityEnderman) {
+        final BlockState heldBlockState = entityEnderman.getHeldBlockState();
         return ((GrieferBridge) this.enderman).bridge$CanGrief() ? heldBlockState : Blocks.AIR.getDefaultState();
     }
 }

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity.monster;
 
-import net.minecraft.entity.monster.EntityZombieVillager;
+import net.minecraft.entity.monster.ZombieVillagerEntity;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,7 +35,7 @@ import org.spongepowered.common.bridge.world.WorldBridge;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 import org.spongepowered.common.mixin.realtime.entity.EntityLivingBaseMixin_RealTime;
 
-@Mixin(EntityZombieVillager.class)
+@Mixin(ZombieVillagerEntity.class)
 public abstract class EntityZombieVillagerMixin_RealTime extends EntityLivingBaseMixin_RealTime {
 
     @Shadow protected abstract int getConversionProgress();
@@ -44,22 +44,22 @@ public abstract class EntityZombieVillagerMixin_RealTime extends EntityLivingBas
         method = "onUpdate",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/entity/monster/EntityZombieVillager;getConversionProgress()I",
+            target = "Lnet/minecraft/entity/monster/ZombieVillagerEntity;getConversionProgress()I",
             ordinal = 0
         ),
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/entity/monster/EntityZombieVillager;isConverting()Z"
+                target = "Lnet/minecraft/entity/monster/ZombieVillagerEntity;isConverting()Z"
             ),
             to = @At(
                 value = "FIELD",
-                target = "Lnet/minecraft/entity/monster/EntityZombieVillager;conversionTime:I",
+                target = "Lnet/minecraft/entity/monster/ZombieVillagerEntity;conversionTime:I",
                 opcode = Opcodes.GETFIELD
             )
         )
     )
-    private int realTimeImpl$adjustForRealTimeConversionTimeBoost(final EntityZombieVillager self) {
+    private int realTimeImpl$adjustForRealTimeConversionTimeBoost(final ZombieVillagerEntity self) {
         if (((WorldBridge) this.world).bridge$isFake()) {
             return this.getConversionProgress();
         }

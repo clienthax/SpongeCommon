@@ -25,14 +25,14 @@
 package org.spongepowered.common.mixin.core.item;
 
 import com.flowpowered.math.vector.Vector3d;
-import net.minecraft.entity.item.EntityEnderEye;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.item.EyeOfEnderEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemEnderEye;
+import net.minecraft.item.EnderEyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
@@ -57,7 +57,7 @@ import org.spongepowered.common.event.ShouldFire;
 
 import javax.annotation.Nullable;
 
-@Mixin(ItemEnderEye.class)
+@Mixin(EnderEyeItem.class)
 public class ItemEnderEyeMixin extends Item {
 
     /**
@@ -82,13 +82,13 @@ public class ItemEnderEyeMixin extends Item {
         method = "onItemRightClick",
         at = @At(
             value = "NEW",
-            target = "net/minecraft/entity/item/EntityEnderEye"
+            target = "net/minecraft/entity/item/EyeOfEnderEntity"
         ),
         locals = LocalCapture.CAPTURE_FAILSOFT,
         require = 1,
         cancellable = true
     )
-    private void implThrowForPreEvent(final World worldIn, final EntityPlayer playerIn, final EnumHand handIn,
+    private void implThrowForPreEvent(final World worldIn, final PlayerEntity playerIn, final Hand handIn,
         final CallbackInfoReturnable<ActionResult<ItemStack>> cir, final ItemStack used, final RayTraceResult rayTraceResult, @Nullable final BlockPos targetPos) {
         if (targetPos != null && !((WorldBridge) worldIn).bridge$isFake() && ShouldFire.CONSTRUCT_ENTITY_EVENT_PRE) {
             final Vector3d targetPosition = new Vector3d(playerIn.posX, playerIn.posY + (double) (playerIn.height / 2.0F), playerIn.posZ);
@@ -97,7 +97,7 @@ public class ItemEnderEyeMixin extends Item {
             final ConstructEntityEvent.Pre event = SpongeEventFactory.createConstructEntityEventPre(Sponge.getCauseStackManager().getCurrentCause(),
                 EntityTypes.EYE_OF_ENDER, targetTransform);
             if (SpongeImpl.postEvent(event)) {
-                cir.setReturnValue(new ActionResult<>(EnumActionResult.SUCCESS, used));
+                cir.setReturnValue(new ActionResult<>(ActionResultType.SUCCESS, used));
             }
         }
     }
@@ -114,7 +114,7 @@ public class ItemEnderEyeMixin extends Item {
      */
     @SuppressWarnings("Duplicates")
     @Surrogate
-    private void implThrowForPreEvent(final World worldIn, final EntityPlayer playerIn, final EnumHand handIn,
+    private void implThrowForPreEvent(final World worldIn, final PlayerEntity playerIn, final Hand handIn,
         final CallbackInfoReturnable<ActionResult<ItemStack>> cir, final ItemStack used, @Nullable final BlockPos targetPos) {
         if (targetPos != null && !((WorldBridge) worldIn).bridge$isFake() && ShouldFire.CONSTRUCT_ENTITY_EVENT_PRE) {
             final Vector3d targetPosition = new Vector3d(playerIn.posX, playerIn.posY + (double) (playerIn.height / 2.0F), playerIn.posZ);
@@ -123,7 +123,7 @@ public class ItemEnderEyeMixin extends Item {
             final ConstructEntityEvent.Pre event = SpongeEventFactory.createConstructEntityEventPre(Sponge.getCauseStackManager().getCurrentCause(),
                 EntityTypes.EYE_OF_ENDER, targetTransform);
             if (SpongeImpl.postEvent(event)) {
-                cir.setReturnValue(new ActionResult<>(EnumActionResult.SUCCESS, used));
+                cir.setReturnValue(new ActionResult<>(ActionResultType.SUCCESS, used));
             }
         }
     }
@@ -154,7 +154,7 @@ public class ItemEnderEyeMixin extends Item {
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/entity/item/EntityEnderEye;moveTowards(Lnet/minecraft/util/math/BlockPos;)V"
+                target = "Lnet/minecraft/entity/item/EyeOfEnderEntity;moveTowards(Lnet/minecraft/util/math/BlockPos;)V"
             ),
             to = @At(
                 value = "FIELD",
@@ -164,9 +164,9 @@ public class ItemEnderEyeMixin extends Item {
         ),
         locals = LocalCapture.CAPTURE_FAILSOFT
     )
-    private void implSetShooter(final World worldIn, final EntityPlayer playerIn, final EnumHand handIn,
+    private void implSetShooter(final World worldIn, final PlayerEntity playerIn, final Hand handIn,
         final CallbackInfoReturnable<ActionResult<ItemStack>> cir, final ItemStack playerStack, final RayTraceResult result,
-        final BlockPos targetPos, final EntityEnderEye enderEye) {
+        final BlockPos targetPos, final EyeOfEnderEntity enderEye) {
         if (((WorldBridge) worldIn).bridge$isFake()) {
             return;
         }
@@ -176,7 +176,7 @@ public class ItemEnderEyeMixin extends Item {
     /**
      * The RayTraceResult is lost, and somehow, production JVM will shove the CallbackInfoReturnable
      * into the LVT.... So.... Don't care which one is actually on the stack, it might be the one from
-     * {@link #implThrowForPreEvent(World, EntityPlayer, EnumHand, CallbackInfoReturnable, ItemStack, BlockPos)}
+     * {@link #implThrowForPreEvent(World, PlayerEntity, Hand, CallbackInfoReturnable, ItemStack, BlockPos)}
      * or some other injection. Either way, this one works in production.
      *
      * @param worldIn
@@ -189,9 +189,9 @@ public class ItemEnderEyeMixin extends Item {
      * @param preEventCir
      */
     @Surrogate
-    private void implSetShooter(final World worldIn, final EntityPlayer playerIn, final EnumHand handIn,
+    private void implSetShooter(final World worldIn, final PlayerEntity playerIn, final Hand handIn,
         final CallbackInfoReturnable<ActionResult<ItemStack>> cir, final ItemStack playerStack,
-        final BlockPos targetPos, final EntityEnderEye enderEye, final CallbackInfoReturnable<ActionResult<ItemStack>> preEventCir) {
+        final BlockPos targetPos, final EyeOfEnderEntity enderEye, final CallbackInfoReturnable<ActionResult<ItemStack>> preEventCir) {
         if (((WorldBridge) worldIn).bridge$isFake()) {
             return;
         }

@@ -25,7 +25,7 @@
 package org.spongepowered.common.mixin.core.inventory;
 
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryCrafting;
+import net.minecraft.inventory.CraftingInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import org.spongepowered.asm.mixin.Final;
@@ -42,7 +42,7 @@ import org.spongepowered.common.item.inventory.lens.impl.collections.SlotCollect
 import org.spongepowered.common.item.inventory.lens.impl.comp.CraftingGridInventoryLensImpl;
 import org.spongepowered.common.item.inventory.lens.impl.fabric.IInventoryFabric;
 
-@Mixin(InventoryCrafting.class)
+@Mixin(CraftingInventory.class)
 public abstract class InventoryCraftingMixin implements IInventory, LensProviderBridge, InventoryAdapter, InventoryAdapterBridge {
 
     @Shadow @Final private NonNullList<ItemStack> stackList;

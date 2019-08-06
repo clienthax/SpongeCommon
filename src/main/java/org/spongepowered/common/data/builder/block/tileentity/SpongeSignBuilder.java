@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.builder.block.tileentity;
 
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntitySign;
+import net.minecraft.tileentity.SignTileEntity;
 import org.spongepowered.api.block.tileentity.Sign;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
@@ -52,9 +52,9 @@ public class SpongeSignBuilder extends AbstractTileBuilder<Sign> {
             List<String> rawLines = container.getStringList(Keys.SIGN_LINES.getQuery()).get();
             List<Text> textLines = SpongeTexts.fromJson(rawLines);
             for (int i = 0; i < 4; i++) {
-                ((TileEntitySign) sign1).signText[i] = SpongeTexts.toComponent(textLines.get(i));
+                ((SignTileEntity) sign1).signText[i] = SpongeTexts.toComponent(textLines.get(i));
             }
-            ((TileEntitySign) sign1).validate();
+            ((SignTileEntity) sign1).validate();
             return Optional.of(sign1);
         });
     }

@@ -26,7 +26,7 @@ package org.spongepowered.common.data.processor.data.entity;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import net.minecraft.entity.monster.EntityEndermite;
+import net.minecraft.entity.monster.EndermiteEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableExpirableData;
@@ -42,10 +42,10 @@ import org.spongepowered.common.mixin.core.entity.monster.EntityEndermiteAccesso
 import java.util.Optional;
 
 public class EndermiteExpirableDataProcessor extends
-        AbstractEntitySingleDataProcessor<EntityEndermite, Integer, MutableBoundedValue<Integer>, ExpirableData, ImmutableExpirableData> {
+        AbstractEntitySingleDataProcessor<EndermiteEntity, Integer, MutableBoundedValue<Integer>, ExpirableData, ImmutableExpirableData> {
 
     public EndermiteExpirableDataProcessor() {
-        super(EntityEndermite.class, Keys.EXPIRATION_TICKS);
+        super(EndermiteEntity.class, Keys.EXPIRATION_TICKS);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class EndermiteExpirableDataProcessor extends
     }
 
     @Override
-    protected boolean set(final EntityEndermite entity, final Integer value) {
+    protected boolean set(final EndermiteEntity entity, final Integer value) {
         if (entity.isNoDespawnRequired()) {
             return false;
         }
@@ -65,7 +65,7 @@ public class EndermiteExpirableDataProcessor extends
     }
 
     @Override
-    protected Optional<Integer> getVal(final EntityEndermite entity) {
+    protected Optional<Integer> getVal(final EndermiteEntity entity) {
         return entity.isNoDespawnRequired() ? Optional.empty() : Optional.of(((EntityEndermiteAccessor) entity).accessor$getLifetime());
     }
 

@@ -34,37 +34,37 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Lists;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.MultiPartEntityPart;
-import net.minecraft.entity.effect.EntityLightningBolt;
-import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.entity.item.EntityEnderPearl;
-import net.minecraft.entity.item.EntityFallingBlock;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityPainting;
+import net.minecraft.entity.effect.LightningBoltEntity;
+import net.minecraft.entity.item.ArmorStandEntity;
+import net.minecraft.entity.item.EnderPearlEntity;
+import net.minecraft.entity.item.FallingBlockEntity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.PaintingEntity;
 import net.minecraft.entity.item.EntityPainting.EnumArt;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.play.server.SPacketBlockChange;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.play.server.SChangeBlockPacket;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameType;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.IWorldEventListener;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.WorldSettings;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.storage.ISaveHandler;
+import net.minecraft.world.storage.SaveHandler;
 import net.minecraft.world.storage.WorldInfo;
 import org.apache.commons.lang3.reflect.ConstructorUtils;
 import org.spongepowered.api.Sponge;
@@ -153,13 +153,13 @@ public abstract class WorldMixin_API implements World {
 
     // @formatter:off
     @Shadow @Final public boolean isRemote;
-    @Shadow @Final public WorldProvider provider;
+    @Shadow @Final public Dimension provider;
     @Shadow @Final public Random rand;
     @Shadow @Final public Profiler profiler;
-    @Shadow @Final public List<EntityPlayer> playerEntities;
+    @Shadow @Final public List<PlayerEntity> playerEntities;
     @Shadow @Final public List<net.minecraft.entity.Entity> loadedEntityList;
     @Shadow @Final public List<net.minecraft.tileentity.TileEntity> loadedTileEntityList;
-    @Shadow @Final protected ISaveHandler saveHandler;
+    @Shadow @Final protected SaveHandler saveHandler;
     @Shadow protected List<IWorldEventListener> eventListeners;
     @Shadow private int seaLevel;
     @Shadow protected WorldInfo worldInfo;
@@ -175,13 +175,13 @@ public abstract class WorldMixin_API implements World {
     @Shadow public abstract <T extends net.minecraft.entity.Entity> List<T> getEntitiesWithinAABB(Class <? extends T > clazz, AxisAlignedBB aabb,
             com.google.common.base.Predicate<? super T > filter);
     @Shadow public abstract MinecraftServer getMinecraftServer();
-    @Shadow public abstract boolean setBlockState(BlockPos pos, IBlockState state);
-    @Shadow public abstract boolean setBlockState(BlockPos pos, IBlockState state, int flags);
-    @Shadow public abstract void playSound(EntityPlayer p_184148_1_, double p_184148_2_, double p_184148_4_, double p_184148_6_, SoundEvent p_184148_8_, net.minecraft.util.SoundCategory p_184148_9_, float p_184148_10_, float p_184148_11_);
+    @Shadow public abstract boolean setBlockState(BlockPos pos, BlockState state);
+    @Shadow public abstract boolean setBlockState(BlockPos pos, BlockState state, int flags);
+    @Shadow public abstract void playSound(PlayerEntity p_184148_1_, double p_184148_2_, double p_184148_4_, double p_184148_6_, SoundEvent p_184148_8_, net.minecraft.util.SoundCategory p_184148_9_, float p_184148_10_, float p_184148_11_);
     @Shadow public abstract BlockPos getPrecipitationHeight(BlockPos pos);
     @Shadow public abstract List<AxisAlignedBB> getCollisionBoxes(net.minecraft.entity.Entity entityIn, AxisAlignedBB bb);
     @Shadow public abstract int getHeight(int x, int z);
-    @Shadow public abstract IBlockState getBlockState(BlockPos pos);
+    @Shadow public abstract BlockState getBlockState(BlockPos pos);
     @Shadow @Nullable public abstract net.minecraft.tileentity.TileEntity getTileEntity(BlockPos pos);
 
     @Nullable private Context worldContext;
@@ -203,7 +203,7 @@ public abstract class WorldMixin_API implements World {
      * <p>TODO There may be some issues with plugins somehow picking up these "fake"
      * worlds with regards to their block changes, and therefor cause issues when
      * those plugins are finding those worlds, instead of traditional
-     * {@link WorldServer} instances.</p>
+     * {@link ServerWorld} instances.</p>
      *
      * @return The world id, verified from the properties
      */
@@ -227,7 +227,7 @@ public abstract class WorldMixin_API implements World {
         if (!SpongeChunkLayout.instance.isValidChunk(x, y, z)) {
             return Optional.empty();
         }
-        final WorldServer worldserver = (WorldServer) (Object) this;
+        final ServerWorld worldserver = (ServerWorld) (Object) this;
         return Optional.ofNullable((Chunk) worldserver.getChunkProvider().getLoadedChunk(x, z));
     }
 
@@ -236,7 +236,7 @@ public abstract class WorldMixin_API implements World {
         if (!SpongeChunkLayout.instance.isValidChunk(x, y, z)) {
             return Optional.empty();
         }
-        final WorldServer worldserver = (WorldServer) (Object) this;
+        final ServerWorld worldserver = (ServerWorld) (Object) this;
         // If we aren't generating, return the chunk
         if (!shouldGenerate) {
             return Optional.ofNullable((Chunk) worldserver.getChunkProvider().loadChunk(x, z));
@@ -246,7 +246,7 @@ public abstract class WorldMixin_API implements World {
 
     @Override
     public Optional<Chunk> regenerateChunk(int cx, int cy, int cz, ChunkRegenerateFlag flag) {
-        return Optional.empty(); // World does not do this, WorldServer can, but not WorldClient.
+        return Optional.empty(); // World does not do this, ServerWorld can, but not WorldClient.
     }
 
     @Override
@@ -322,7 +322,7 @@ public abstract class WorldMixin_API implements World {
         double y = position.getY();
         double z = position.getZ();
 
-        if (entityClass.isAssignableFrom(EntityPlayerMP.class) || entityClass.isAssignableFrom(MultiPartEntityPart.class)) {
+        if (entityClass.isAssignableFrom(ServerPlayerEntity.class) || entityClass.isAssignableFrom(MultiPartEntityPart.class)) {
             // Unable to construct these
             throw new IllegalArgumentException("Cannot construct " + type.getId() + " please look to using entity types correctly!");
         }
@@ -331,21 +331,21 @@ public abstract class WorldMixin_API implements World {
 
         // TODO - archetypes should solve the problem of calling the correct constructor
         // Not all entities have a single World parameter as their constructor
-        if (entityClass.isAssignableFrom(EntityLightningBolt.class)) {
-            entity = (Entity) new EntityLightningBolt(world, x, y, z, false);
-        } else if (entityClass.isAssignableFrom(EntityEnderPearl.class)) {
-            EntityArmorStand tempEntity = new EntityArmorStand(world, x, y, z);
+        if (entityClass.isAssignableFrom(LightningBoltEntity.class)) {
+            entity = (Entity) new LightningBoltEntity(world, x, y, z, false);
+        } else if (entityClass.isAssignableFrom(EnderPearlEntity.class)) {
+            ArmorStandEntity tempEntity = new ArmorStandEntity(world, x, y, z);
             tempEntity.posY -= tempEntity.getEyeHeight();
-            entity = (Entity) new EntityEnderPearl(world, tempEntity);
+            entity = (Entity) new EnderPearlEntity(world, tempEntity);
             ((EnderPearl) entity).setShooter(ProjectileSource.UNKNOWN);
         }
 
         // Some entities need to have non-null fields (and the easiest way to
         // set them is to use the more specialised constructor).
-        if (entityClass.isAssignableFrom(EntityFallingBlock.class)) {
-            entity = (Entity) new EntityFallingBlock(world, x, y, z, Blocks.SAND.getDefaultState());
-        } else if (entityClass.isAssignableFrom(EntityItem.class)) {
-            entity = (Entity) new EntityItem(world, x, y, z, new ItemStack(Blocks.STONE));
+        if (entityClass.isAssignableFrom(FallingBlockEntity.class)) {
+            entity = (Entity) new FallingBlockEntity(world, x, y, z, Blocks.SAND.getDefaultState());
+        } else if (entityClass.isAssignableFrom(ItemEntity.class)) {
+            entity = (Entity) new ItemEntity(world, x, y, z, new ItemStack(Blocks.STONE));
         }
 
         if (entity == null) {
@@ -363,22 +363,22 @@ public abstract class WorldMixin_API implements World {
             if (((EntityHanging) entity).facingDirection == null) {
                 // TODO Some sort of detection of a valid direction?
                 // i.e scan immediate blocks for something to attach onto.
-                ((EntityHanging) entity).facingDirection = EnumFacing.NORTH;
+                ((EntityHanging) entity).facingDirection = Direction.NORTH;
             }
             if (!((EntityHanging) entity).onValidSurface()) {
                 return Optional.empty();
             }
         }*/
 
-        if (naturally && entity instanceof EntityLiving) {
+        if (naturally && entity instanceof MobEntity) {
             // Adding the default equipment
-            ((EntityLiving)entity).onInitialSpawn(world.getDifficultyForLocation(new BlockPos(x, y, z)), null);
+            ((MobEntity)entity).onInitialSpawn(world.getDifficultyForLocation(new BlockPos(x, y, z)), null);
         }
 
-        if (entity instanceof EntityPainting) {
+        if (entity instanceof PaintingEntity) {
             // This is default when art is null when reading from NBT, could
             // choose a random art instead?
-            ((EntityPainting) entity).art = EnumArt.KEBAB;
+            ((PaintingEntity) entity).art = EnumArt.KEBAB;
         }
 
         return entity;
@@ -438,7 +438,7 @@ public abstract class WorldMixin_API implements World {
         if (((WorldBridge) this).bridge$isFake()) { // If we're client side, we can't know solidly what loaded chunks are... need to do this in MixinWorldClient in forge.
             return Collections.emptyList();
         }
-        return (List<Chunk>) (List<?>) Lists.newArrayList(((WorldServer) (Object) this).getChunkProvider().getLoadedChunks());
+        return (List<Chunk>) (List<?>) Lists.newArrayList(((ServerWorld) (Object) this).getChunkProvider().getLoadedChunks());
     }
 
     @Override
@@ -616,7 +616,7 @@ public abstract class WorldMixin_API implements World {
             for (DataManipulator<?, ?> manipulator : ((CustomDataHolderBridge) tileEntity).bridge$getCustomManipulators()) {
                 builder.add(manipulator);
             }
-            final NBTTagCompound compound = new NBTTagCompound();
+            final CompoundNBT compound = new CompoundNBT();
             ((net.minecraft.tileentity.TileEntity) tileEntity).writeToNBT(compound);
             builder.unsafeNbt(compound);
         }
@@ -655,7 +655,7 @@ public abstract class WorldMixin_API implements World {
     @Override
     public Optional<AABB> getBlockSelectionBox(int x, int y, int z) {
         final BlockPos pos = new BlockPos(x, y, z);
-        final IBlockState state = getBlockState(pos);
+        final BlockState state = getBlockState(pos);
         final AxisAlignedBB box = state.getBoundingBox((IBlockAccess) this, pos);
         try {
             return Optional.of(VecHelper.toSpongeAABB(box).offset(x, y, z));
@@ -893,24 +893,24 @@ public abstract class WorldMixin_API implements World {
     @Override
     public void sendBlockChange(int x, int y, int z, BlockState state) {
         checkNotNull(state, "state");
-        SPacketBlockChange packet = new SPacketBlockChange();
+        SChangeBlockPacket packet = new SChangeBlockPacket();
         packet.blockPosition = new BlockPos(x, y, z);
-        packet.blockState = (IBlockState) state;
+        packet.blockState = (BlockState) state;
 
-        for (EntityPlayer player : this.playerEntities) {
-            if (player instanceof EntityPlayerMP) {
-                ((EntityPlayerMP) player).connection.sendPacket(packet);
+        for (PlayerEntity player : this.playerEntities) {
+            if (player instanceof ServerPlayerEntity) {
+                ((ServerPlayerEntity) player).connection.sendPacket(packet);
             }
         }
     }
 
     @Override
     public void resetBlockChange(int x, int y, int z) {
-        SPacketBlockChange packet = new SPacketBlockChange((net.minecraft.world.World) (Object) this, new BlockPos(x, y, z));
+        SChangeBlockPacket packet = new SChangeBlockPacket((net.minecraft.world.World) (Object) this, new BlockPos(x, y, z));
 
-        for (EntityPlayer player : this.playerEntities) {
-            if (player instanceof EntityPlayerMP) {
-                ((EntityPlayerMP) player).connection.sendPacket(packet);
+        for (PlayerEntity player : this.playerEntities) {
+            if (player instanceof ServerPlayerEntity) {
+                ((ServerPlayerEntity) player).connection.sendPacket(packet);
             }
         }
     }
@@ -948,7 +948,7 @@ public abstract class WorldMixin_API implements World {
         final PropertyStore<? extends Property<?, ?>> store = optional.get();
         final Location<World> loc = new Location<>(this, x, y, z);
         ImmutableList.Builder<Direction> faces = ImmutableList.builder();
-        for (EnumFacing facing : EnumFacing.values()) {
+        for (Direction facing : Direction.values()) {
             Direction direction = DirectionFacingProvider.getInstance().getKey(facing).get();
             if (store.getFor(loc, direction).isPresent()) {
                 faces.add(direction);

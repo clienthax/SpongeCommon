@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.nbt.value;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.value.BaseValue;
@@ -40,19 +40,19 @@ public interface NbtValueProcessor<E, V extends BaseValue<E>> {
 
     boolean isCompatible(NbtDataType nbtDataType);
 
-    Optional<V> readFrom(NBTTagCompound compound);
+    Optional<V> readFrom(CompoundNBT compound);
 
     Optional<V> readFrom(DataView view);
 
-    Optional<E> readValue(NBTTagCompound compound);
+    Optional<E> readValue(CompoundNBT compound);
 
     Optional<E> readValue(DataView view);
 
-    DataTransactionResult offer(NBTTagCompound NBTTagCompound, E value);
+    DataTransactionResult offer(CompoundNBT CompoundNBT, E value);
 
     DataTransactionResult offer(DataView view, E value);
 
-    DataTransactionResult remove(NBTTagCompound compound);
+    DataTransactionResult remove(CompoundNBT compound);
 
     DataTransactionResult remove(DataView view);
 

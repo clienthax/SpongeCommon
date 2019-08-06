@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.item.inventory.lens.impl.fabric;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.entity.living.Living;
 import org.spongepowered.api.text.translation.Translation;
@@ -37,13 +37,13 @@ import java.util.Collections;
 
 @SuppressWarnings("unchecked")
 public class EquipmentSlotsFabric implements Fabric {
-    private static final EntityEquipmentSlot[] SLOTS;
+    private static final EquipmentSlotType[] SLOTS;
     private static final int MAX_STACK_SIZE = 64;
 
     static {
-        EntityEquipmentSlot[] values = EntityEquipmentSlot.values();
-        SLOTS = new EntityEquipmentSlot[values.length];
-        for (EntityEquipmentSlot slot : values) {
+        EquipmentSlotType[] values = EquipmentSlotType.values();
+        SLOTS = new EquipmentSlotType[values.length];
+        for (EquipmentSlotType slot : values) {
             SLOTS[slot.getSlotIndex()] = slot;
         }
     }
@@ -66,12 +66,12 @@ public class EquipmentSlotsFabric implements Fabric {
 
     @Override
     public ItemStack getStack(int index) {
-        return ((EntityLivingBase) this.living).getItemStackFromSlot(SLOTS[index]);
+        return ((LivingEntity) this.living).getItemStackFromSlot(SLOTS[index]);
     }
 
     @Override
     public void setStack(int index, ItemStack stack) {
-        ((EntityLivingBase) this.living).setItemStackToSlot(SLOTS[index], stack);
+        ((LivingEntity) this.living).setItemStackToSlot(SLOTS[index], stack);
     }
 
     @Override
@@ -91,8 +91,8 @@ public class EquipmentSlotsFabric implements Fabric {
 
     @Override
     public void clear() {
-        EntityLivingBase entity = (EntityLivingBase) this.living;
-        for (EntityEquipmentSlot slot : SLOTS) {
+        LivingEntity entity = (LivingEntity) this.living;
+        for (EquipmentSlotType slot : SLOTS) {
             entity.setItemStackToSlot(slot, ItemStack.EMPTY);
         }
     }

@@ -26,8 +26,8 @@ package org.spongepowered.common.mixin.tracking.bridge;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.IEntityOwnable;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
@@ -152,7 +152,7 @@ public class OwnershipTrackedBridgeMixin implements OwnershipTrackedBridge {
             this.tracked$notifier = uuid;
         }
         if (((DataCompoundHolder) this).data$hasRootCompound()) {
-            final NBTTagCompound spongeData = ((DataCompoundHolder) this).data$getSpongeCompound();
+            final CompoundNBT spongeData = ((DataCompoundHolder) this).data$getSpongeCompound();
             if (uuid == null) {
                 if (spongeData.hasKey(type.compoundKey)) {
                     spongeData.removeTag(type.compoundKey);
@@ -160,11 +160,11 @@ public class OwnershipTrackedBridgeMixin implements OwnershipTrackedBridge {
                 return;
             }
             if (!spongeData.hasKey(type.compoundKey)) {
-                final NBTTagCompound sourceNbt = new NBTTagCompound();
+                final CompoundNBT sourceNbt = new CompoundNBT();
                 sourceNbt.setUniqueId(Constants.UUID, uuid);
                 spongeData.setTag(type.compoundKey, sourceNbt);
             } else {
-                final NBTTagCompound compoundTag = spongeData.getCompoundTag(type.compoundKey);
+                final CompoundNBT compoundTag = spongeData.getCompoundTag(type.compoundKey);
                 compoundTag.setUniqueId(Constants.UUID, uuid);
             }
         }
@@ -178,18 +178,18 @@ public class OwnershipTrackedBridgeMixin implements OwnershipTrackedBridge {
         if (this instanceof IEntityOwnable) {
             final IEntityOwnable ownable = (IEntityOwnable) this;
             final Entity owner = ownable.getOwner();
-            if (owner instanceof EntityPlayer) {
+            if (owner instanceof PlayerEntity) {
                 this.tracked$setTrackedUUID(PlayerTracker.Type.OWNER, owner.getUniqueID());
                 return owner.getUniqueID();
             }
         } else if (this.tracked$notifier != null && PlayerTracker.Type.NOTIFIER == nbtKey) {
             return this.tracked$notifier;
         }
-        final NBTTagCompound nbt = ((DataCompoundHolder) this).data$getSpongeCompound();
+        final CompoundNBT nbt = ((DataCompoundHolder) this).data$getSpongeCompound();
         if (!nbt.hasKey(nbtKey.compoundKey)) {
             return null;
         }
-        final NBTTagCompound creatorNbt = nbt.getCompoundTag(nbtKey.compoundKey);
+        final CompoundNBT creatorNbt = nbt.getCompoundTag(nbtKey.compoundKey);
 
 
         if (!creatorNbt.hasKey(Constants.UUID_MOST) && !creatorNbt.hasKey(Constants.UUID_LEAST)) {

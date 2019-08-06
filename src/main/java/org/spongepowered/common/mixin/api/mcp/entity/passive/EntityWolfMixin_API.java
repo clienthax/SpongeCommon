@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.passive;
 
-import net.minecraft.entity.passive.EntityWolf;
+import net.minecraft.entity.passive.WolfEntity;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.SittingData;
 import org.spongepowered.api.entity.living.animal.Wolf;
@@ -35,7 +35,7 @@ import org.spongepowered.common.mixin.api.mcp.entity.EntityAgeableMixin_API;
 
 import java.util.Collection;
 
-@Mixin(EntityWolf.class)
+@Mixin(WolfEntity.class)
 public abstract class EntityWolfMixin_API extends EntityAgeableMixin_API implements Wolf {
 
     @Shadow public abstract boolean shadow$isAngry();

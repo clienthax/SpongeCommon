@@ -25,12 +25,12 @@
 package org.spongepowered.common.mixin.api.mcp.world.gen.feature;
 
 import com.flowpowered.math.vector.Vector3i;
-import net.minecraft.block.BlockFlower;
+import net.minecraft.block.FlowerBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.feature.WorldGenFlowers;
-import net.minecraft.world.gen.feature.WorldGenerator;
+import net.minecraft.world.gen.feature.FlowersFeature;
+import net.minecraft.world.gen.feature.Feature;
 import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.data.type.PlantTypes;
 import org.spongepowered.api.util.weighted.VariableAmount;
@@ -51,15 +51,15 @@ import java.util.function.Function;
 
 import javax.annotation.Nullable;
 
-@Mixin(WorldGenFlowers.class)
-public abstract class WorldGenFlowersMixin_API extends WorldGenerator implements Flower {
+@Mixin(FlowersFeature.class)
+public abstract class WorldGenFlowersMixin_API extends Feature implements Flower {
 
     private final WeightedTable<PlantType> api$flowers = new WeightedTable<PlantType>();
     @Nullable private Function<Location<Extent>, PlantType> api$override = null;
     private VariableAmount api$count = VariableAmount.fixed(2);
 
     @Shadow
-    public abstract void setGeneratedBlock(BlockFlower p_175914_1_, BlockFlower.EnumFlowerType p_175914_2_);
+    public abstract void setGeneratedBlock(FlowerBlock p_175914_1_, FlowerBlock.EnumFlowerType p_175914_2_);
 
     @Override
     public PopulatorType getType() {
@@ -99,8 +99,8 @@ public abstract class WorldGenFlowersMixin_API extends WorldGenerator implements
                 }
                 type = result.get(0);
             }
-            final BlockFlower.EnumFlowerType enumflowertype = (BlockFlower.EnumFlowerType) (Object) type;
-            final BlockFlower blockflower = enumflowertype.getBlockType().getBlock();
+            final FlowerBlock.EnumFlowerType enumflowertype = (FlowerBlock.EnumFlowerType) (Object) type;
+            final FlowerBlock blockflower = enumflowertype.getBlockType().getBlock();
 
             if (enumflowertype != null && blockflower.getDefaultState().getMaterial() != Material.AIR) {
                 setGeneratedBlock(blockflower, enumflowertype);

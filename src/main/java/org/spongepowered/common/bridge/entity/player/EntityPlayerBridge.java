@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.bridge.entity.player;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.common.bridge.entity.EntityBridge;
 
@@ -39,7 +39,7 @@ public interface EntityPlayerBridge {
     boolean bridge$isSpawnForced(int dim);
 
     /**
-     * {@link EntityPlayer#addExperienceLevel(int)} doesn't update the total
+     * {@link PlayerEntity#addExperienceLevel(int)} doesn't update the total
      * experience. This recalculates it for plugins to properly make use of it.
      */
     void bridge$recalculateTotalExperience();

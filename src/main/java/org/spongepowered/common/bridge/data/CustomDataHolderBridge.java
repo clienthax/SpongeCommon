@@ -25,8 +25,8 @@
 package org.spongepowered.common.bridge.data;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
@@ -64,13 +64,13 @@ public interface CustomDataHolderBridge {
 
     default void bridge$removeCustomFromNbt(DataManipulator<?, ?> manipulator) {
         if (this instanceof DataCompoundHolder) {
-            final NBTTagCompound spongeData = ((DataCompoundHolder) this).data$getSpongeCompound();
+            final CompoundNBT spongeData = ((DataCompoundHolder) this).data$getSpongeCompound();
             if (spongeData.hasKey(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_LIST)) {
-                final NBTTagList tagList = spongeData.getTagList(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_COMPOUND);
+                final ListNBT tagList = spongeData.getTagList(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_COMPOUND);
                 if (!tagList.isEmpty()) {
                     String id = DataUtil.getRegistrationFor(manipulator).getId();
                     for (int i = 0; i < tagList.tagCount(); i++) {
-                        final NBTTagCompound tag = tagList.getCompoundTagAt(i);
+                        final CompoundNBT tag = tagList.getCompoundTagAt(i);
                         if (id.equals(tag.getString(Constants.Sponge.MANIPULATOR_ID))) {
                             tagList.removeTag(i);
                             break;

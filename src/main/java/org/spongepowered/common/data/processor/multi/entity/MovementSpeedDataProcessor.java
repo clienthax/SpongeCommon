@@ -27,7 +27,7 @@ package org.spongepowered.common.data.processor.multi.entity;
 import static org.spongepowered.common.data.util.DataUtil.getData;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -43,19 +43,19 @@ import org.spongepowered.common.mixin.core.entity.player.PlayerCapabilitiesAcces
 import java.util.Map;
 import java.util.Optional;
 
-public class MovementSpeedDataProcessor extends AbstractEntityDataProcessor<EntityPlayer, MovementSpeedData, ImmutableMovementSpeedData> {
+public class MovementSpeedDataProcessor extends AbstractEntityDataProcessor<PlayerEntity, MovementSpeedData, ImmutableMovementSpeedData> {
 
     public MovementSpeedDataProcessor() {
-        super(EntityPlayer.class);
+        super(PlayerEntity.class);
     }
 
     @Override
-    protected boolean doesDataExist(final EntityPlayer entity) {
+    protected boolean doesDataExist(final PlayerEntity entity) {
         return true;
     }
 
     @Override
-    protected boolean set(final EntityPlayer entity, final Map<Key<?>, Object> keyValues) {
+    protected boolean set(final PlayerEntity entity, final Map<Key<?>, Object> keyValues) {
         WalkingSpeedValueProcessor.setWalkSpeed(entity, (Double) keyValues.get(Keys.WALKING_SPEED));
         ((PlayerCapabilitiesAccessor) entity.capabilities).accessor$setFlySpeed(((Double) keyValues.get(Keys.FLYING_SPEED)).floatValue());
         entity.sendPlayerAbilities();
@@ -63,7 +63,7 @@ public class MovementSpeedDataProcessor extends AbstractEntityDataProcessor<Enti
     }
 
     @Override
-    protected Map<Key<?>, ?> getValues(final EntityPlayer entity) {
+    protected Map<Key<?>, ?> getValues(final PlayerEntity entity) {
         final double walkSpeed = entity.capabilities.getWalkSpeed();
         final double flySpeed = entity.capabilities.getFlySpeed();
         return ImmutableMap.<Key<?>, Object>of(Keys.WALKING_SPEED, walkSpeed,

@@ -27,7 +27,7 @@ package org.spongepowered.common.data.processor.multi.entity;
 import static org.spongepowered.common.data.util.DataUtil.getData;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -43,10 +43,10 @@ import org.spongepowered.common.util.Constants;
 import java.util.Map;
 import java.util.Optional;
 
-public class FoodDataProcessor extends AbstractEntityDataProcessor<EntityPlayer, FoodData, ImmutableFoodData> {
+public class FoodDataProcessor extends AbstractEntityDataProcessor<PlayerEntity, FoodData, ImmutableFoodData> {
 
     public FoodDataProcessor() {
-        super(EntityPlayer.class);
+        super(PlayerEntity.class);
     }
 
     @Override
@@ -55,12 +55,12 @@ public class FoodDataProcessor extends AbstractEntityDataProcessor<EntityPlayer,
     }
 
     @Override
-    protected boolean doesDataExist(final EntityPlayer entity) {
+    protected boolean doesDataExist(final PlayerEntity entity) {
         return true;
     }
 
     @Override
-    protected boolean set(final EntityPlayer entity, final Map<Key<?>, Object> keyValues) {
+    protected boolean set(final PlayerEntity entity, final Map<Key<?>, Object> keyValues) {
         entity.getFoodStats().setFoodLevel((Integer) keyValues.get(Keys.FOOD_LEVEL));
         ((FoodStatsAccessor) entity.getFoodStats()).accessor$setFoodSaturationLevel(((Double) keyValues.get(Keys.SATURATION)).floatValue());
         ((FoodStatsAccessor) entity.getFoodStats()).accessor$setFoodExhaustionLevel(((Double) keyValues.get(Keys.EXHAUSTION)).floatValue());
@@ -68,7 +68,7 @@ public class FoodDataProcessor extends AbstractEntityDataProcessor<EntityPlayer,
     }
 
     @Override
-    protected Map<Key<?>, ?> getValues(final EntityPlayer entity) {
+    protected Map<Key<?>, ?> getValues(final PlayerEntity entity) {
         final int food = entity.getFoodStats().getFoodLevel();
         final double saturation = entity.getFoodStats().getSaturationLevel();
         final double exhaustion = ((FoodStatsAccessor) entity.getFoodStats()).accessor$getFoodExhaustionLevel();

@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.persistence;
 
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.DataFormat;
@@ -54,7 +54,7 @@ public class NbtDataFormat extends SpongeCatalogType implements DataFormat {
             dis = new DataInputStream(input);
         }
         try {
-            NBTTagCompound tag = CompressedStreamTools.read(dis);
+            CompoundNBT tag = CompressedStreamTools.read(dis);
             return NbtTranslator.getInstance().translateFrom(tag);
         } finally {
             dis.close();
@@ -64,7 +64,7 @@ public class NbtDataFormat extends SpongeCatalogType implements DataFormat {
     @Override
     @SuppressWarnings("resource")
     public void writeTo(OutputStream output, DataView data) throws IOException {
-        NBTTagCompound tag = NbtTranslator.getInstance().translateData(data);
+        CompoundNBT tag = NbtTranslator.getInstance().translateData(data);
         DataOutputStream dos;
         if (output instanceof DataOutputStream) {
             dos = (DataOutputStream) output;

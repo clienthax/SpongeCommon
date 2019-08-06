@@ -26,31 +26,31 @@ package org.spongepowered.common.mixin.core.server.management;
 
 import com.flowpowered.math.vector.Vector3d;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockChest;
-import net.minecraft.block.BlockCommandBlock;
-import net.minecraft.block.BlockDoor;
-import net.minecraft.block.BlockStructure;
+import net.minecraft.block.ChestBlock;
+import net.minecraft.block.CommandBlockBlock;
+import net.minecraft.block.DoorBlock;
+import net.minecraft.block.StructureBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.inventory.Container;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemDoor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SPacketBlockChange;
-import net.minecraft.network.play.server.SPacketCloseWindow;
-import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraft.network.play.server.SChangeBlockPacket;
+import net.minecraft.network.play.server.SCloseWindowPacket;
+import net.minecraft.network.play.server.SSetSlotPacket;
 import net.minecraft.server.management.PlayerInteractionManager;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.tileentity.ChestTileEntity;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.GameType;
@@ -87,7 +87,7 @@ import javax.annotation.Nullable;
 @Mixin(value = PlayerInteractionManager.class)
 public abstract class PlayerInteractionManagerMixin implements PlayerInteractionManagerBridge {
 
-    @Shadow public EntityPlayerMP player;
+    @Shadow public ServerPlayerEntity player;
     @Shadow public net.minecraft.world.World world;
     @Shadow private GameType gameType;
     @Shadow private int initialDamage;
@@ -143,7 +143,7 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
      * @reason Fire interact block event.
      */
     @Overwrite
-    public void onBlockClicked(final BlockPos pos, final EnumFacing side) {
+    public void onBlockClicked(final BlockPos pos, final Direction side) {
         // Sponge start - Fire interact block event
         // This was an @inject in SpongeVanilla and Forge is also firing its event.
         // To achieve compatibility and standardize this method, we use an @Overwrite
@@ -153,14 +153,14 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
         final ItemStack stack = this.player.getHeldItemMainhand();
 
         final InteractBlockEvent.Primary blockEvent =
-                SpongeCommonEventFactory.callInteractBlockEventPrimary(this.player, stack, blockSnapshot, EnumHand.MAIN_HAND, side, vec);
+                SpongeCommonEventFactory.callInteractBlockEventPrimary(this.player, stack, blockSnapshot, Hand.MAIN_HAND, side, vec);
 
         final boolean isCancelled = blockEvent.isCancelled();
         this.impl$interactBlockLeftClickEventCancelled = isCancelled;
 
         if (isCancelled) {
 
-            final IBlockState state = this.player.world.getBlockState(pos);
+            final BlockState state = this.player.world.getBlockState(pos);
             ((EntityPlayerMPBridge) this.player).bridge$sendBlockChange(pos, state);
             this.player.world.notifyBlockUpdate(pos, this.player.world.getBlockState(pos), state, 3);
             return;
@@ -168,11 +168,11 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
         // Sponge End
 
         if (this.isCreative()) {
-            if (!this.world.extinguishFire((EntityPlayer)null, pos, side)) {
+            if (!this.world.extinguishFire((PlayerEntity)null, pos, side)) {
                 this.tryHarvestBlock(pos);
             }
         } else {
-            final IBlockState iblockstate = this.world.getBlockState(pos);
+            final BlockState iblockstate = this.world.getBlockState(pos);
             final Block block = iblockstate.getBlock();
 
             if (this.gameType.hasLimitedInteractions()) {
@@ -193,7 +193,7 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
                 }
             }
 
-            this.world.extinguishFire((EntityPlayer)null, pos, side);
+            this.world.extinguishFire((PlayerEntity)null, pos, side);
             this.initialDamage = this.curblockDamage;
             float f = 1.0F;
 
@@ -224,9 +224,9 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
      * @reason Fire interact block event.
      */
     @Overwrite
-    public EnumActionResult processRightClickBlock(
-        final EntityPlayer player, final net.minecraft.world.World worldIn, final ItemStack stack, final EnumHand hand, final BlockPos
-            pos, final EnumFacing facing, final float hitX, final float hitY, final float hitZ) {
+    public ActionResultType processRightClickBlock(
+        final PlayerEntity player, final net.minecraft.world.World worldIn, final ItemStack stack, final Hand hand, final BlockPos
+            pos, final Direction facing, final float hitX, final float hitY, final float hitZ) {
         if (this.gameType == GameType.SPECTATOR) {
             final TileEntity tileentity = worldIn.getTileEntity(pos);
 
@@ -234,22 +234,22 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
                 final Block block = worldIn.getBlockState(pos).getBlock();
                 ILockableContainer ilockablecontainer = (ILockableContainer) tileentity;
 
-                if (ilockablecontainer instanceof TileEntityChest && block instanceof BlockChest) {
-                    ilockablecontainer = ((BlockChest) block).getLockableContainer(worldIn, pos);
+                if (ilockablecontainer instanceof ChestTileEntity && block instanceof ChestBlock) {
+                    ilockablecontainer = ((ChestBlock) block).getLockableContainer(worldIn, pos);
                 }
 
                 if (ilockablecontainer != null) {
                     // TODO - fire event
                     player.displayGUIChest(ilockablecontainer);
-                    return EnumActionResult.SUCCESS;
+                    return ActionResultType.SUCCESS;
                 }
             } else if (tileentity instanceof IInventory) {
                 // TODO - fire event
                 player.displayGUIChest((IInventory) tileentity);
-                return EnumActionResult.SUCCESS;
+                return ActionResultType.SUCCESS;
             }
 
-            return EnumActionResult.PASS;
+            return ActionResultType.PASS;
 
         } // else { // Sponge - Remove unecessary else
         // Sponge Start - Create an interact block event before something happens.
@@ -273,42 +273,42 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
         this.bridge$setLastInteractItemOnBlockCancelled(event.isCancelled() || event.getUseItemResult() == Tristate.FALSE);
 
         if (event.isCancelled()) {
-            final IBlockState state = (IBlockState) currentSnapshot.getState();
+            final BlockState state = (BlockState) currentSnapshot.getState();
 
             if (state.getBlock() == Blocks.COMMAND_BLOCK) {
                 // CommandBlock GUI opens solely on the client, we need to force it close on cancellation
-                this.player.connection.sendPacket(new SPacketCloseWindow(0));
+                this.player.connection.sendPacket(new SCloseWindowPacket(0));
 
-            } else if (state.getProperties().containsKey(BlockDoor.HALF)) {
+            } else if (state.getProperties().containsKey(DoorBlock.HALF)) {
                 // Stopping a door from opening while interacting the top part will allow the door to open, we need to update the
                 // client to resolve this
-                if (state.getValue(BlockDoor.HALF) == BlockDoor.EnumDoorHalf.LOWER) {
-                    this.player.connection.sendPacket(new SPacketBlockChange(worldIn, pos.up()));
+                if (state.getValue(DoorBlock.HALF) == DoorBlock.EnumDoorHalf.LOWER) {
+                    this.player.connection.sendPacket(new SChangeBlockPacket(worldIn, pos.up()));
                 } else {
-                    this.player.connection.sendPacket(new SPacketBlockChange(worldIn, pos.down()));
+                    this.player.connection.sendPacket(new SChangeBlockPacket(worldIn, pos.down()));
                 }
 
             } else if (!oldStack.isEmpty()) {
                 // Stopping the placement of a door or double plant causes artifacts (ghosts) on the top-side of the block. We need to remove it
                 final Item item = oldStack.getItem();
-                if (item instanceof ItemDoor || (item instanceof ItemBlock && ((ItemBlock) item).getBlock().equals(Blocks.DOUBLE_PLANT))) {
-                    this.player.connection.sendPacket(new SPacketBlockChange(worldIn, pos.up(2)));
+                if (item instanceof ItemDoor || (item instanceof BlockItem && ((BlockItem) item).getBlock().equals(Blocks.DOUBLE_PLANT))) {
+                    this.player.connection.sendPacket(new SChangeBlockPacket(worldIn, pos.up(2)));
                 }
             }
             SpongeImplHooks.shouldCloseScreen(worldIn, pos, forgeEventObject, this.player);
 
             ((PlayerInteractionManagerBridge) this.player.interactionManager).bridge$setInteractBlockRightClickCancelled(true);
 
-            ((EntityPlayerMP) player).sendContainerToPlayer(player.inventoryContainer);
+            ((ServerPlayerEntity) player).sendContainerToPlayer(player.inventoryContainer);
             return SpongeImplHooks.getInteractionCancellationResult(forgeEventObject);
         }
         // Sponge End
 
-        EnumActionResult result = EnumActionResult.PASS;
+        ActionResultType result = ActionResultType.PASS;
 
         if (event.getUseItemResult() != Tristate.FALSE) {
             result = SpongeImplHooks.onForgeItemUseFirst(player, stack, worldIn, pos, hand, facing, hitX, hitY, hitZ);
-            if (result != EnumActionResult.PASS) {
+            if (result != ActionResultType.PASS) {
                 return result ;
             }
         }
@@ -321,13 +321,13 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
             // Sponge start - check event useBlockResult, and revert the client if it's FALSE.
             // also, store the result instead of returning immediately
             if (event.getUseBlockResult() != Tristate.FALSE) {
-                final IBlockState iblockstate = (IBlockState) currentSnapshot.getState();
+                final BlockState iblockstate = (BlockState) currentSnapshot.getState();
                 final Container lastOpenContainer = player.openContainer;
 
                 // Don't close client gui based on the result of Block#onBlockActivated
                 // See https://github.com/SpongePowered/SpongeForge/commit/a684cccd0355d1387a30a7fee08d23fa308273c9
                 if (iblockstate.getBlock().onBlockActivated(worldIn, pos, iblockstate, player, hand, facing, hitX, hitY, hitZ)) {
-                    result = EnumActionResult.SUCCESS;
+                    result = ActionResultType.SUCCESS;
                 }
 
                 // if itemstack changed, avoid restore
@@ -343,7 +343,7 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
                         frame.addContext(EventContextKeys.BLOCK_HIT, currentSnapshot);
                         ((ContainerBridge) player.openContainer).bridge$setOpenLocation(currentSnapshot.getLocation().orElse(null));
                         if (!SpongeCommonEventFactory.callInteractInventoryOpenEvent(this.player)) {
-                            result = EnumActionResult.FAIL;
+                            result = ActionResultType.FAIL;
                             this.impl$interactBlockRightClickEventCancelled = true;
                         }
                     }
@@ -351,10 +351,10 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
             } else {
                 // Need to send a block change to the client, because otherwise, they are not
                 // going to be told about the block change.
-                this.player.connection.sendPacket(new SPacketBlockChange(this.world, pos));
+                this.player.connection.sendPacket(new SChangeBlockPacket(this.world, pos));
                 // Since the event was explicitly set to fail, we need to respect it and treat it as if
                 // it wasn't cancelled, but perform no further processing.
-                @Nullable final EnumActionResult modifiedResult = SpongeImplHooks.getEnumResultForProcessRightClickBlock(this.player, event, result, worldIn, pos, hand);
+                @Nullable final ActionResultType modifiedResult = SpongeImplHooks.getEnumResultForProcessRightClickBlock(this.player, event, result, worldIn, pos, hand);
                 if (modifiedResult != null) {
                     return modifiedResult;
                 }
@@ -363,20 +363,20 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
         }
 
         if (stack.isEmpty()) {
-            return EnumActionResult.PASS;
+            return ActionResultType.PASS;
         } else if (player.getCooldownTracker().hasCooldown(stack.getItem())) {
-            return EnumActionResult.PASS;
-        } else if (stack.getItem() instanceof ItemBlock && !player.canUseCommandBlock()) {
-            final Block block = ((ItemBlock)stack.getItem()).getBlock();
+            return ActionResultType.PASS;
+        } else if (stack.getItem() instanceof BlockItem && !player.canUseCommandBlock()) {
+            final Block block = ((BlockItem)stack.getItem()).getBlock();
 
-            if (block instanceof BlockCommandBlock || block instanceof BlockStructure) {
-                return EnumActionResult.FAIL;
+            if (block instanceof CommandBlockBlock || block instanceof StructureBlock) {
+                return ActionResultType.FAIL;
             }
         }
         // else if (this.isCreative()) { // Sponge - Rewrite this to handle an isCreative check after the result, since we have a copied stack at the top of this method.
         //    int j = stack.getMetadata();
         //    int i = stack.stackSize;
-        //    EnumActionResult enumactionresult = stack.onItemUse(player, worldIn, pos, hand, facing, offsetX, offsetY, offsetZ);
+        //    ActionResultType enumactionresult = stack.onItemUse(player, worldIn, pos, hand, facing, offsetX, offsetY, offsetZ);
         //    stack.setItemDamage(j);
         //    stack.stackSize = i;
         //    return enumactionresult;
@@ -386,7 +386,7 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
         // } // Sponge - Remove unecessary else bracket
         // Sponge Start - complete the method with the micro change of resetting item damage and quantity from the copied stack.
 
-        if ((result != EnumActionResult.SUCCESS && event.getUseItemResult() != Tristate.FALSE || result == EnumActionResult.SUCCESS && event.getUseItemResult() == Tristate.TRUE)) {
+        if ((result != ActionResultType.SUCCESS && event.getUseItemResult() != Tristate.FALSE || result == ActionResultType.SUCCESS && event.getUseItemResult() == Tristate.TRUE)) {
             final int meta = stack.getMetadata();
             final int size = stack.getCount();
             result = stack.onItemUse(player, worldIn, pos, hand, facing, hitX, hitY, hitZ);
@@ -396,7 +396,7 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
             }
         }
 
-        if (!ItemStack.areItemStacksEqual(player.getHeldItem(hand), oldStack) || result != EnumActionResult.SUCCESS) {
+        if (!ItemStack.areItemStacksEqual(player.getHeldItem(hand), oldStack) || result != ActionResultType.SUCCESS) {
             player.openContainer.detectAndSendChanges();
         }
 
@@ -418,13 +418,13 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
      * @reason Fire interact item event.
      */
     @Overwrite
-    public EnumActionResult processRightClick(
-        final EntityPlayer player, final net.minecraft.world.World worldIn, final ItemStack stack, final EnumHand hand) {
+    public ActionResultType processRightClick(
+        final PlayerEntity player, final net.minecraft.world.World worldIn, final ItemStack stack, final Hand hand) {
         // Sponge start - Fire interact item event
         // This is modified by Forge to fire its own event.
         // To achieve compatibility and standardize this method, we use an @Overwrite
         if (this.gameType == GameType.SPECTATOR) {
-            return EnumActionResult.PASS;
+            return ActionResultType.PASS;
         }
 
         // Sponge - start
@@ -442,16 +442,16 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
             if (event.isCancelled()) {
                 this.impl$interactBlockRightClickEventCancelled = true;
 
-                ((EntityPlayerMP) player).sendContainerToPlayer(player.inventoryContainer);
-                return EnumActionResult.FAIL;
+                ((ServerPlayerEntity) player).sendContainerToPlayer(player.inventoryContainer);
+                return ActionResultType.FAIL;
             }
         }
         // Sponge End
 
         if (stack.isEmpty()) {
-            return EnumActionResult.PASS;
+            return ActionResultType.PASS;
         } else if (player.getCooldownTracker().hasCooldown(stack.getItem())) {
-            return EnumActionResult.PASS;
+            return ActionResultType.PASS;
         }
 
 
@@ -466,30 +466,30 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
 
             // Sanity checks on the world being used (hey, i don't know the rules about clients...
             // and if the world is in fact a responsible server world.
-            final EnumActionResult result = actionresult.getType();
+            final ActionResultType result = actionresult.getType();
             if (!(worldIn instanceof WorldBridge) || ((WorldBridge) worldIn).bridge$isFake()) {
                 return result;
             }
 
             // Otherwise, let's find out if it's a failed result
-            if (result == EnumActionResult.FAIL && player instanceof EntityPlayerMP) {
+            if (result == ActionResultType.FAIL && player instanceof ServerPlayerEntity) {
                 // Then, go ahead and tell the client about the change.
                 // A few comments about this:
                 // window id of -2 sets the player's inventory slot instead of the "held cursor"
                 // Then, we need to get the slot index for the held item, which is always
                 // playerMP.inventory.currentItem
-                final EntityPlayerMP playerMP = (EntityPlayerMP) player;
-                final SPacketSetSlot packetToSend;
-                if (hand == EnumHand.MAIN_HAND) {
+                final ServerPlayerEntity playerMP = (ServerPlayerEntity) player;
+                final SSetSlotPacket packetToSend;
+                if (hand == Hand.MAIN_HAND) {
                     // And here, my friends, is why the offhand slot is so stupid....
-                    packetToSend = new SPacketSetSlot(-2, player.inventory.currentItem, actionresult.getResult());
+                    packetToSend = new SSetSlotPacket(-2, player.inventory.currentItem, actionresult.getResult());
                 } else {
                     // This is the type of stupidity that comes from finding out that offhand slots
                     // are always the last remaining slot index remaining of the player's overall inventory.
                     // And this has to be done to avoid duplications by inadvertently setting the main hand
                     // item.
                     final int offhandSlotIndex = player.inventory.getSizeInventory() - 1;
-                    packetToSend = new SPacketSetSlot(-2, offhandSlotIndex, actionresult.getResult());
+                    packetToSend = new SSetSlotPacket(-2, offhandSlotIndex, actionresult.getResult());
                 }
                 // And finally, set the packet.
                 playerMP.connection.sendPacket(packetToSend);
@@ -500,7 +500,7 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
 
             return result;
 
-        } else if (actionresult.getType() == EnumActionResult.FAIL && itemstack.getMaxItemUseDuration() > 0 && !player.isHandActive()) {
+        } else if (actionresult.getType() == ActionResultType.FAIL && itemstack.getMaxItemUseDuration() > 0 && !player.isHandActive()) {
             return actionresult.getType();
         } else {
             player.setHeldItem(hand, itemstack);
@@ -518,7 +518,7 @@ public abstract class PlayerInteractionManagerMixin implements PlayerInteraction
             }
 
             if (!player.isHandActive()) {
-                ((EntityPlayerMP)player).sendContainerToPlayer(player.inventoryContainer);
+                ((ServerPlayerEntity)player).sendContainerToPlayer(player.inventoryContainer);
             }
 
             return actionresult.getType();

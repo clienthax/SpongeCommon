@@ -28,8 +28,8 @@ import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Items;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import org.spongepowered.api.block.BlockSoundGroup;
 import org.spongepowered.api.block.BlockState;
@@ -61,8 +61,8 @@ public abstract class BlockMixin_API implements BlockType {
     @Shadow protected SoundType blockSoundType;
 
     @Shadow public abstract String getTranslationKey();
-    @Shadow public abstract Material getMaterial(IBlockState state);
-    @Shadow public abstract IBlockState shadow$getDefaultState();
+    @Shadow public abstract Material getMaterial(BlockState state);
+    @Shadow public abstract BlockState shadow$getDefaultState();
     @Shadow public abstract boolean shadow$getTickRandomly();
     @Shadow public abstract BlockStateContainer getBlockState();
 

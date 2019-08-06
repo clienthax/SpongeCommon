@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.passive;
 
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.entity.passive.SheepEntity;
+import net.minecraft.item.DyeColor;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.DyeableData;
@@ -41,10 +41,10 @@ import org.spongepowered.common.util.Constants;
 
 import java.util.Collection;
 
-@Mixin(EntitySheep.class)
+@Mixin(SheepEntity.class)
 public abstract class EntitySheepMixin_API extends EntityAnimalMixin_API implements Sheep {
 
-    @Shadow public abstract EnumDyeColor getFleeceColor();
+    @Shadow public abstract DyeColor getFleeceColor();
     @Shadow public abstract boolean getSheared();
 
     @Override

@@ -31,7 +31,7 @@ import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.item.Item;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.GameDictionary;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -78,7 +78,7 @@ public class SpongeItemStackSnapshot implements ItemStackSnapshot {
     private final transient ItemStack privateStack; // only for internal use since the processors have a huge say
     private final ImmutableSet<Key<?>> keys;
     private final ImmutableSet<ImmutableValue<?>> values;
-    @Nullable private final NBTTagCompound compound;
+    @Nullable private final CompoundNBT compound;
     @Nullable private UUID creatorUniqueId;
 
     @SuppressWarnings({"EqualsBetweenInconvertibleTypes", "ConstantConditions"})
@@ -110,13 +110,13 @@ public class SpongeItemStackSnapshot implements ItemStackSnapshot {
         this.privateStack = itemStack.copy();
         this.keys = keyBuilder.build();
         this.values = valueBuilder.build();
-        @Nullable NBTTagCompound compound = ((net.minecraft.item.ItemStack) this.privateStack).getTagCompound();
+        @Nullable CompoundNBT compound = ((net.minecraft.item.ItemStack) this.privateStack).getTagCompound();
         if (compound != null) {
             compound = compound.copy();
         }
         if (compound != null) {
             if (compound.hasKey(Constants.Sponge.SPONGE_DATA)) {
-                final NBTTagCompound spongeCompound = compound.getCompoundTag(Constants.Sponge.SPONGE_DATA);
+                final CompoundNBT spongeCompound = compound.getCompoundTag(Constants.Sponge.SPONGE_DATA);
                 if (spongeCompound.hasKey(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST)) {
                     spongeCompound.removeTag(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST);
                 }
@@ -136,7 +136,7 @@ public class SpongeItemStackSnapshot implements ItemStackSnapshot {
                                    int quantity,
                                    int damageValue,
                                    ImmutableList<ImmutableDataManipulator<?, ?>> manipulators,
-                                   @Nullable NBTTagCompound compound) {
+                                   @Nullable CompoundNBT compound) {
         this.itemType = checkNotNull(itemType);
         this.quantity = quantity;
         this.manipulators = checkNotNull(manipulators);
@@ -378,7 +378,7 @@ public class SpongeItemStackSnapshot implements ItemStackSnapshot {
         return this.damageValue;
     }
 
-    public Optional<NBTTagCompound> getCompound() {
+    public Optional<CompoundNBT> getCompound() {
         if (this.compound != null) {
             return Optional.of(this.compound.copy());
         }

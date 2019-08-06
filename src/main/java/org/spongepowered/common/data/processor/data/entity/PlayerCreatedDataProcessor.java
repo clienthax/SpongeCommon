@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.monster.EntityIronGolem;
+import net.minecraft.entity.passive.IronGolemEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutablePlayerCreatedData;
@@ -40,20 +40,20 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 import java.util.Optional;
 
 public class PlayerCreatedDataProcessor
-        extends AbstractEntitySingleDataProcessor<EntityIronGolem, Boolean, Value<Boolean>, PlayerCreatedData, ImmutablePlayerCreatedData> {
+        extends AbstractEntitySingleDataProcessor<IronGolemEntity, Boolean, Value<Boolean>, PlayerCreatedData, ImmutablePlayerCreatedData> {
 
     public PlayerCreatedDataProcessor() {
-        super(EntityIronGolem.class, Keys.PLAYER_CREATED);
+        super(IronGolemEntity.class, Keys.PLAYER_CREATED);
     }
 
     @Override
-    protected boolean set(EntityIronGolem entity, Boolean value) {
+    protected boolean set(IronGolemEntity entity, Boolean value) {
         entity.setPlayerCreated(value);
         return true;
     }
 
     @Override
-    protected Optional<Boolean> getVal(EntityIronGolem entity) {
+    protected Optional<Boolean> getVal(IronGolemEntity entity) {
         return Optional.of(entity.isPlayerCreated());
     }
 

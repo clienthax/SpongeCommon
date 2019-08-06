@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.service.ban;
 
-import net.minecraft.server.management.UserListBans;
-import net.minecraft.server.management.UserListBansEntry;
+import net.minecraft.server.management.BanList;
+import net.minecraft.server.management.ProfileBanEntry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.profile.GameProfile;
 import org.spongepowered.api.service.ban.BanService;
@@ -40,7 +40,7 @@ import javax.annotation.Nullable;
 /**
  * Redirects all calls to the {@link BanService}.
  */
-public class SpongeUserListBans extends UserListBans {
+public class SpongeUserListBans extends BanList {
 
     public SpongeUserListBans(File bansFile) {
         super(bansFile);
@@ -56,8 +56,8 @@ public class SpongeUserListBans extends UserListBans {
     }
 
     @Override
-    public UserListBansEntry getEntry(com.mojang.authlib.GameProfile obj) {
-        return (UserListBansEntry) getService().getBanFor((GameProfile) obj).orElse(null);
+    public ProfileBanEntry getEntry(com.mojang.authlib.GameProfile obj) {
+        return (ProfileBanEntry) getService().getBanFor((GameProfile) obj).orElse(null);
     }
 
     @Override
@@ -70,7 +70,7 @@ public class SpongeUserListBans extends UserListBans {
     }
 
     @Override
-    public void addEntry(UserListBansEntry entry) {
+    public void addEntry(ProfileBanEntry entry) {
         getService().addBan((Ban) entry);
     }
 

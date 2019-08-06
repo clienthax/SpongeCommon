@@ -24,9 +24,9 @@
  */
 package org.spongepowered.common.world.border;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.SPacketWorldBorder;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.play.server.SWorldBorderPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.border.IBorderListener;
 import net.minecraft.world.border.WorldBorder;
@@ -44,27 +44,27 @@ public final class PlayerBorderListener implements IBorderListener {
 
     @Override
     public void onSizeChanged(WorldBorder border, double newSize) {
-        sendBorderPacket(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_SIZE));
+        sendBorderPacket(new SWorldBorderPacket(border, SWorldBorderPacket.Action.SET_SIZE));
     }
 
     @Override
     public void onTransitionStarted(WorldBorder border, double oldSize, double newSize, long time) {
-        sendBorderPacket(new SPacketWorldBorder(border, SPacketWorldBorder.Action.LERP_SIZE));
+        sendBorderPacket(new SWorldBorderPacket(border, SWorldBorderPacket.Action.LERP_SIZE));
     }
 
     @Override
     public void onCenterChanged(WorldBorder border, double x, double z) {
-        sendBorderPacket(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_CENTER));
+        sendBorderPacket(new SWorldBorderPacket(border, SWorldBorderPacket.Action.SET_CENTER));
     }
 
     @Override
     public void onWarningTimeChanged(WorldBorder border, int newTime) {
-        sendBorderPacket(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_WARNING_TIME));
+        sendBorderPacket(new SWorldBorderPacket(border, SWorldBorderPacket.Action.SET_WARNING_TIME));
     }
 
     @Override
     public void onWarningDistanceChanged(WorldBorder border, int newDistance) {
-        sendBorderPacket(new SPacketWorldBorder(border, SPacketWorldBorder.Action.SET_WARNING_BLOCKS));
+        sendBorderPacket(new SWorldBorderPacket(border, SWorldBorderPacket.Action.SET_WARNING_BLOCKS));
     }
 
     @Override
@@ -75,8 +75,8 @@ public final class PlayerBorderListener implements IBorderListener {
     public void onDamageBufferChanged(WorldBorder border, double newSize) {
     }
 
-    private void sendBorderPacket(Packet<?> packet) {
-        for (EntityPlayerMP player : this.server.getPlayerList().getPlayers()) {
+    private void sendBorderPacket(IPacket<?> packet) {
+        for (ServerPlayerEntity player : this.server.getPlayerList().getPlayers()) {
             if (player.dimension == this.dimensionId && !((Player) player).getWorldBorder().isPresent()) {
                 player.connection.sendPacket(packet);
             }

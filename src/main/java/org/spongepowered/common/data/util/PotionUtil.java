@@ -24,17 +24,17 @@
  */
 package org.spongepowered.common.data.util;
 
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
 
 public final class PotionUtil {
 
-    public static PotionEffect copyToNative(org.spongepowered.api.effect.potion.PotionEffect effect) {
-        return new PotionEffect(((PotionEffect) effect).getPotion(), effect.getDuration(), effect.getAmplifier(), effect.isAmbient(),
+    public static EffectInstance copyToNative(org.spongepowered.api.effect.potion.EffectInstance effect) {
+        return new EffectInstance(((EffectInstance) effect).getPotion(), effect.getDuration(), effect.getAmplifier(), effect.isAmbient(),
                 effect.getShowParticles());
     }
 
-    public static org.spongepowered.api.effect.potion.PotionEffect copyToApi(PotionEffect effect) {
-        return (org.spongepowered.api.effect.potion.PotionEffect) new PotionEffect(effect.getPotion(), effect.getDuration(), effect.getAmplifier(),
+    public static org.spongepowered.api.effect.potion.EffectInstance copyToApi(EffectInstance effect) {
+        return (org.spongepowered.api.effect.potion.EffectInstance) new EffectInstance(effect.getPotion(), effect.getDuration(), effect.getAmplifier(),
                 effect.getIsAmbient(), effect.doesShowParticles());
     }
 

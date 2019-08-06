@@ -26,8 +26,8 @@ package org.spongepowered.common.data.processor.common;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.MobSpawnerBaseLogic;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.spawner.AbstractSpawner;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedSpawnerEntity;
 import org.spongepowered.api.data.key.Key;
@@ -63,7 +63,7 @@ public class SpawnerUtils {
 
         final EntityType type = EntityUtil.fromNameToType(logic.accessor$getSpawnData().getNbt().getString("id")).orElse(EntityTypes.PIG);
 
-        final NBTTagCompound data = logic.accessor$getSpawnData().getNbt();
+        final CompoundNBT data = logic.accessor$getSpawnData().getNbt();
 
         final EntityArchetype archetype = EntityArchetype.builder()
                 .type(type)
@@ -74,8 +74,8 @@ public class SpawnerUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static void setNextEntity(final MobSpawnerBaseLogic logic, final WeightedSerializableObject<EntityArchetype> value) {
-        final NBTTagCompound compound = NbtTranslator.getInstance().translateData(value.get().getEntityData());
+    public static void setNextEntity(final AbstractSpawner logic, final WeightedSerializableObject<EntityArchetype> value) {
+        final CompoundNBT compound = NbtTranslator.getInstance().translateData(value.get().getEntityData());
         if (!compound.hasKey(Constants.Entity.ENTITY_TYPE_ID)) {
             final ResourceLocation key = EntityList.getKey((Class<? extends Entity>) value.get().getType().getEntityClass());
             compound.setString(Constants.Entity.ENTITY_TYPE_ID, key != null ? key.toString() : "");
@@ -84,11 +84,11 @@ public class SpawnerUtils {
         logic.setNextSpawnData(new WeightedSpawnerEntity((int) value.getWeight(), compound));
     }
 
-    public static WeightedTable<EntityArchetype> getEntities(final MobSpawnerBaseLogic logic) {
+    public static WeightedTable<EntityArchetype> getEntities(final AbstractSpawner logic) {
         final WeightedTable<EntityArchetype> possibleEntities = new WeightedTable<>();
         for (final WeightedSpawnerEntity weightedEntity : ((MobSpawnerBaseLogicAccessor) logic).accessor$getPotentialSpawns()) {
 
-            final NBTTagCompound nbt = weightedEntity.getNbt();
+            final CompoundNBT nbt = weightedEntity.getNbt();
 
             final EntityType type = EntityUtil.fromNameToType(nbt.getString(Constants.Entity.ENTITY_TYPE_ID)).orElse(EntityTypes.PIG);
 
@@ -112,7 +112,7 @@ public class SpawnerUtils {
             }
             final WeightedObject<EntityArchetype> object = (WeightedObject<EntityArchetype>) entry;
 
-            final NBTTagCompound compound = NbtTranslator.getInstance().translateData(object.get().getEntityData());
+            final CompoundNBT compound = NbtTranslator.getInstance().translateData(object.get().getEntityData());
             if (!compound.hasKey(Constants.Entity.ENTITY_TYPE_ID)) {
                 final ResourceLocation key = EntityList.getKey((Class<? extends Entity>) object.get().getType().getEntityClass());
                 compound.setString(Constants.Entity.ENTITY_TYPE_ID, key != null ? key.toString() : "");
@@ -132,11 +132,11 @@ public class SpawnerUtils {
         logic.accessor$setMaxNearbyEntities((short) values.get(Keys.SPAWNER_MAXIMUM_NEARBY_ENTITIES));
         logic.accessor$setActivatingRangeFromPlayer((short) values.get(Keys.SPAWNER_REQUIRED_PLAYER_RANGE));
         logic.accessor$setSpawnRange((short) values.get(Keys.SPAWNER_SPAWN_RANGE));
-        setNextEntity((MobSpawnerBaseLogic) logic, (WeightedSerializableObject<EntityArchetype>) values.get(Keys.SPAWNER_NEXT_ENTITY_TO_SPAWN));
+        setNextEntity((AbstractSpawner) logic, (WeightedSerializableObject<EntityArchetype>) values.get(Keys.SPAWNER_NEXT_ENTITY_TO_SPAWN));
         setEntities(logic, (WeightedTable<EntityArchetype>) values.get(Keys.SPAWNER_ENTITIES));
     }
 
-    public static void applyData(final MobSpawnerBaseLogic logic, final MobSpawnerData data) {
+    public static void applyData(final AbstractSpawner logic, final MobSpawnerData data) {
         final Map<Key<?>, Object> map = new IdentityHashMap<>();
         final Set<ImmutableValue<?>> newValues = data.getValues();
         for (final ImmutableValue<?> value : newValues) {

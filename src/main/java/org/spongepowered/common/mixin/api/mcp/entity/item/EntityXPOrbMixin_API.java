@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.item;
 
-import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.item.ExperienceOrbEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.ExpOrbData;
@@ -38,7 +38,7 @@ import org.spongepowered.common.mixin.api.mcp.entity.EntityMixin_API;
 
 import java.util.Collection;
 
-@Mixin(EntityXPOrb.class)
+@Mixin(ExperienceOrbEntity.class)
 public abstract class EntityXPOrbMixin_API extends EntityMixin_API implements ExperienceOrb {
 
     @Shadow private int xpValue;

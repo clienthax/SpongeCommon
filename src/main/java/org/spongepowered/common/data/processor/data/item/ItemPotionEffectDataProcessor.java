@@ -25,11 +25,11 @@
 package org.spongepowered.common.data.processor.data.item;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.potion.PotionUtils;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -58,12 +58,12 @@ public class ItemPotionEffectDataProcessor extends AbstractItemSingleDataProcess
     @Override
     protected boolean set(ItemStack dataHolder, List<PotionEffect> value) {
         if (!dataHolder.hasTagCompound()) {
-            dataHolder.setTagCompound(new NBTTagCompound());
+            dataHolder.setTagCompound(new CompoundNBT());
         }
-        final NBTTagCompound mainCompound = dataHolder.getTagCompound();
-        final NBTTagList potionList = new NBTTagList();
+        final CompoundNBT mainCompound = dataHolder.getTagCompound();
+        final ListNBT potionList = new ListNBT();
         for (PotionEffect effect : value) {
-            final NBTTagCompound potionCompound = new NBTTagCompound();
+            final CompoundNBT potionCompound = new CompoundNBT();
             ((net.minecraft.potion.PotionEffect) effect).writeCustomPotionEffectToNBT(potionCompound);
             potionList.appendTag(potionCompound);
         }
@@ -109,11 +109,11 @@ public class ItemPotionEffectDataProcessor extends AbstractItemSingleDataProcess
 
         Optional<List<PotionEffect>> currentEffects = getVal(itemStack);
         if (!itemStack.hasTagCompound()) {
-            itemStack.setTagCompound(new NBTTagCompound());
+            itemStack.setTagCompound(new CompoundNBT());
         }
 
-        final NBTTagCompound tagCompound = itemStack.getTagCompound();
-        tagCompound.setTag(Constants.Item.CUSTOM_POTION_EFFECTS, new NBTTagList());
+        final CompoundNBT tagCompound = itemStack.getTagCompound();
+        tagCompound.setTag(Constants.Item.CUSTOM_POTION_EFFECTS, new ListNBT());
         if (currentEffects.isPresent()) {
             return DataTransactionResult.successRemove(constructImmutableValue(currentEffects.get()));
         }

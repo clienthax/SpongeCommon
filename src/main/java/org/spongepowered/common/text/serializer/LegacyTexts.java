@@ -27,7 +27,7 @@ package org.spongepowered.common.text.serializer;
 import com.google.common.collect.Lists;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.util.text.TextFormatting;
 import org.spongepowered.api.text.LiteralText;
 import org.spongepowered.api.text.Text;
@@ -209,7 +209,7 @@ public final class LegacyTexts {
     }
 
     @SuppressWarnings("ConstantConditions")
-    public static TextComponentString parseComponent(final TextComponentString component, final char code) {
+    public static StringTextComponent parseComponent(final StringTextComponent component, final char code) {
         String text = component.getText();
         int next = text.lastIndexOf(code, text.length() - 2);
 
@@ -217,7 +217,7 @@ public final class LegacyTexts {
         if (next >= 0) {
             parsed = new ArrayList<>();
 
-            TextComponentString current = null;
+            StringTextComponent current = null;
             boolean reset = false;
 
             int pos = text.length();
@@ -231,19 +231,19 @@ public final class LegacyTexts {
                                 parsed.add(current);
                                 current.getStyle().setParentStyle(component.getStyle());
                                 reset = false;
-                                current = new TextComponentString("");
+                                current = new StringTextComponent("");
                             } else {
-                                final TextComponentString old = current;
-                                current = new TextComponentString("");
+                                final StringTextComponent old = current;
+                                current = new StringTextComponent("");
                                 current.appendSibling(old);
                             }
                         } else {
-                            current = new TextComponentString("");
+                            current = new StringTextComponent("");
                         }
 
                         ((TextComponentStringAccessor) current).accessor$setText(text.substring(from, pos));
                     } else if (current == null) {
-                        current = new TextComponentString("");
+                        current = new StringTextComponent("");
                     }
 
                     reset |= applyStyle(current.getStyle(), format);
@@ -261,7 +261,7 @@ public final class LegacyTexts {
             Collections.reverse(parsed);
             text = pos > 0 ? text.substring(0, pos) : "";
             if (component.getSiblings().isEmpty()) {
-                final TextComponentString newComponent = new TextComponentString(text);
+                final StringTextComponent newComponent = new StringTextComponent(text);
                 newComponent.getSiblings().addAll(parsed);
                 newComponent.setStyle(component.getStyle());
                 return newComponent;
@@ -270,15 +270,15 @@ public final class LegacyTexts {
             return component;
         }
 
-        final TextComponentString newComponent = new TextComponentString(text);
+        final StringTextComponent newComponent = new StringTextComponent(text);
         if (parsed != null) {
             newComponent.getSiblings().addAll(parsed);
         }
 
         newComponent.setStyle(component.getStyle());
         for (ITextComponent child : component.getSiblings()) {
-            if (child instanceof TextComponentString) {
-                child = parseComponent((TextComponentString) child, code);
+            if (child instanceof StringTextComponent) {
+                child = parseComponent((StringTextComponent) child, code);
             } else {
                 child = child.createCopy();
             }

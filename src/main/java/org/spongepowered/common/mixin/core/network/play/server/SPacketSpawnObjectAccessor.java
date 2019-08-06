@@ -24,13 +24,13 @@
  */
 package org.spongepowered.common.mixin.core.network.play.server;
 
-import net.minecraft.network.play.server.SPacketSpawnObject;
+import net.minecraft.network.play.server.SSpawnObjectPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.UUID;
 
-@Mixin(SPacketSpawnObject.class)
+@Mixin(SSpawnObjectPacket.class)
 public interface SPacketSpawnObjectAccessor {
 
     @Accessor("entityId") int accessor$getEntityId();

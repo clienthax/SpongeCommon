@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.core.inventory;
 
-import net.minecraft.inventory.ContainerRepair;
+import net.minecraft.inventory.container.RepairContainer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.event.item.inventory.UpdateAnvilEvent;
@@ -56,7 +56,7 @@ import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 import java.util.ArrayList;
 import java.util.List;
 
-@Mixin(ContainerRepair.class)
+@Mixin(RepairContainer.class)
 public abstract class ContainerRepairMixin extends ContainerMixin implements LensProviderBridge {
 
     @Shadow private String repairedItemName;
@@ -91,7 +91,7 @@ public abstract class ContainerRepairMixin extends ContainerMixin implements Len
         final ItemStack itemstack = this.inputSlots.getStackInSlot(0);
         final ItemStack itemstack2 = this.inputSlots.getStackInSlot(1);
         final ItemStack result = this.outputSlot.getStackInSlot(0);
-        final UpdateAnvilEvent event = SpongeCommonEventFactory.callUpdateAnvilEvent((ContainerRepair) (Object) this, itemstack, itemstack2, result, this.repairedItemName, this.maximumCost, this.materialCost);
+        final UpdateAnvilEvent event = SpongeCommonEventFactory.callUpdateAnvilEvent((RepairContainer) (Object) this, itemstack, itemstack2, result, this.repairedItemName, this.maximumCost, this.materialCost);
 
         final ItemStackSnapshot finalItem = event.getResult().getFinal();
         if (event.isCancelled() || finalItem.isEmpty()) {
@@ -105,7 +105,7 @@ public abstract class ContainerRepairMixin extends ContainerMixin implements Len
         this.outputSlot.setInventorySlotContents(0, ItemStackUtil.fromSnapshotToNative(event.getResult().getFinal()));
         this.maximumCost = event.getCosts().getFinal().getLevelCost();
         this.materialCost = event.getCosts().getFinal().getMaterialCost();
-        this.listeners.forEach(l -> l.sendWindowProperty(((ContainerRepair)(Object) this), 0, this.maximumCost));
+        this.listeners.forEach(l -> l.sendWindowProperty(((RepairContainer)(Object) this), 0, this.maximumCost));
         this.detectAndSendChanges();
     }
 

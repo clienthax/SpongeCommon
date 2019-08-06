@@ -25,8 +25,8 @@
 package org.spongepowered.common.data.processor.data.entity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.EntityShulkerBullet;
-import net.minecraft.world.WorldServer;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
+import net.minecraft.world.ServerWorld;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableTargetedEntityData;
@@ -55,7 +55,7 @@ public final class EntityTargetedEntityDataProcessor extends AbstractSingleDataS
         if (!value.getUniqueId().isPresent()) {
             return false;
         }
-        final Entity newTarget = ((WorldServer) ((EntityShulkerBullet) dataHolder).world).getEntityFromUuid(value.getUniqueId().get());
+        final Entity newTarget = ((ServerWorld) ((ShulkerBulletEntity) dataHolder).world).getEntityFromUuid(value.getUniqueId().get());
         if (newTarget == null) {
             return false;
         }

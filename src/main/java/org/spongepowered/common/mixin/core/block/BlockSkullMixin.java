@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockSkull;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.SkullBlock;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -43,12 +43,12 @@ import org.spongepowered.common.data.util.DirectionResolver;
 
 import java.util.Optional;
 
-@Mixin(BlockSkull.class)
+@Mixin(SkullBlock.class)
 public abstract class BlockSkullMixin extends BlockMixin {
 
     @SuppressWarnings("RedundantTypeArguments") // some JDK's can fail to compile without the explicit type generics
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getShouldDropFor(blockState), impl$getDirectionalData(blockState));
     }
 
@@ -58,38 +58,38 @@ public abstract class BlockSkullMixin extends BlockMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableDropData) {
             final boolean shouldDrop = ((ImmutableDropData) manipulator).willDrop().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockSkull.NODROP, !shouldDrop));
+            return Optional.of((BlockState) blockState.withProperty(SkullBlock.NODROP, !shouldDrop));
         }
         if (manipulator instanceof ImmutableDirectionalData) {
             final Direction dir = ((ImmutableDirectionalData) manipulator).direction().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockSkull.FACING, DirectionResolver.getFor(dir)));
+            return Optional.of((BlockState) blockState.withProperty(SkullBlock.FACING, DirectionResolver.getFor(dir)));
         }
         return super.bridge$getStateWithData(blockState, manipulator);
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.SHOULD_DROP)) {
             final boolean shouldDrop = (Boolean) value;
-            return Optional.of((BlockState) blockState.withProperty(BlockSkull.NODROP, !shouldDrop));
+            return Optional.of((BlockState) blockState.withProperty(SkullBlock.NODROP, !shouldDrop));
         }
         if (key.equals(Keys.DIRECTION)) {
             final Direction dir = (Direction) value;
-            return Optional.of((BlockState) blockState.withProperty(BlockSkull.FACING, DirectionResolver.getFor(dir)));
+            return Optional.of((BlockState) blockState.withProperty(SkullBlock.FACING, DirectionResolver.getFor(dir)));
         }
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
-    private ImmutableDropData impl$getShouldDropFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeDropData.class, !blockState.getValue(BlockSkull.NODROP));
+    private ImmutableDropData impl$getShouldDropFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeDropData.class, !blockState.getValue(SkullBlock.NODROP));
     }
 
-    private ImmutableDirectionalData impl$getDirectionalData(final IBlockState blockState) {
+    private ImmutableDirectionalData impl$getDirectionalData(final BlockState blockState) {
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeDirectionalData.class,
-                DirectionResolver.getFor(blockState.getValue(BlockSkull.FACING)));
+                DirectionResolver.getFor(blockState.getValue(SkullBlock.FACING)));
     }
 
 }

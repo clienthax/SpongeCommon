@@ -26,7 +26,7 @@ package org.spongepowered.common.data.processor.data.item;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -88,7 +88,7 @@ public class ItemLoreDataProcessor extends AbstractItemSingleDataProcessor<List<
 
     @Override
     protected Optional<List<Text>> getVal(ItemStack itemStack) {
-        final NBTTagCompound subCompound = itemStack.getSubCompound(Constants.Item.ITEM_DISPLAY);
+        final CompoundNBT subCompound = itemStack.getSubCompound(Constants.Item.ITEM_DISPLAY);
         if (subCompound == null) {
             return Optional.empty();
         }

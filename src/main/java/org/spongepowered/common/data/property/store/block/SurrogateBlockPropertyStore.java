@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.property.store.block;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.data.property.block.SurrogateBlockProperty;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.common.bridge.block.BlockBridge;
@@ -41,7 +41,7 @@ public class SurrogateBlockPropertyStore extends AbstractBlockPropertyStore<Surr
     }
 
     @Override
-    protected Optional<SurrogateBlockProperty> getForBlock(@Nullable Location<?> location, IBlockState block) {
+    protected Optional<SurrogateBlockProperty> getForBlock(@Nullable Location<?> location, BlockState block) {
         return Optional.of(new SurrogateBlockProperty(((BlockBridge) block.getBlock()).bridge$isDummy()));
     }
 }

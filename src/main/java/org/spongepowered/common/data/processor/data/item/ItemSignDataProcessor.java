@@ -28,9 +28,9 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -64,12 +64,12 @@ public class ItemSignDataProcessor extends AbstractItemSingleDataProcessor<List<
         if (!itemStack.hasTagCompound()) {
             return Optional.empty();
         }
-        final NBTTagCompound mainCompound = itemStack.getTagCompound();
+        final CompoundNBT mainCompound = itemStack.getTagCompound();
         if (!mainCompound.hasKey(Constants.Item.BLOCK_ENTITY_TAG, Constants.NBT.TAG_COMPOUND)
                 || !mainCompound.getCompoundTag(Constants.Item.BLOCK_ENTITY_TAG).hasKey(Constants.Item.BLOCK_ENTITY_ID)) {
             return Optional.empty();
         }
-        final NBTTagCompound tileCompound = mainCompound.getCompoundTag(Constants.Item.BLOCK_ENTITY_TAG);
+        final CompoundNBT tileCompound = mainCompound.getCompoundTag(Constants.Item.BLOCK_ENTITY_TAG);
         final String id = tileCompound.getString(Constants.Item.BLOCK_ENTITY_ID);
         if (!id.equalsIgnoreCase(Constants.TileEntity.SIGN)) {
             return Optional.empty();
@@ -113,8 +113,8 @@ public class ItemSignDataProcessor extends AbstractItemSingleDataProcessor<List<
 
     @Override
     protected boolean set(ItemStack itemStack, List<Text> lines) {
-        final NBTTagCompound mainCompound = NbtDataUtil.getOrCreateCompound(itemStack);
-        final NBTTagCompound tileCompound = NbtDataUtil.getOrCreateSubCompound(mainCompound, Constants.Item.BLOCK_ENTITY_TAG);
+        final CompoundNBT mainCompound = NbtDataUtil.getOrCreateCompound(itemStack);
+        final CompoundNBT tileCompound = NbtDataUtil.getOrCreateSubCompound(mainCompound, Constants.Item.BLOCK_ENTITY_TAG);
         tileCompound.setString(Constants.Item.BLOCK_ENTITY_ID, Constants.TileEntity.SIGN);
         for (int i = 0; i < 4; i++) {
             Text line = lines.size() > i ? lines.get(i) : Text.EMPTY;

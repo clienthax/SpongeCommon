@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.item;
 
-import net.minecraft.entity.item.EntityMinecartContainer;
+import net.minecraft.entity.item.minecart.ContainerMinecartEntity;
 import org.spongepowered.api.entity.vehicle.minecart.ContainerMinecart;
 import org.spongepowered.api.item.inventory.Carrier;
 import org.spongepowered.api.item.inventory.type.CarriedInventory;
@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.Optional;
 
-@Mixin(EntityMinecartContainer.class)
+@Mixin(ContainerMinecartEntity.class)
 public abstract class EntityMinecartContainerMixin_API<M extends ContainerMinecart<M>> extends EntityMinecartMixin_API implements ContainerMinecart<M> {
 
     @Override

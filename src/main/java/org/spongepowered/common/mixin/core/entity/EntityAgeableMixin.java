@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.core.entity;
 
-import net.minecraft.entity.EntityAgeable;
-import net.minecraft.entity.passive.EntityAnimal;
+import net.minecraft.entity.AgeableEntity;
+import net.minecraft.entity.passive.AnimalEntity;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.animal.Animal;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -39,7 +39,7 @@ import org.spongepowered.common.event.ShouldFire;
 
 import java.util.Optional;
 
-@Mixin(EntityAgeable.class)
+@Mixin(AgeableEntity.class)
 public abstract class EntityAgeableMixin extends EntityMixin {
 
     @Inject(method = "setGrowingAge", at = @At("RETURN"))
@@ -51,7 +51,7 @@ public abstract class EntityAgeableMixin extends EntityMixin {
 
     @SuppressWarnings("deprecation")
     private void callReadyToMateEvent() {
-        if (!((WorldBridge) this.world).bridge$isFake() && ShouldFire.BREED_ENTITY_EVENT_READY_TO_MATE && ((EntityAgeable) (Object) this) instanceof EntityAnimal) {
+        if (!((WorldBridge) this.world).bridge$isFake() && ShouldFire.BREED_ENTITY_EVENT_READY_TO_MATE && ((AgeableEntity) (Object) this) instanceof AnimalEntity) {
             final org.spongepowered.api.event.entity.BreedEntityEvent.ReadyToMate event =
                 SpongeEventFactory.createBreedEntityEventReadyToMate(Sponge.getCauseStackManager().getCurrentCause(), Optional.empty(), (Animal)
                     this);

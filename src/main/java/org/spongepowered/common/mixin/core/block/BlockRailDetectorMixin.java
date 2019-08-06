@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockRailDetector;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.DetectorRailBlock;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -39,11 +39,11 @@ import org.spongepowered.common.data.manipulator.immutable.block.ImmutableSponge
 
 import java.util.Optional;
 
-@Mixin(BlockRailDetector.class)
+@Mixin(DetectorRailBlock.class)
 public abstract class BlockRailDetectorMixin extends BlockRailBaseMixin {
 
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>builder()
                 .addAll(super.bridge$getManipulators(blockState))
                 .add(impl$getIsPoweredFor(blockState))
@@ -56,22 +56,22 @@ public abstract class BlockRailDetectorMixin extends BlockRailBaseMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutablePoweredData) {
-            return Optional.of((BlockState) blockState.withProperty(BlockRailDetector.POWERED, ((ImmutablePoweredData) manipulator).powered().get()));
+            return Optional.of((BlockState) blockState.withProperty(DetectorRailBlock.POWERED, ((ImmutablePoweredData) manipulator).powered().get()));
         }
         return super.bridge$getStateWithData(blockState, manipulator);
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.POWERED)) {
-            return Optional.of((BlockState) blockState.withProperty(BlockRailDetector.POWERED, (Boolean) value));
+            return Optional.of((BlockState) blockState.withProperty(DetectorRailBlock.POWERED, (Boolean) value));
         }
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
-    private ImmutablePoweredData impl$getIsPoweredFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePoweredData.class, blockState.getValue(BlockRailDetector.POWERED));
+    private ImmutablePoweredData impl$getIsPoweredFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePoweredData.class, blockState.getValue(DetectorRailBlock.POWERED));
     }
 }

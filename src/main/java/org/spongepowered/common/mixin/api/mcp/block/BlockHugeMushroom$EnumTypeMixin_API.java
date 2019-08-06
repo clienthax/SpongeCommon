@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.block;
 
-import net.minecraft.block.BlockHugeMushroom;
+import net.minecraft.block.HugeMushroomBlock;
 import org.spongepowered.api.data.type.BigMushroomType;
 import org.spongepowered.asm.mixin.Implements;
 import org.spongepowered.asm.mixin.Interface;
@@ -32,9 +32,9 @@ import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(BlockHugeMushroom.EnumType.class)
+@Mixin(HugeMushroomBlock.EnumType.class)
 @Implements(@Interface(iface = BigMushroomType.class, prefix = "mushroom$"))
-public abstract class BlockHugeMushroom$EnumTypeMixin_API {
+public abstract class HugeMushroomBlock$EnumTypeMixin_API {
 
     @Shadow public abstract String shadow$getName();
 

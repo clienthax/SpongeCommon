@@ -27,19 +27,19 @@ package org.spongepowered.common.mixin.core.world.gen.feature;
 import com.google.common.base.MoreObjects;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.feature.WorldGenIceSpike;
+import net.minecraft.world.gen.feature.IceSpikeFeature;
 import org.spongepowered.api.world.gen.populator.IceSpike;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 import java.util.Random;
 
-@Mixin(WorldGenIceSpike.class)
+@Mixin(IceSpikeFeature.class)
 public abstract class WorldGenIceSpikeMixin extends WorldGeneratorMixin {
 
     /**
@@ -82,7 +82,7 @@ public abstract class WorldGenIceSpikeMixin extends WorldGeneratorMixin {
 
                     if ((i1 == 0 && j1 == 0 || f1 * f1 + f2 * f2 <= f * f)
                             && (i1 != -l && i1 != l && j1 != -l && j1 != l || rand.nextFloat() <= 0.75F)) {
-                        IBlockState iblockstate = worldIn.getBlockState(position.add(i1, k, j1));
+                        BlockState iblockstate = worldIn.getBlockState(position.add(i1, k, j1));
                         Block block = iblockstate.getBlock();
 
                         if (iblockstate.getMaterial() == Material.AIR || block == Blocks.DIRT || block == Blocks.SNOW || block == Blocks.ICE) {
@@ -120,7 +120,7 @@ public abstract class WorldGenIceSpikeMixin extends WorldGeneratorMixin {
                 }
 
                 while (blockpos.getY() > 50) {
-                    final IBlockState iblockstate1 = worldIn.getBlockState(blockpos);
+                    final BlockState iblockstate1 = worldIn.getBlockState(blockpos);
                     final Block block1 = iblockstate1.getBlock();
 
                     if (iblockstate1.getMaterial() != Material.AIR && block1 != Blocks.DIRT && block1 != Blocks.SNOW && block1 != Blocks.ICE

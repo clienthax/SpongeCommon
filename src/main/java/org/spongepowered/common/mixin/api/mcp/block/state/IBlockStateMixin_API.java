@@ -27,7 +27,7 @@ package org.spongepowered.common.mixin.api.mcp.block.state;
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.trait.BlockTrait;
@@ -57,8 +57,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
-@Mixin(IBlockState.class)
-public interface IBlockStateMixin_API extends IBlockState, BlockState {
+@Mixin(BlockState.class)
+public interface IBlockStateMixin_API extends BlockState, BlockState {
 
     @Override
     default BlockType getType() {

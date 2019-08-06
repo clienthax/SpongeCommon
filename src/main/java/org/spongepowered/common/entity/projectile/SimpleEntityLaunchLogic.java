@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.entity.projectile;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.projectile.Projectile;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
@@ -48,15 +48,15 @@ public class SimpleEntityLaunchLogic<P extends Projectile> implements Projectile
         }
         Location<World> loc = ((Entity) source).getLocation().add(0, ((net.minecraft.entity.Entity) source).height / 2, 0);
         Optional<P> projectile;
-        if (source instanceof EntityLivingBase) {
-            projectile = createProjectile((EntityLivingBase) source, loc);
+        if (source instanceof LivingEntity) {
+            projectile = createProjectile((LivingEntity) source, loc);
         } else {
             projectile = createProjectile(source, this.projectileClass, loc);
         }
         return projectile;
     }
 
-    protected Optional<P> createProjectile(EntityLivingBase source, Location<?> loc) {
+    protected Optional<P> createProjectile(LivingEntity source, Location<?> loc) {
         return createProjectile((ProjectileSource) source, this.projectileClass, loc);
     }
 }

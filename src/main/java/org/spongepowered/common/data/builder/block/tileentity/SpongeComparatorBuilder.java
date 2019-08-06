@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.builder.block.tileentity;
 
-import net.minecraft.tileentity.TileEntityComparator;
+import net.minecraft.tileentity.ComparatorTileEntity;
 import org.spongepowered.api.block.tileentity.Comparator;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -40,7 +40,7 @@ public class SpongeComparatorBuilder extends AbstractTileBuilder<Comparator> {
     @Override
     protected Optional<Comparator> buildContent(DataView container) throws InvalidDataException {
         return super.buildContent(container).map(comparator -> {
-            ((TileEntityComparator) comparator).validate();
+            ((ComparatorTileEntity) comparator).validate();
             return comparator;
         });
     }

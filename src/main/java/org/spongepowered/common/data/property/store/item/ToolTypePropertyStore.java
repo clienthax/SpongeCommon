@@ -25,10 +25,10 @@
 package org.spongepowered.common.data.property.store.item;
 
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemHoe;
+import net.minecraft.item.HoeItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemSword;
-import net.minecraft.item.ItemTool;
+import net.minecraft.item.SwordItem;
+import net.minecraft.item.ToolItem;
 import org.spongepowered.api.data.property.item.ToolTypeProperty;
 import org.spongepowered.api.data.type.ToolType;
 import org.spongepowered.common.data.property.store.common.AbstractItemStackPropertyStore;

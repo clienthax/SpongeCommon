@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.core.item;
 
 import net.minecraft.block.IGrowable;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemDye;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.DyeItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -44,7 +44,7 @@ import org.spongepowered.common.event.tracking.phase.block.GrowablePhaseContext;
 
 import java.util.Random;
 
-@Mixin(ItemDye.class)
+@Mixin(DyeItem.class)
 public abstract class ItemDyeMixin extends ItemMixin {
 
     /**
@@ -74,13 +74,13 @@ public abstract class ItemDyeMixin extends ItemMixin {
         method = "applyBonemeal",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/block/IGrowable;grow(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)V"
+            target = "Lnet/minecraft/block/IGrowable;grow(Lnet/minecraft/world/World;Ljava/util/Random;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;)V"
         ),
         require = 0, // Will be removed once the above github issue is resolved with a proper solution
         // Even though we're in a group, expecting this to succeed in forge environments will not work since there is a different mixin
         expect = 0
     )
-    private static void onGrowableVanilla(IGrowable iGrowable, World worldIn, Random rand, BlockPos pos, IBlockState blockState, ItemStack stack, World sameWorld, BlockPos target) {
+    private static void onGrowableVanilla(IGrowable iGrowable, World worldIn, Random rand, BlockPos pos, BlockState blockState, ItemStack stack, World sameWorld, BlockPos target) {
         if (((WorldBridge) worldIn).bridge$isFake() || !ShouldFire.CHANGE_BLOCK_EVENT_GROW) {
             iGrowable.grow(worldIn, rand, pos, blockState);
             return;

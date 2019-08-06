@@ -24,13 +24,13 @@
  */
 package org.spongepowered.common.mixin.core.world;
 
-import net.minecraft.world.MinecraftException;
+import net.minecraft.world.storage.SessionLockException;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServerMulti;
+import net.minecraft.world.ServerMultiWorld;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
-@Mixin(WorldServerMulti.class)
+@Mixin(ServerMultiWorld.class)
 public abstract class WorldServerMultiMixin extends WorldServerMixin {
 
     /**
@@ -39,11 +39,11 @@ public abstract class WorldServerMultiMixin extends WorldServerMixin {
      * the "parent" world since multi-world support changes the
      * structure.
      *
-     * @throws MinecraftException An exception
+     * @throws SessionLockException An exception
      */
     @Override
     @Overwrite
-    protected void saveLevel() throws MinecraftException {
+    protected void saveLevel() throws SessionLockException {
         // this.perWorldStorage.saveAllData();
         // we handle all saving including perWorldStorage in WorldServer.saveLevel. This needs to be disabled since we
         // use a seperate save handler for each world. Each world folder needs to generate a corresponding

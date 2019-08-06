@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.nbt.data;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -39,17 +39,17 @@ public interface NbtDataProcessor<M extends DataManipulator<M, I>, I extends Imm
 
     NbtDataType getTargetType();
 
-    boolean isCompatible(NBTTagCompound compound);
+    boolean isCompatible(CompoundNBT compound);
 
-    Optional<M> readFrom(NBTTagCompound compound);
+    Optional<M> readFrom(CompoundNBT compound);
 
     Optional<M> readFrom(DataView view);
 
-    Optional<NBTTagCompound> storeToCompound(NBTTagCompound compound, M manipulator);
+    Optional<CompoundNBT> storeToCompound(CompoundNBT compound, M manipulator);
 
     Optional<DataView> storeToView(DataView view, M manipulator);
 
-    DataTransactionResult remove(NBTTagCompound data);
+    DataTransactionResult remove(CompoundNBT data);
 
     DataTransactionResult remove(DataView data);
 }

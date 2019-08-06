@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.tileentity;
 
-import net.minecraft.tileentity.TileEntityEndGateway;
+import net.minecraft.tileentity.EndGatewayTileEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -36,10 +36,10 @@ import org.spongepowered.common.mixin.core.tileentity.TileEntityEndGatewayAccess
 
 import java.util.Optional;
 
-public class EndGatewayExactTeleportValueProcessor extends AbstractSpongeValueProcessor<TileEntityEndGateway, Boolean, Value<Boolean>> {
+public class EndGatewayExactTeleportValueProcessor extends AbstractSpongeValueProcessor<EndGatewayTileEntity, Boolean, Value<Boolean>> {
 
     public EndGatewayExactTeleportValueProcessor() {
-        super(TileEntityEndGateway.class, Keys.EXACT_TELEPORT);
+        super(EndGatewayTileEntity.class, Keys.EXACT_TELEPORT);
     }
 
     @Override
@@ -48,13 +48,13 @@ public class EndGatewayExactTeleportValueProcessor extends AbstractSpongeValuePr
     }
 
     @Override
-    protected boolean set(TileEntityEndGateway container, Boolean value) {
+    protected boolean set(EndGatewayTileEntity container, Boolean value) {
         ((TileEntityEndGatewayAccessor) container).accessor$setExactTeleport(value);
         return true;
     }
 
     @Override
-    protected Optional<Boolean> getVal(TileEntityEndGateway container) {
+    protected Optional<Boolean> getVal(EndGatewayTileEntity container) {
         return Optional.of(((TileEntityEndGatewayAccessor) container).accessor$getExactTeleport());
     }
 

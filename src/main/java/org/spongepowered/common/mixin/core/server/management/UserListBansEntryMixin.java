@@ -25,7 +25,7 @@
 package org.spongepowered.common.mixin.core.server.management;
 
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.management.UserListBansEntry;
+import net.minecraft.server.management.ProfileBanEntry;
 import org.spongepowered.api.util.ban.Ban;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -34,7 +34,7 @@ import org.spongepowered.asm.mixin.injection.invoke.arg.Args;
 
 import java.util.Date;
 
-@Mixin(UserListBansEntry.class)
+@Mixin(ProfileBanEntry.class)
 public abstract class UserListBansEntryMixin extends UserListEntryBanMixin<GameProfile> {
 
     /**

@@ -26,7 +26,7 @@ package org.spongepowered.common.mixin.api.mcp.potion;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.RegistryNamespacedDefaultedByKey;
+import net.minecraft.util.registry.DefaultedRegistry;
 import org.spongepowered.api.effect.potion.PotionEffect;
 import org.spongepowered.api.item.potion.PotionType;
 import org.spongepowered.asm.mixin.Final;
@@ -40,7 +40,7 @@ import javax.annotation.Nullable;
 @Mixin(net.minecraft.potion.PotionType.class)
 public abstract class PotionTypeMixin_API implements PotionType {
 
-    @Shadow @Final public static RegistryNamespacedDefaultedByKey<ResourceLocation, net.minecraft.potion.PotionType> REGISTRY;
+    @Shadow @Final public static DefaultedRegistry<ResourceLocation, net.minecraft.potion.PotionType> REGISTRY;
     @Shadow @Final private ImmutableList<net.minecraft.potion.PotionEffect> effects;
 
     @Nullable private String spongeResourceID;

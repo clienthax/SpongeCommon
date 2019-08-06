@@ -24,12 +24,12 @@
  */
 package org.spongepowered.common.mixin.core.entity;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(EntityLiving.class)
+@Mixin(MobEntity.class)
 public interface EntityLivingAccessor {
 
     @Accessor("persistenceRequired") void accessor$setPersisting(boolean persisting);

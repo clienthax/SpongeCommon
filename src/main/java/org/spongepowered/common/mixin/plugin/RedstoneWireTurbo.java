@@ -30,8 +30,8 @@ import java.util.Map;
 import java.util.HashMap;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockRedstoneWire;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.RedstoneWireBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.common.mixin.optimization.block.BlockRedstoneWireAccessor_Eigen;
@@ -40,13 +40,13 @@ import java.util.concurrent.ThreadLocalRandom;
 
 public class RedstoneWireTurbo {
     /*
-     * This is Helper class for BlockRedstoneWire.  It implements a minimially-invasive
+     * This is Helper class for RedstoneWireBlock.  It implements a minimially-invasive
      * bolt-on accelerator that performs a breadth-first search through redstone wire blocks
      * in order to more efficiently and deterministicly compute new redstone wire power levels
      * and determine the order in which other blocks should be updated.  
      *
      * Features:
-     * - Changes to BlockRedstoneWire are very limited, no other classes are affected, and the 
+     * - Changes to RedstoneWireBlock are very limited, no other classes are affected, and the 
      *   choice between old and new redstone wire update algorithms is switchable on-line.
      * - The vanilla implementation relied on World.notifyNeighborsOfStateChange for redstone 
      *   wire blocks to communicate power level changes to each other, generating 36 block 
@@ -100,15 +100,15 @@ public class RedstoneWireTurbo {
      */
     
     
-    /* Reference to BlockRedstoneWire object, which uses this accelerator */
-    private final BlockRedstoneWire wire;
+    /* Reference to RedstoneWireBlock object, which uses this accelerator */
+    private final RedstoneWireBlock wire;
     
     
     /*
      * Implementation:
      *  
      * RedstoneWire Blocks are updated in concentric rings or "layers" radiating out from the 
-     * initial block update that came from a call to BlockRedstoneWire.neighborChanged().
+     * initial block update that came from a call to RedstoneWireBlock.neighborChanged().
      * All nodes put in Layer N are those with Manattan distance N from the trigger
      * position, reachable through connected redstone wire blocks.
      *
@@ -137,7 +137,7 @@ public class RedstoneWireTurbo {
     private List<UpdateNode> updateQueue2 = new ArrayList<>();
     
     
-    public RedstoneWireTurbo(BlockRedstoneWire wire) {
+    public RedstoneWireTurbo(RedstoneWireBlock wire) {
         this.wire = wire;
     }
 
@@ -295,7 +295,7 @@ public class RedstoneWireTurbo {
             UNKNOWN, REDSTONE, OTHER
         }
         
-        IBlockState currentState;       // Keep track of redstone wire value
+        BlockState currentState;       // Keep track of redstone wire value
         UpdateNode[] neighbor_nodes;    // References to neighbors (directed graph edges)
         BlockPos self;                  // UpdateNode's own position
         BlockPos parent;                // Which block pos spawned/updated this node
@@ -318,7 +318,7 @@ public class RedstoneWireTurbo {
      */
     private void identifyNode(final World worldIn, final UpdateNode upd1) {
         final BlockPos pos = upd1.self;
-        final IBlockState oldState = worldIn.getBlockState(pos);
+        final BlockState oldState = worldIn.getBlockState(pos);
         upd1.currentState = oldState;
 
         // Some neighbors of redstone wire are other kinds of blocks.
@@ -336,9 +336,9 @@ public class RedstoneWireTurbo {
             return;
         }
 
-        // One job of BlockRedstoneWire.neighborChanged is to convert 
+        // One job of RedstoneWireBlock.neighborChanged is to convert 
         // redstone wires to items if the block beneath was removed.
-        // With this accelerator, BlockRedstoneWire.neighborChanged
+        // With this accelerator, RedstoneWireBlock.neighborChanged
         // is only typically called for a single wire block, while
         // others are processed internally by the breadth first search
         // algorithm.  To preserve this game behavior, this check must
@@ -432,7 +432,7 @@ public class RedstoneWireTurbo {
         return ThreadLocalRandom.current().nextInt(0, 4);
     }
 
-    // Select whether to use updateSurroundingRedstone from BlockRedstoneWire (old)
+    // Select whether to use updateSurroundingRedstone from RedstoneWireBlock (old)
     // or this helper class (new)
     private static final boolean old_current_change = false;
 
@@ -450,7 +450,7 @@ public class RedstoneWireTurbo {
         // Due to the way other redstone components are updated, we do not
         // have to worry about a state changing behind our backs.  The rare
         // exception is handled by scheduleReentrantNeighborChanged.
-        final IBlockState oldState = upd1.currentState;
+        final BlockState oldState = upd1.currentState;
     
         // Ask the wire block to compute its power level from its neighbors.
         // This will also update the wire's power level and return a new
@@ -458,7 +458,7 @@ public class RedstoneWireTurbo {
         // calculateCurrentChanges will immediately update the block state in the world
         // and return the same value here to be cached in the corresponding
         // UpdateNode object.  
-        IBlockState newState;
+        BlockState newState;
         if (old_current_change) {
             newState = ((BlockRedstoneWireAccessor_Eigen) this.wire).accessor$calculateCurrentChanges(worldIn, pos, pos, oldState);
         } else {
@@ -712,7 +712,7 @@ public class RedstoneWireTurbo {
      * (1) A redstone wire is conducting a signal.
      * (2) Partway through that wave of updates, a neighbor is updated that causes an update to a completely
      *     separate redstone wire.
-     * (3) This results in a call to BlockRedstoneWire.neighborChanged for that other wire, in the middle of 
+     * (3) This results in a call to RedstoneWireBlock.neighborChanged for that other wire, in the middle of 
      *     an already on-going propagation through the first wire.
      *
      * The vanilla code, being depth-first, would end up fully processing the second wire before going back
@@ -723,7 +723,7 @@ public class RedstoneWireTurbo {
      * order to continue processing both the first and second wire in the order of distance from the initial
      * trigger.
      */
-    private IBlockState scheduleReentrantNeighborChanged(final World worldIn, final BlockPos pos, final IBlockState newState, final BlockPos source)
+    private BlockState scheduleReentrantNeighborChanged(final World worldIn, final BlockPos pos, final BlockState newState, final BlockPos source)
     {
         if (source != null) {
             // If the cause of the redstone wire update is known, we can use that to help determine
@@ -781,15 +781,15 @@ public class RedstoneWireTurbo {
     /*
      * New version of pre-existing updateSurroundingRedstone, which is called from
      * wire.updateSurroundingRedstone, which is called from wire.neighborChanged and a 
-     * few other methods in BlockRedstoneWire.  This sets off the breadth-first 
+     * few other methods in RedstoneWireBlock.  This sets off the breadth-first 
      * walk through all redstone dust connected to the initial position triggered.
      */
-    public IBlockState updateSurroundingRedstone(final World worldIn, final BlockPos pos, final IBlockState state, final BlockPos source)
+    public BlockState updateSurroundingRedstone(final World worldIn, final BlockPos pos, final BlockState state, final BlockPos source)
     {
         // Check this block's neighbors and see if its power level needs to change
-        // Use the calculateCurrentChanges method in BlockRedstoneWire since we have no
+        // Use the calculateCurrentChanges method in RedstoneWireBlock since we have no
         // cached block states at this point.
-        final IBlockState newState = ((BlockRedstoneWireAccessor_Eigen) this.wire).accessor$calculateCurrentChanges(worldIn, pos, pos, state);
+        final BlockState newState = ((BlockRedstoneWireAccessor_Eigen) this.wire).accessor$calculateCurrentChanges(worldIn, pos, pos, state);
         
         // If no change, exit
         if (newState == state) {
@@ -854,10 +854,10 @@ public class RedstoneWireTurbo {
      * the UpdateNode's neighbor array to find the redstone states of neighbors
      * that might power it.
      */
-    private IBlockState calculateCurrentChanges(final World worldIn, final UpdateNode upd)
+    private BlockState calculateCurrentChanges(final World worldIn, final UpdateNode upd)
     {
-        IBlockState state = upd.currentState;
-        final int i = state.getValue(BlockRedstoneWire.POWER).intValue();
+        BlockState state = upd.currentState;
+        final int i = state.getValue(RedstoneWireBlock.POWER).intValue();
         int j = 0;
         j = getMaxCurrentStrength(upd, j);
         int l = 0;
@@ -927,7 +927,7 @@ public class RedstoneWireTurbo {
             // and set it in the world.  
             // Possible optimization:  Don't commit state changes to the world until they
             // need to be known by some nearby non-redstone-wire block.
-            state = state.withProperty(BlockRedstoneWire.POWER, Integer.valueOf(j));
+            state = state.withProperty(RedstoneWireBlock.POWER, Integer.valueOf(j));
             worldIn.setBlockState(upd.self, state, 2);
         }
 
@@ -940,7 +940,7 @@ public class RedstoneWireTurbo {
      */
     private static int getMaxCurrentStrength(final UpdateNode upd, final int strength) {   
         if (upd.type != UpdateNode.Type.REDSTONE) return strength;
-        final int i = upd.currentState.getValue(BlockRedstoneWire.POWER).intValue();
+        final int i = upd.currentState.getValue(RedstoneWireBlock.POWER).intValue();
         return i > strength ? i : strength;
     }
 }

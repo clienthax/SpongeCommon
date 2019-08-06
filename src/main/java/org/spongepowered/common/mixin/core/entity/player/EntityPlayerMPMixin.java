@@ -28,53 +28,53 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Sets;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IMerchant;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.merchant.IMerchant;
 import net.minecraft.entity.SharedMonsterAttributes;
 import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.ai.attributes.AttributeModifier;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
 import net.minecraft.entity.ai.attributes.ModifiableAttributeInstance;
 import net.minecraft.entity.ai.attributes.RangedAttribute;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ContainerChest;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.ChestContainer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotCrafting;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.inventory.container.CraftingResultSlot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.play.client.CPacketClientSettings;
-import net.minecraft.network.play.server.SPacketAnimation;
-import net.minecraft.network.play.server.SPacketBlockChange;
-import net.minecraft.network.play.server.SPacketCombatEvent;
-import net.minecraft.network.play.server.SPacketEntityProperties;
-import net.minecraft.network.play.server.SPacketSetSlot;
-import net.minecraft.network.play.server.SPacketSpawnPosition;
-import net.minecraft.network.play.server.SPacketUpdateHealth;
-import net.minecraft.scoreboard.IScoreCriteria;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.play.ServerPlayNetHandler;
+import net.minecraft.network.play.client.CClientSettingsPacket;
+import net.minecraft.network.play.server.SAnimateHandPacket;
+import net.minecraft.network.play.server.SChangeBlockPacket;
+import net.minecraft.network.play.server.SCombatPacket;
+import net.minecraft.network.play.server.SEntityPropertiesPacket;
+import net.minecraft.network.play.server.SSetSlotPacket;
+import net.minecraft.network.play.server.SSpawnPositionPacket;
+import net.minecraft.network.play.server.SUpdateHealthPacket;
+import net.minecraft.scoreboard.ScoreCriteria;
 import net.minecraft.scoreboard.Score;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerInteractionManager;
-import net.minecraft.stats.StatBase;
-import net.minecraft.stats.StatList;
+import net.minecraft.stats.Stat;
+import net.minecraft.stats.Stats;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.GameType;
 import net.minecraft.world.IInteractionObject;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
@@ -154,20 +154,20 @@ import java.util.Set;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityPlayerMP.class)
+@Mixin(ServerPlayerEntity.class)
 public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements SubjectBridge, EntityPlayerMPBridge, CommandSenderBridge,
     CommandSourceBridge {
 
     @Shadow @Final public MinecraftServer server;
     @Shadow @Final public PlayerInteractionManager interactionManager;
-    @Shadow public NetHandlerPlayServer connection;
+    @Shadow public ServerPlayNetHandler connection;
     @Shadow private int lastExperience;
     @Shadow private float lastHealth;
     @Shadow private int lastFoodLevel;
     @Shadow public boolean isChangingQuantityOnly;
 
-    @Shadow @Override public abstract void takeStat(StatBase stat);
-    @Shadow public abstract WorldServer getServerWorld();
+    @Shadow @Override public abstract void takeStat(Stat stat);
+    @Shadow public abstract ServerWorld getServerWorld();
 
     // Used to restore original item received in a packet after canceling an event
     private ItemStack impl$packetItem = ItemStack.EMPTY;
@@ -176,16 +176,16 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     private int impl$viewDistance;
     @Nullable private GameType impl$pendingGameType;
     private Scoreboard impl$spongeScoreboard = Sponge.getGame().getServer().getServerScoreboard().get();
-    @Nullable private EntityPlayerMP impl$delegate;
+    @Nullable private ServerPlayerEntity impl$delegate;
     @Nullable private Vector3d impl$velocityOverride = null;
     private double impl$healthScale = Constants.Entity.Player.DEFAULT_HEALTH_SCALE;
     private float impl$cachedModifiedHealth = -1;
-    private final PlayerOwnBorderListener borderListener = new PlayerOwnBorderListener((EntityPlayerMP) (Object) this);
+    private final PlayerOwnBorderListener borderListener = new PlayerOwnBorderListener((ServerPlayerEntity) (Object) this);
     private boolean keepInventory = false;
     @Nullable private Text displayName = null;
 
     @Override
-    public void spongeImpl$writeToSpongeCompound(final NBTTagCompound compound) {
+    public void spongeImpl$writeToSpongeCompound(final CompoundNBT compound) {
         super.spongeImpl$writeToSpongeCompound(compound);
         if (bridge$isHealthScaled()) {
             compound.setDouble(Constants.Sponge.Entity.Player.HEALTH_SCALE, this.impl$healthScale);
@@ -193,7 +193,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     }
 
     @Override
-    public void spongeImpl$readFromSpongeCompound(final NBTTagCompound compound) {
+    public void spongeImpl$readFromSpongeCompound(final CompoundNBT compound) {
         super.spongeImpl$readFromSpongeCompound(compound);
         if (compound.hasKey(Constants.Sponge.Entity.Player.HEALTH_SCALE, Constants.NBT.TAG_DOUBLE)) {
             this.impl$healthScale = compound.getDouble(Constants.Sponge.Entity.Player.HEALTH_SCALE);
@@ -201,10 +201,10 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     }
 
     @Inject(method = "removeEntity", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/network/NetHandlerPlayServer;sendPacket(Lnet/minecraft/network/Packet;)V"))
+            target = "Lnet/minecraft/network/ServerPlayNetHandler;sendPacket(Lnet/minecraft/network/Packet;)V"))
     private void onRemoveEntity(final Entity entityIn, final CallbackInfo ci) {
         if (entityIn instanceof EntityHuman) {
-            ((EntityHuman) entityIn).onRemovedFrom((EntityPlayerMP) (Object) this);
+            ((EntityHuman) entityIn).onRemovedFrom((ServerPlayerEntity) (Object) this);
         }
     }
 
@@ -225,7 +225,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     public void onDeath(final DamageSource cause) {
         // Sponge start
         final boolean isMainThread = Sponge.isServerAvailable() && Sponge.getServer().isMainThread();
-        final Optional<DestructEntityEvent.Death> optEvent = SpongeCommonEventFactory.callDestructEntityEventDeath((EntityPlayerMP) (Object) this, cause, isMainThread);
+        final Optional<DestructEntityEvent.Death> optEvent = SpongeCommonEventFactory.callDestructEntityEventDeath((ServerPlayerEntity) (Object) this, cause, isMainThread);
         if (optEvent.map(Cancellable::isCancelled).orElse(true)) {
             return;
         }
@@ -245,7 +245,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
             // Sponge end
 
             final boolean flag = this.world.getGameRules().getBoolean("showDeathMessages");
-            this.connection.sendPacket(new SPacketCombatEvent(this.getCombatTracker(), SPacketCombatEvent.Event.ENTITY_DIED, flag));
+            this.connection.sendPacket(new SCombatPacket(this.getCombatTracker(), SCombatPacket.Event.ENTITY_DIED, flag));
 
             if (flag) {
                 final Team team = this.getTeam();
@@ -253,10 +253,10 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
                 if (team != null && team.getDeathMessageVisibility() != Team.EnumVisible.ALWAYS) {
                     if (team.getDeathMessageVisibility() == Team.EnumVisible.HIDE_FOR_OTHER_TEAMS) {
                         this.server.getPlayerList()
-                            .sendMessageToAllTeamMembers((EntityPlayerMP) (Object) this, this.getCombatTracker().getDeathMessage());
+                            .sendMessageToAllTeamMembers((ServerPlayerEntity) (Object) this, this.getCombatTracker().getDeathMessage());
                     } else if (team.getDeathMessageVisibility() == Team.EnumVisible.HIDE_FOR_OWN_TEAM) {
                         this.server.getPlayerList()
-                            .sendMessageToTeamOrAllPlayers((EntityPlayerMP) (Object) this, this.getCombatTracker().getDeathMessage());
+                            .sendMessageToTeamOrAllPlayers((ServerPlayerEntity) (Object) this, this.getCombatTracker().getDeathMessage());
                     }
                 } else {
                     this.server.getPlayerList().sendMessage(this.getCombatTracker().getDeathMessage());
@@ -271,12 +271,12 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
                 this.inventory.dropAllItems();
             }
 
-            for (final ScoreObjective scoreobjective : this.getWorldScoreboard().getObjectivesFromCriteria(IScoreCriteria.DEATH_COUNT)) {
+            for (final ScoreObjective scoreobjective : this.getWorldScoreboard().getObjectivesFromCriteria(ScoreCriteria.DEATH_COUNT)) {
                 final Score score = this.getWorldScoreboard().getOrCreateScore(this.shadow$getName(), scoreobjective);
                 score.incrementScore();
             }
 
-            final EntityLivingBase entitylivingbase = this.getAttackingEntity();
+            final LivingEntity entitylivingbase = this.getAttackingEntity();
 
             if (entitylivingbase != null) {
                 final EntityList.EntityEggInfo entitylist$entityegginfo = EntityList.ENTITY_EGGS.get(EntityList.getKey(entitylivingbase));
@@ -285,11 +285,11 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
                     this.addStat(entitylist$entityegginfo.entityKilledByStat);
                 }
 
-                entitylivingbase.awardKillScore((EntityPlayerMP) (Object) this, this.scoreValue, cause);
+                entitylivingbase.awardKillScore((ServerPlayerEntity) (Object) this, this.scoreValue, cause);
             }
 
-            this.addStat(StatList.DEATHS);
-            this.takeStat(StatList.TIME_SINCE_DEATH);
+            this.addStat(Stats.DEATHS);
+            this.takeStat(Stats.TIME_SINCE_DEATH);
             this.extinguish();
             this.setFlag(0, false);
             this.getCombatTracker().reset();
@@ -308,12 +308,12 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     }
 
     @Inject(method = "copyFrom", at = @At("HEAD"))
-    private void onClonePlayer(final EntityPlayerMP oldPlayer, final boolean respawnFromEnd, final CallbackInfo ci) {
+    private void onClonePlayer(final ServerPlayerEntity oldPlayer, final boolean respawnFromEnd, final CallbackInfo ci) {
         // Copy over sponge data from the old player.
         // Allows plugins to specify data that persists after players respawn.
         final EntityBridge oldEntity = (EntityBridge) oldPlayer;
         if (((DataCompoundHolder) oldEntity).data$hasRootCompound()) {
-            final NBTTagCompound old = ((DataCompoundHolder) oldEntity).data$getRootCompound();
+            final CompoundNBT old = ((DataCompoundHolder) oldEntity).data$getRootCompound();
             if (old.hasKey(Constants.Sponge.SPONGE_DATA)) {
                 ((DataCompoundHolder) this).data$getRootCompound().setTag(Constants.Sponge.SPONGE_DATA, old.getCompoundTag(Constants.Sponge.SPONGE_DATA));
                 this.spongeImpl$readFromSpongeCompound(((DataCompoundHolder) this).data$getSpongeCompound());
@@ -322,7 +322,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     }
 
     @Redirect(method = "copyFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/GameRules;getBoolean(Ljava/lang/String;)Z"))
-    private boolean keepInventory(final GameRules gameRules, final String key, final EntityPlayerMP corpse, final boolean keepEverything) {
+    private boolean keepInventory(final GameRules gameRules, final String key, final ServerPlayerEntity corpse, final boolean keepEverything) {
         final boolean keep = ((EntityPlayerBridge) corpse).bridge$keepInventory(); // Override Keep Inventory GameRule?
         if (!keep) {
             // Copy corpse inventory to respawned player
@@ -349,7 +349,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
 
             if (this.isPlayerSleeping()) {
                 this.getServerWorld().getEntityTracker()
-                        .sendToTrackingAndSelf((Entity) (Object) this, new SPacketAnimation((Entity) (Object) this, 2)); // Sponge - cast to Entity
+                        .sendToTrackingAndSelf((Entity) (Object) this, new SAnimateHandPacket((Entity) (Object) this, 2)); // Sponge - cast to Entity
             }
 
             super.wakeUpPlayer(immediately, updateWorldFlag, setSpawn);
@@ -383,7 +383,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     // Post before the player values are updated
     @SuppressWarnings("ConstantConditions")
     @Inject(method = "handleClientSettings", at = @At("HEAD"))
-    private void postClientSettingsEvent(final CPacketClientSettings packet, final CallbackInfo ci) {
+    private void postClientSettingsEvent(final CClientSettingsPacket packet, final CallbackInfo ci) {
         if (ShouldFire.PLAYER_CHANGE_CLIENT_SETTINGS_EVENT) {
             final CauseStackManager csm = Sponge.getCauseStackManager();
             csm.pushCause(this);
@@ -402,7 +402,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     }
 
     @Inject(method = "handleClientSettings", at = @At("RETURN"))
-    private void impl$updateSkinFromPacket(final CPacketClientSettings packet, final CallbackInfo ci) {
+    private void impl$updateSkinFromPacket(final CClientSettingsPacket packet, final CallbackInfo ci) {
         this.impl$skinParts = SkinUtil.fromFlags(packet.getModelPartFlags()); // Returned set is immutable
         this.impl$viewDistance = packet.view;
     }
@@ -461,7 +461,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     }
 
     @Override
-    public void bridge$restorePacketItem(final EnumHand hand) {
+    public void bridge$restorePacketItem(final Hand hand) {
         if (this.impl$packetItem.isEmpty()) {
             return;
         }
@@ -472,12 +472,12 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
         this.openContainer.detectAndSendChanges();
         this.isChangingQuantityOnly = false;
         // force client itemstack update if place event was cancelled
-        this.connection.sendPacket(new SPacketSetSlot(this.openContainer.windowId, slot.slotNumber, this.impl$packetItem));
+        this.connection.sendPacket(new SSetSlotPacket(this.openContainer.windowId, slot.slotNumber, this.impl$packetItem));
     }
 
     @Override
     public void bridge$initScoreboard() {
-        ((ServerScoreboardBridge) this.getWorldScoreboard()).bridge$addPlayer((EntityPlayerMP) (Object) this, true);
+        ((ServerScoreboardBridge) this.getWorldScoreboard()).bridge$addPlayer((ServerPlayerEntity) (Object) this, true);
     }
 
     @Override
@@ -496,17 +496,17 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     @Override
     public void bridge$setScoreboardOnRespawn(final Scoreboard scoreboard) {
         this.impl$spongeScoreboard = scoreboard;
-        ((ServerScoreboardBridge) ((Player) this).getScoreboard()).bridge$addPlayer((EntityPlayerMP) (Object) this, false);
+        ((ServerScoreboardBridge) ((Player) this).getScoreboard()).bridge$addPlayer((ServerPlayerEntity) (Object) this, false);
     }
 
     @Override
     public void bridge$removeScoreboardOnRespawn() {
-        ((ServerScoreboardBridge) ((Player) this).getScoreboard()).bridge$removePlayer((EntityPlayerMP) (Object) this, false);
+        ((ServerScoreboardBridge) ((Player) this).getScoreboard()).bridge$removePlayer((ServerPlayerEntity) (Object) this, false);
     }
 
     @Override
     public MessageChannel bridge$getDeathMessageChannel() {
-        final EntityPlayerMP player = (EntityPlayerMP) (Object) this;
+        final ServerPlayerEntity player = (ServerPlayerEntity) (Object) this;
         if (player.world.getGameRules().getBoolean("showDeathMessages")) {
             @Nullable final Team team = player.getTeam();
 
@@ -573,7 +573,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
 
     @Nullable
     @Override
-    public EntityPlayerMP bridge$getDelegate() {
+    public ServerPlayerEntity bridge$getDelegate() {
         return this.impl$delegate;
     }
 
@@ -616,7 +616,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     @Override
     public void bridge$setTargetedLocation(@Nullable final Vector3d vec) {
         super.bridge$setTargetedLocation(vec);
-        this.connection.sendPacket(new SPacketSpawnPosition(VecHelper.toBlockPos(this.bridge$getTargetedLocation())));
+        this.connection.sendPacket(new SSpawnPositionPacket(VecHelper.toBlockPos(this.bridge$getTargetedLocation())));
     }
 
     @Override
@@ -631,8 +631,8 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     }
 
     @Override
-    public void bridge$sendBlockChange(final BlockPos pos, final IBlockState state) {
-        final SPacketBlockChange packet = new SPacketBlockChange();
+    public void bridge$sendBlockChange(final BlockPos pos, final BlockState state) {
+        final SChangeBlockPacket packet = new SChangeBlockPacket();
         packet.blockPosition = pos;
         packet.blockState = state;
         this.connection.sendPacket(packet);
@@ -641,13 +641,13 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     /**
      * @author gabizou, April 7th, 2016
      *
-     * Technically an overwrite of {@link EntityPlayer#dropItem(boolean)}
+     * Technically an overwrite of {@link PlayerEntity#dropItem(boolean)}
      * @param dropAll
      * @return
      */
     @Override
     @Nullable
-    public EntityItem dropItem(final boolean dropAll) {
+    public ItemEntity dropItem(final boolean dropAll) {
         final ItemStack currentItem = this.inventory.getCurrentItem();
         if (currentItem.isEmpty()) {
             return null;
@@ -670,7 +670,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
         // We need to re-send the player's inventory to overwrite any client-side inventory changes that may have occured as a result
         // of the client (but not the server) calling Item#onPlayerStoppedUsing (which in the case of a bow, removes one arrow from the inventory).
         if (this.activeItemStack.isEmpty()) {
-            ((EntityPlayerMP) (Object) this).sendContainerToPlayer(((EntityPlayerMP) (Object) this).inventoryContainer);
+            ((ServerPlayerEntity) (Object) this).sendContainerToPlayer(((ServerPlayerEntity) (Object) this).inventoryContainer);
         }
         super.stopActiveHand();
     }
@@ -685,10 +685,10 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
         }
     }
 
-    @Inject(method = "displayGUIChest", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/EntityPlayerMP;openContainer:Lnet/minecraft/inventory/Container;", opcode = Opcodes.PUTFIELD, ordinal = 1, shift = At.Shift.AFTER))
+    @Inject(method = "displayGUIChest", at = @At(value = "FIELD", target = "Lnet/minecraft/entity/player/ServerPlayerEntity;openContainer:Lnet/minecraft/inventory/Container;", opcode = Opcodes.PUTFIELD, ordinal = 1, shift = At.Shift.AFTER))
     private void onSetContainer(final IInventory chestInventory, final CallbackInfo ci) {
-        if (!(chestInventory instanceof IInteractionObject) && this.openContainer instanceof ContainerChest && this.isSpectator()) {
-            SpongeImpl.getLogger().warn("Opening fallback ContainerChest for inventory '{}'. Most API inventory methods will not be supported", chestInventory);
+        if (!(chestInventory instanceof IInteractionObject) && this.openContainer instanceof ChestContainer && this.isSpectator()) {
+            SpongeImpl.getLogger().warn("Opening fallback ChestContainer for inventory '{}'. Most API inventory methods will not be supported", chestInventory);
             ((ContainerBridge) this.openContainer).bridge$setSpectatorChest(true);
         }
     }
@@ -699,40 +699,40 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     }
 
     /**
-     * Send SlotCrafting updates to client for custom recipes.
+     * Send CraftingResultSlot updates to client for custom recipes.
      *
      * @author Faithcaio - 31.12.2016
-     * @reason Vanilla is not updating the Client when Slot is SlotCrafting - this is an issue when plugins register new recipes
+     * @reason Vanilla is not updating the Client when Slot is CraftingResultSlot - this is an issue when plugins register new recipes
      */
     @Inject(method = "sendSlotContents", at = @At("HEAD"))
     private void sendSlotContents(
         final net.minecraft.inventory.Container containerToSend, final int slotInd, final ItemStack stack, final CallbackInfo ci) {
-        if (containerToSend.getSlot(slotInd) instanceof SlotCrafting) {
-            this.connection.sendPacket(new SPacketSetSlot(containerToSend.windowId, slotInd, stack));
+        if (containerToSend.getSlot(slotInd) instanceof CraftingResultSlot) {
+            this.connection.sendPacket(new SSetSlotPacket(containerToSend.windowId, slotInd, stack));
         }
     }
 
     @Redirect(method = "onUpdateEntity",
             at = @At(
                     value = "INVOKE",
-                    target = "Lnet/minecraft/entity/player/EntityPlayerMP;getHealth()F"
+                    target = "Lnet/minecraft/entity/player/ServerPlayerEntity;getHealth()F"
             ),
             slice =  @Slice(
                     from = @At(
                             value = "FIELD",
-                            target = "Lnet/minecraft/entity/player/EntityPlayerMP;lastHealth:F"
+                            target = "Lnet/minecraft/entity/player/ServerPlayerEntity;lastHealth:F"
                     ),
                     to = @At(
                             value = "INVOKE",
-                            target = "Lnet/minecraft/network/play/server/SPacketUpdateHealth;<init>(FIF)V"
+                            target = "Lnet/minecraft/network/play/server/SUpdateHealthPacket;<init>(FIF)V"
                     )
             )
     )
-    private float spongeGetScaledHealthForPacket(final EntityPlayerMP entityPlayerMP) {
+    private float spongeGetScaledHealthForPacket(final ServerPlayerEntity entityPlayerMP) {
         return bridge$getInternalScaledHealth();
     }
 
-    @Inject(method = "onUpdateEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/EntityPlayerMP;getTotalArmorValue()I", ordinal = 1))
+    @Inject(method = "onUpdateEntity", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/player/ServerPlayerEntity;getTotalArmorValue()I", ordinal = 1))
     private void updateHealthPriorToArmor(final CallbackInfo ci) {
         bridge$refreshScaledHealth();
     }
@@ -756,8 +756,8 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
         bridge$injectScaledHealth(dirtyInstances);
 
         // Send the new information to the client.
-        this.connection.sendPacket(new SPacketUpdateHealth(bridge$getInternalScaledHealth(), getFoodStats().getFoodLevel(), getFoodStats().getSaturationLevel()));
-        this.connection.sendPacket(new SPacketEntityProperties(this.getEntityId(), dirtyInstances));
+        this.connection.sendPacket(new SUpdateHealthPacket(bridge$getInternalScaledHealth(), getFoodStats().getFoodLevel(), getFoodStats().getSaturationLevel()));
+        this.connection.sendPacket(new SEntityPropertiesPacket(this.getEntityId(), dirtyInstances));
         // Reset the dirty instances since they've now been manually updated on the client.
         dirtyInstances.clear();
 
@@ -851,7 +851,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
     }
 
     @Override
-    public void bridge$setDelegateAfterRespawn(EntityPlayerMP delegate) {
+    public void bridge$setDelegateAfterRespawn(ServerPlayerEntity delegate) {
         this.impl$delegate = delegate;
     }
 
@@ -865,7 +865,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
         if (this.displayName == null) {
             return chestInventory.getDisplayName();
         }
-        return new TextComponentString(SpongeTexts.toLegacy(this.displayName));
+        return new StringTextComponent(SpongeTexts.toLegacy(this.displayName));
     }
 
     @Redirect(method = "displayGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/IInteractionObject;getDisplayName()Lnet/minecraft/util/text/ITextComponent;"))
@@ -873,7 +873,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
         if (this.displayName == null) {
             return guiOwner.getDisplayName();
         }
-        return new TextComponentString(SpongeTexts.toLegacy(this.displayName));
+        return new StringTextComponent(SpongeTexts.toLegacy(this.displayName));
     }
 
     @Redirect(method = "openGuiHorseInventory", at = @At(value = "INVOKE", target = "Lnet/minecraft/inventory/IInventory;getDisplayName()Lnet/minecraft/util/text/ITextComponent;"))
@@ -881,7 +881,7 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
         if (this.displayName == null) {
             return inventoryIn.getDisplayName();
         }
-        return new TextComponentString(SpongeTexts.toLegacy(this.displayName));
+        return new StringTextComponent(SpongeTexts.toLegacy(this.displayName));
     }
 
     @Redirect(method = "displayVillagerTradeGui", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/IMerchant;getDisplayName()Lnet/minecraft/util/text/ITextComponent;"))
@@ -889,11 +889,11 @@ public abstract class EntityPlayerMPMixin extends EntityPlayerMixin implements S
         if (this.displayName == null) {
             return villager.getDisplayName();
         }
-        return new TextComponentString(SpongeTexts.toLegacy(this.displayName));
+        return new StringTextComponent(SpongeTexts.toLegacy(this.displayName));
     }
 
     @Inject(method = "canAttackPlayer", at = @At("HEAD"), cancellable = true)
-    private void onCanAttackPlayer(final EntityPlayer other, final CallbackInfoReturnable<Boolean> cir) {
+    private void onCanAttackPlayer(final PlayerEntity other, final CallbackInfoReturnable<Boolean> cir) {
         final boolean worldPVP = ((WorldProperties) other.world.getWorldInfo()).isPVPEnabled();
 
         if (!worldPVP) {

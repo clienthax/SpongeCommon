@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.core.entity.monster;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.monster.EndermanEntity;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.CauseStackManager;
 import org.spongepowered.api.event.cause.EventContextKeys;
@@ -38,15 +38,15 @@ import org.spongepowered.common.event.tracking.phase.tick.EntityTickContext;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityEnderman.class)
+@Mixin(EndermanEntity.class)
 public abstract class EntityEndermanMixin extends EntityMobMixin {
 
-    @Shadow @Nullable public abstract IBlockState getHeldBlockState();
+    @Shadow @Nullable public abstract BlockState getHeldBlockState();
 
-    @Shadow public abstract void setHeldBlockState(@Nullable IBlockState state);
+    @Shadow public abstract void setHeldBlockState(@Nullable BlockState state);
 
-    @Redirect(method = "teleportTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/monster/EntityEnderman;attemptTeleport(DDD)Z"))
-    private boolean impl$CheckContextWithTeleport(EntityEnderman entityEnderman, double x, double y, double z) {
+    @Redirect(method = "teleportTo", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/monster/EndermanEntity;attemptTeleport(DDD)Z"))
+    private boolean impl$CheckContextWithTeleport(EndermanEntity entityEnderman, double x, double y, double z) {
         if (entityEnderman.world.isRemote) {
             return entityEnderman.attemptTeleport(x, y, z);
         }

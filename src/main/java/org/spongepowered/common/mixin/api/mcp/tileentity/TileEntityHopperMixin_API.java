@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.tileentity;
 
-import net.minecraft.tileentity.TileEntityHopper;
+import net.minecraft.tileentity.HopperTileEntity;
 import org.spongepowered.api.block.tileentity.carrier.Hopper;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -37,7 +37,7 @@ import org.spongepowered.common.util.Constants;
 import java.util.List;
 
 @NonnullByDefault
-@Mixin(TileEntityHopper.class)
+@Mixin(HopperTileEntity.class)
 public abstract class TileEntityHopperMixin_API extends TileEntityLockableLootMixin_API<Hopper> implements Hopper {
 
     @Shadow private int transferCooldown;

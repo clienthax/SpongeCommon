@@ -33,20 +33,20 @@ import com.google.common.base.Predicates;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.ai.attributes.AttributeMap;
 import net.minecraft.entity.ai.attributes.IAttributeInstance;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityMinecartTNT;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.minecart.TNTMinecartEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.play.server.SPacketEntityEffect;
-import net.minecraft.network.play.server.SPacketEntityProperties;
-import net.minecraft.network.play.server.SPacketEntityStatus;
-import net.minecraft.network.play.server.SPacketRespawn;
-import net.minecraft.network.play.server.SPacketServerDifficulty;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.network.play.server.SPlayEntityEffectPacket;
+import net.minecraft.network.play.server.SEntityPropertiesPacket;
+import net.minecraft.network.play.server.SEntityStatusPacket;
+import net.minecraft.network.play.server.SRespawnPacket;
+import net.minecraft.network.play.server.SServerDifficultyPacket;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerList;
 import net.minecraft.util.ResourceLocation;
@@ -56,11 +56,11 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldProviderEnd;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.dimension.EndDimension;
 import net.minecraft.world.WorldProviderSurface;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.Transform;
@@ -135,7 +135,7 @@ public final class EntityUtil {
 
     @Nullable
     public static Entity transferEntityToWorld(final Entity entity, @Nullable MoveEntityEvent.Teleport event,
-        @Nullable WorldServer toWorld,  @Nullable final ForgeITeleporterBridge teleporter, final boolean recreate) {
+        @Nullable ServerWorld toWorld,  @Nullable final ForgeITeleporterBridge teleporter, final boolean recreate) {
 
         if (entity.world.isRemote || entity.isDead) {
             return null;
@@ -144,7 +144,7 @@ public final class EntityUtil {
         org.spongepowered.api.entity.Entity sEntity = (org.spongepowered.api.entity.Entity) entity;
         final EntityBridge mEntity = (EntityBridge) entity;
         final Transform<World> fromTransform = sEntity.getTransform();
-        final WorldServer fromWorld = (WorldServer) fromTransform.getExtent();
+        final ServerWorld fromWorld = (ServerWorld) fromTransform.getExtent();
 
         fromWorld.profiler.startSection("changeDimension");
 
@@ -194,7 +194,7 @@ public final class EntityUtil {
                     return null;
                 } else {
                     toTransform = event.getToTransform();
-                    toWorld = (WorldServer) toTransform.getExtent();
+                    toWorld = (ServerWorld) toTransform.getExtent();
 
                     // Handle plugins setting changing to a different world than the teleporter said so. This is considered a cancellation
                     if (context.getExitTransform().getExtent() != toTransform.getExtent()) {
@@ -243,7 +243,7 @@ public final class EntityUtil {
             return null;
         } else {
             toTransform = event.getToTransform();
-            toWorld = (WorldServer) toTransform.getExtent();
+            toWorld = (ServerWorld) toTransform.getExtent();
         }
 
         fromWorld.profiler.endStartSection("reloading");
@@ -290,7 +290,7 @@ public final class EntityUtil {
         }
 
         // Fix Vanilla bug where primed minecart TNTs don't keep state through a portal
-        if (toReturn instanceof EntityMinecartTNT) {
+        if (toReturn instanceof TNTMinecartEntity) {
             if (((FusedExplosive) sEntity).isPrimed()) {
                 toReturn.world.setEntityState(toReturn, (byte) 10);
             }
@@ -306,8 +306,8 @@ public final class EntityUtil {
     }
 
     @Nullable
-    public static EntityPlayerMP transferPlayerToWorld(final EntityPlayerMP player, @Nullable MoveEntityEvent.Teleport event,
-        @Nullable WorldServer toWorld,  @Nullable final ForgeITeleporterBridge teleporter) {
+    public static ServerPlayerEntity transferPlayerToWorld(final ServerPlayerEntity player, @Nullable MoveEntityEvent.Teleport event,
+        @Nullable ServerWorld toWorld,  @Nullable final ForgeITeleporterBridge teleporter) {
 
         if (player.world.isRemote || player.isDead) {
             return null;
@@ -316,7 +316,7 @@ public final class EntityUtil {
         final PlayerList playerList = SpongeImpl.getServer().getPlayerList();
         final Player sPlayer = (Player) player;
         final Transform<World> fromTransform = sPlayer.getTransform();
-        final WorldServer fromWorld = (WorldServer) fromTransform.getExtent();
+        final ServerWorld fromWorld = (ServerWorld) fromTransform.getExtent();
 
         fromWorld.profiler.startSection("changeDimension");
 
@@ -364,7 +364,7 @@ public final class EntityUtil {
                     return null;
                 } else {
                     toTransform = event.getToTransform();
-                    toWorld = (WorldServer) toTransform.getExtent();
+                    toWorld = (ServerWorld) toTransform.getExtent();
 
                     // Handle plugins setting changing to a different world than the teleporter said so. This is considered a cancellation
                     if (context.getExitTransform().getExtent() != toTransform.getExtent()) {
@@ -409,7 +409,7 @@ public final class EntityUtil {
             return null;
         } else {
             toTransform = event.getToTransform();
-            toWorld = (WorldServer) toTransform.getExtent();
+            toWorld = (ServerWorld) toTransform.getExtent();
         }
 
         final int fromClientDimId = WorldManager.getClientDimensionId(player, fromWorld);
@@ -429,11 +429,11 @@ public final class EntityUtil {
                     break;
             }
 
-            player.connection.sendPacket(new SPacketRespawn(fakeDimId, toWorld.getDifficulty(), toWorld.getWorldType(),
+            player.connection.sendPacket(new SRespawnPacket(fakeDimId, toWorld.getDifficulty(), toWorld.getWorldType(),
                 player.interactionManager.getGameType()));
         }
 
-        player.connection.sendPacket(new SPacketRespawn(toClientDimId, toWorld.getDifficulty(), toWorld.getWorldType(),
+        player.connection.sendPacket(new SRespawnPacket(toClientDimId, toWorld.getDifficulty(), toWorld.getWorldType(),
             player.interactionManager.getGameType()));
 
         playerList.updatePermissionLevel(player);
@@ -475,19 +475,19 @@ public final class EntityUtil {
         playerList.updateTimeAndWeatherForPlayer(player, toWorld);
         playerList.syncPlayerInventory(player);
 
-        for (final PotionEffect potioneffect : player.getActivePotionEffects()) {
-            player.connection.sendPacket(new SPacketEntityEffect(player.getEntityId(), potioneffect));
+        for (final EffectInstance potioneffect : player.getActivePotionEffects()) {
+            player.connection.sendPacket(new SPlayEntityEffectPacket(player.getEntityId(), potioneffect));
         }
 
-        // Fix MC-88179: on non-death SPacketRespawn, also resend attributes
+        // Fix MC-88179: on non-death SRespawnPacket, also resend attributes
         final AttributeMap attributemap = (AttributeMap) player.getAttributeMap();
         final Collection<IAttributeInstance> watchedAttribs = attributemap.getWatchedAttributes();
         if (!watchedAttribs.isEmpty()) {
-            player.connection.sendPacket(new SPacketEntityProperties(player.getEntityId(), watchedAttribs));
+            player.connection.sendPacket(new SEntityPropertiesPacket(player.getEntityId(), watchedAttribs));
         }
 
-        player.connection.sendPacket(new SPacketServerDifficulty(toWorld.getDifficulty(), toWorld.getWorldInfo().isDifficultyLocked()));
-        player.connection.sendPacket(new SPacketEntityStatus(player, toWorld.getGameRules().getBoolean(DefaultGameRules.REDUCED_DEBUG_INFO) ?
+        player.connection.sendPacket(new SServerDifficultyPacket(toWorld.getDifficulty(), toWorld.getWorldInfo().isDifficultyLocked()));
+        player.connection.sendPacket(new SEntityStatusPacket(player, toWorld.getGameRules().getBoolean(DefaultGameRules.REDUCED_DEBUG_INFO) ?
             (byte) 22 : 23));
 
         if (!event.getKeepsVelocity()) {
@@ -502,18 +502,18 @@ public final class EntityUtil {
     }
 
     // Teleporter code is extremely stupid
-    private static InvokingTeleporterContext createInvokingTeleporterPhase(final Entity entity, WorldServer toWorld, ForgeITeleporterBridge teleporter) {
+    private static InvokingTeleporterContext createInvokingTeleporterPhase(final Entity entity, ServerWorld toWorld, ForgeITeleporterBridge teleporter) {
         SpongeImplHooks.registerPortalAgentType(teleporter);
 
         final MinecraftServer mcServer = SpongeImpl.getServer();
         final org.spongepowered.api.entity.Entity sEntity = (org.spongepowered.api.entity.Entity) entity;
         final Transform<World> fromTransform = sEntity.getTransform();
-        final WorldServer fromWorld = ((WorldServer) entity.world);
+        final ServerWorld fromWorld = ((ServerWorld) entity.world);
 
         int toDimensionId = ((WorldServerBridge) toWorld).bridge$getDimensionId();
 
         // Entering End Portal in End goes to Overworld in Vanilla
-        if (toDimensionId == 1 && fromWorld.provider instanceof WorldProviderEnd) {
+        if (toDimensionId == 1 && fromWorld.provider instanceof EndDimension) {
             toDimensionId = 0;
         }
 
@@ -535,7 +535,7 @@ public final class EntityUtil {
                 if (properties.getWorldName().equalsIgnoreCase(worldName)) {
                     final Optional<World> spongeWorld = Sponge.getServer().loadWorld(properties);
                     if (spongeWorld.isPresent()) {
-                        toWorld = (WorldServer) spongeWorld.get();
+                        toWorld = (ServerWorld) spongeWorld.get();
                         teleporter = (ForgeITeleporterBridge) toWorld.getDefaultTeleporter();
                         if (teleporter instanceof TeleporterBridge) {
                             if (!((fromWorld.provider.isNether() || toWorld.provider.isNether()))) {
@@ -558,14 +558,14 @@ public final class EntityUtil {
             .setExitTransform(toTransform)
             .buildAndSwitch();
 
-        if (!(fromWorld.provider instanceof WorldProviderEnd)) {
+        if (!(fromWorld.provider instanceof EndDimension)) {
 
             // Only place entity in portal if one of the following are true :
             // 1. The teleporter is custom. (not vanilla)
             // 2. The last known portal vec is known. (Usually set after block collision)
             // 3. The entity is traveling to end from a non-end world.
             // Note: We must always use placeInPortal to support mods.
-            if (!teleporter.bridge$isVanilla() || entity.getLastPortalVec() != null || toWorld.provider instanceof WorldProviderEnd) {
+            if (!teleporter.bridge$isVanilla() || entity.getLastPortalVec() != null || toWorld.provider instanceof EndDimension) {
                 // In Forge, the entity dimension is already set by this point.
                 // To maintain compatibility with Forge mods, we temporarily
                 // set the entity's dimension to the current target dimension
@@ -576,7 +576,7 @@ public final class EntityUtil {
                     (float) toTransform.getPitch());
 
                 fromWorld.profiler.startSection("placing");
-                if (!teleporter.bridge$isVanilla() || toWorld.provider instanceof WorldProviderEnd) {
+                if (!teleporter.bridge$isVanilla() || toWorld.provider instanceof EndDimension) {
                     // Have to assume mod teleporters or end -> overworld always port. We set this state for nether ports in
                     // TeleporterMixin#bridge$placeEntity
                     context.setDidPort(true);
@@ -600,9 +600,9 @@ public final class EntityUtil {
         return context;
     }
 
-    private static Transform<World> getPortalExitTransform(final Entity entity, final WorldServer fromWorld, final WorldServer toWorld) {
-        final WorldProvider fromWorldProvider = fromWorld.provider;
-        final WorldProvider toWorldProvider = toWorld.provider;
+    private static Transform<World> getPortalExitTransform(final Entity entity, final ServerWorld fromWorld, final ServerWorld toWorld) {
+        final Dimension fromWorldProvider = fromWorld.provider;
+        final Dimension toWorldProvider = toWorld.provider;
 
         double x;
         final double y;
@@ -610,12 +610,12 @@ public final class EntityUtil {
 
         final Transform<World> transform;
 
-        if (toWorldProvider instanceof WorldProviderEnd) {
+        if (toWorldProvider instanceof EndDimension) {
             final BlockPos coordinate = toWorld.getSpawnCoordinate();
             x = coordinate.getX();
             y = coordinate.getY();
             z = coordinate.getZ();
-        } else if (fromWorldProvider instanceof WorldProviderEnd && toWorldProvider instanceof WorldProviderSurface) {
+        } else if (fromWorldProvider instanceof EndDimension && toWorldProvider instanceof WorldProviderSurface) {
             final BlockPos coordinate = toWorld.getSpawnPoint();
             x = coordinate.getX();
             y = coordinate.getY();
@@ -641,8 +641,8 @@ public final class EntityUtil {
     }
 
     public static boolean isEntityDead(final net.minecraft.entity.Entity entity) {
-        if (entity instanceof EntityLivingBase) {
-            final EntityLivingBase base = (EntityLivingBase) entity;
+        if (entity instanceof LivingEntity) {
+            final LivingEntity base = (LivingEntity) entity;
             return base.getHealth() <= 0 || base.deathTime > 0 || ((EntityLivingBaseAccessor) entity).accessor$isLivingDead();
         }
         return entity.isDead;
@@ -690,8 +690,8 @@ public final class EntityUtil {
     @SuppressWarnings("ConstantConditions")
     public static boolean processEntitySpawn(final org.spongepowered.api.entity.Entity entity, final Supplier<Optional<User>> supplier) {
         final Entity minecraftEntity = (Entity) entity;
-        if (minecraftEntity instanceof EntityItem) {
-            final ItemStack item = ((EntityItem) minecraftEntity).getItem();
+        if (minecraftEntity instanceof ItemEntity) {
+            final ItemStack item = ((ItemEntity) minecraftEntity).getItem();
             if (!item.isEmpty()) {
                 final Optional<Entity> customEntityItem = Optional.ofNullable(SpongeImplHooks.getCustomEntityIfItem(minecraftEntity));
                 if (customEntityItem.isPresent()) {
@@ -831,7 +831,7 @@ public final class EntityUtil {
      */
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Nullable
-    public static EntityItem entityOnDropItem(final Entity entity, final ItemStack itemStack, final float offsetY, final double xPos, final double zPos) {
+    public static ItemEntity entityOnDropItem(final Entity entity, final ItemStack itemStack, final float offsetY, final double xPos, final double zPos) {
         if (itemStack.isEmpty()) {
             // Sanity check, just like vanilla
             return null;
@@ -864,7 +864,7 @@ public final class EntityUtil {
             // This is where we could perform item pre merging, and cancel before we create a new entity.
             // For now, we aren't performing pre merging.
 
-            final EntityItem entityitem = new EntityItem(entity.world, posX, posY, posZ, item);
+            final ItemEntity entityitem = new ItemEntity(entity.world, posX, posY, posZ, item);
             entityitem.setDefaultPickupDelay();
 
             // FIFTH - Capture the entity maybe?
@@ -889,7 +889,7 @@ public final class EntityUtil {
      * @return The motion vector
      */
     @SuppressWarnings("unused")
-    private static Vector3d createDropMotion(final boolean dropAround, final EntityPlayer player, final Random random) {
+    private static Vector3d createDropMotion(final boolean dropAround, final PlayerEntity player, final Random random) {
         double x;
         double y;
         double z;

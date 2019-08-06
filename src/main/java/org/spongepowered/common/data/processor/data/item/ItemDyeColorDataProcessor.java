@@ -25,9 +25,9 @@
 package org.spongepowered.common.data.processor.data.item;
 
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.Items;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.block.Blocks;
+import net.minecraft.item.Items;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -78,9 +78,9 @@ public class ItemDyeColorDataProcessor extends AbstractItemSingleDataProcessor<D
         Item item = container.getItem();
 
         if(item.equals(Items.DYE) || item.equals(Items.BANNER)) {
-            container.setItemDamage(((EnumDyeColor) (Object) value).getDyeDamage());
+            container.setItemDamage(((DyeColor) (Object) value).getDyeDamage());
         } else {
-            container.setItemDamage(((EnumDyeColor) (Object) value).getMetadata());
+            container.setItemDamage(((DyeColor) (Object) value).getMetadata());
         }
         return true;
     }
@@ -90,9 +90,9 @@ public class ItemDyeColorDataProcessor extends AbstractItemSingleDataProcessor<D
         Item item = container.getItem();
 
         if(item.equals(Items.DYE) || item.equals(Items.BANNER)) {
-            return Optional.of((DyeColor) (Object) EnumDyeColor.byDyeDamage(container.getItemDamage()));
+            return Optional.of((DyeColor) (Object) DyeColor.byDyeDamage(container.getItemDamage()));
         }
-        return Optional.of((DyeColor) (Object) EnumDyeColor.byMetadata(container.getItemDamage()));
+        return Optional.of((DyeColor) (Object) DyeColor.byMetadata(container.getItemDamage()));
     }
 
     @Override

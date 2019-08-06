@@ -27,8 +27,8 @@ package org.spongepowered.common.mixin.core.block;
 import net.minecraft.block.BlockDynamicLiquid;
 import net.minecraft.block.BlockLiquid;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -62,7 +62,7 @@ public abstract class BlockDynamicLiquidMixin extends BlockLiquidMixin {
     }
 
     @Inject(method = "canFlowInto", at = @At("HEAD"), cancellable = true)
-    private void impl$throwPreForFlowingInto(final net.minecraft.world.World worldIn, final BlockPos pos, final IBlockState state,
+    private void impl$throwPreForFlowingInto(final net.minecraft.world.World worldIn, final BlockPos pos, final BlockState state,
         final CallbackInfoReturnable<Boolean> cir) {
         if (!((WorldBridge) worldIn).bridge$isFake() && ShouldFire.CHANGE_BLOCK_EVENT_PRE &&
             SpongeCommonEventFactory.callChangeBlockEventPre((WorldServerBridge) worldIn, pos).isCancelled()) {
@@ -72,7 +72,7 @@ public abstract class BlockDynamicLiquidMixin extends BlockLiquidMixin {
 
     @Inject(method = "updateTick", at = @At("HEAD"), cancellable = true)
     private void impl$throwPreOnUpdate(
-        final net.minecraft.world.World worldIn, final BlockPos pos, final IBlockState state, final Random rand, final CallbackInfo ci) {
+        final net.minecraft.world.World worldIn, final BlockPos pos, final BlockState state, final Random rand, final CallbackInfo ci) {
         if (!((WorldBridge) worldIn).bridge$isFake() && ShouldFire.CHANGE_BLOCK_EVENT_PRE) {
             if (SpongeCommonEventFactory.callChangeBlockEventPre((WorldServerBridge) worldIn, pos).isCancelled()) {
                 ci.cancel();
@@ -87,24 +87,24 @@ public abstract class BlockDynamicLiquidMixin extends BlockLiquidMixin {
         cancellable = true,
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z"
+            target = "Lnet/minecraft/world/World;setBlockState(Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;)Z"
         )
     )
-    private void impl$throwModifyForLavaToStone(final net.minecraft.world.World worldIn, final BlockPos sourcePos, final IBlockState state,
+    private void impl$throwModifyForLavaToStone(final net.minecraft.world.World worldIn, final BlockPos sourcePos, final BlockState state,
         final Random rand, final CallbackInfo ci) {
         if (!ShouldFire.CHANGE_BLOCK_EVENT_MODIFY) {
             return;
         }
         final BlockPos targetPos = sourcePos.down();
         final LocatableBlock source = new SpongeLocatableBlockBuilder().world((World) worldIn).position(sourcePos.getX(), sourcePos.getY(), sourcePos.getZ()).state((BlockState) state).build();
-        final IBlockState newState = Blocks.STONE.getDefaultState();
+        final BlockState newState = Blocks.STONE.getDefaultState();
         final ChangeBlockEvent.Modify event = SpongeCommonEventFactory.callChangeBlockEventModifyLiquidMix(worldIn, targetPos, newState, source);
         final Transaction<BlockSnapshot> transaction = event.getTransactions().get(0);
         if (event.isCancelled() || !transaction.isValid()) {
             ci.cancel();
             return;
         }
-        if (!worldIn.setBlockState(targetPos, (IBlockState) transaction.getFinal().getState())) {
+        if (!worldIn.setBlockState(targetPos, (BlockState) transaction.getFinal().getState())) {
             ci.cancel();
         }
     }
@@ -115,12 +115,12 @@ public abstract class BlockDynamicLiquidMixin extends BlockLiquidMixin {
         cancellable = true,
         at = @At(
             value= "INVOKE",
-            target = "Lnet/minecraft/block/state/IBlockState;getMaterial()Lnet/minecraft/block/material/Material;"
+            target = "Lnet/minecraft/block/state/BlockState;getMaterial()Lnet/minecraft/block/material/Material;"
         ),
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/block/BlockDynamicLiquid;canFlowInto(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/IBlockState;)Z"
+                target = "Lnet/minecraft/block/BlockDynamicLiquid;canFlowInto(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/state/BlockState;)Z"
             ),
             to = @At(
                 value = "FIELD",
@@ -129,13 +129,13 @@ public abstract class BlockDynamicLiquidMixin extends BlockLiquidMixin {
         )
     )
     private void impl$throwBreakForReplacingotherBlocksDuringFlow(
-        final net.minecraft.world.World worldIn, final BlockPos pos, final IBlockState state, final int level, final CallbackInfo ci) {
+        final net.minecraft.world.World worldIn, final BlockPos pos, final BlockState state, final int level, final CallbackInfo ci) {
         if (!ShouldFire.CHANGE_BLOCK_EVENT_BREAK) {
             return;
         }
         // Do not call events when just flowing into air or same liquid
         if (state.getMaterial() != Material.AIR && state.getMaterial() != this.shadow$getDefaultState().getMaterial()) {
-            final IBlockState newState = this.shadow$getDefaultState().withProperty(BlockLiquid.LEVEL, level);
+            final BlockState newState = this.shadow$getDefaultState().withProperty(BlockLiquid.LEVEL, level);
             final ChangeBlockEvent.Break event = SpongeCommonEventFactory.callChangeBlockEventModifyLiquidBreak(worldIn, pos, newState);
 
             final Transaction<BlockSnapshot> transaction = event.getTransactions().get(0);
@@ -146,7 +146,7 @@ public abstract class BlockDynamicLiquidMixin extends BlockLiquidMixin {
 
             // Transaction modified?
             if (transaction.getCustom().isPresent()) {
-                worldIn.setBlockState(pos, (IBlockState) transaction.getFinal().getState());
+                worldIn.setBlockState(pos, (BlockState) transaction.getFinal().getState());
                 ci.cancel();
             }
             // else do vanilla logic

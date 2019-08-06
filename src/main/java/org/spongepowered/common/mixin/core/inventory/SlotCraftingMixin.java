@@ -24,16 +24,16 @@
  */
 package org.spongepowered.common.mixin.core.inventory;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.inventory.Slot;
-import net.minecraft.inventory.SlotCrafting;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.inventory.container.CraftingResultSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.CraftingManager;
-import net.minecraft.network.play.server.SPacketSetSlot;
+import net.minecraft.network.play.server.SSetSlotPacket;
 import net.minecraft.util.NonNullList;
 import org.spongepowered.api.event.item.inventory.CraftItemEvent;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -64,11 +64,11 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@Mixin(SlotCrafting.class)
+@Mixin(CraftingResultSlot.class)
 public abstract class SlotCraftingMixin extends Slot {
 
-    @Shadow @Final private EntityPlayer player;
-    @Shadow @Final private InventoryCrafting craftMatrix;
+    @Shadow @Final private PlayerEntity player;
+    @Shadow @Final private CraftingInventory craftMatrix;
     @Shadow private int amountCrafted;
 
     public SlotCraftingMixin(final IInventory inventoryIn, final int index, final int xPosition, final int yPosition) {
@@ -82,8 +82,8 @@ public abstract class SlotCraftingMixin extends Slot {
     @Override
     public void putStack(@Nullable final ItemStack stack) {
         super.putStack(stack);
-        if (this.player instanceof EntityPlayerMP) {
-            ((EntityPlayerMP) this.player).connection.sendPacket(new SPacketSetSlot(0, 0, stack));
+        if (this.player instanceof ServerPlayerEntity) {
+            ((ServerPlayerEntity) this.player).connection.sendPacket(new SSetSlotPacket(0, 0, stack));
         }
     }
 
@@ -93,7 +93,7 @@ public abstract class SlotCraftingMixin extends Slot {
     }
 
     @Inject(method = "onTake", at = @At("HEAD"))
-    private void beforeTake(final EntityPlayer thePlayer, final ItemStack stack, final CallbackInfoReturnable<ItemStack> cir) {
+    private void beforeTake(final PlayerEntity thePlayer, final ItemStack stack, final CallbackInfoReturnable<ItemStack> cir) {
         this.impl$lastRecipe = ((CraftingRecipe) CraftingManager.findMatchingRecipe(this.craftMatrix, thePlayer.world));
         if (((ContainerBridge) thePlayer.openContainer).bridge$isShiftCrafting()) {
             ((ContainerBridge) thePlayer.openContainer).bridge$detectAndSendChanges(true);
@@ -114,8 +114,8 @@ public abstract class SlotCraftingMixin extends Slot {
         stack.shrink(1);
     }
 
-    @Redirect(method = "onTake", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/crafting/CraftingManager;getRemainingItems(Lnet/minecraft/inventory/InventoryCrafting;Lnet/minecraft/world/World;)Lnet/minecraft/util/NonNullList;"))
-    private NonNullList<ItemStack> onGetRemainingItems(final InventoryCrafting craftMatrix, final net.minecraft.world.World worldIn) {
+    @Redirect(method = "onTake", at = @At(value = "INVOKE", target = "Lnet/minecraft/item/crafting/CraftingManager;getRemainingItems(Lnet/minecraft/inventory/CraftingInventory;Lnet/minecraft/world/World;)Lnet/minecraft/util/NonNullList;"))
+    private NonNullList<ItemStack> onGetRemainingItems(final CraftingInventory craftMatrix, final net.minecraft.world.World worldIn) {
         if (this.impl$lastRecipe == null) {
             return NonNullList.withSize(craftMatrix.getSizeInventory(), ItemStack.EMPTY);
         }
@@ -128,7 +128,7 @@ public abstract class SlotCraftingMixin extends Slot {
      * {@link ContainerMixin#redirectOnTakeThrow}
      */
     @Inject(method = "onTake", cancellable = true, at = @At("RETURN"))
-    private void afterTake(final EntityPlayer thePlayer, final ItemStack stack, final CallbackInfoReturnable<ItemStack> cir) {
+    private void afterTake(final PlayerEntity thePlayer, final ItemStack stack, final CallbackInfoReturnable<ItemStack> cir) {
         if (((WorldBridge) thePlayer.world).bridge$isFake()) {
             return;
         }
@@ -139,7 +139,7 @@ public abstract class SlotCraftingMixin extends Slot {
         final Container container = thePlayer.openContainer;
         final Inventory craftInv = ((Inventory) container).query(QueryOperationTypes.INVENTORY_TYPE.of(CraftingInventory.class));
         if (!(craftInv instanceof CraftingInventory)) {
-            SpongeImpl.getLogger().warn("Detected crafting without a InventoryCrafting!? Crafting Event will not fire.");
+            SpongeImpl.getLogger().warn("Detected crafting without a CraftingInventory!? Crafting Event will not fire.");
             return;
         }
 

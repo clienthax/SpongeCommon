@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableDirectionalData;
@@ -61,7 +61,7 @@ public class ShulkerBulletDirectionalDataProcessor extends AbstractSingleDataSin
 
     @Override
     protected Optional<Direction> getVal(ShulkerBulletEntityAccessor dataHolder) {
-        final EnumFacing direction = dataHolder.accessor$getDirection();
+        final Direction direction = dataHolder.accessor$getDirection();
         return Optional.of(direction != null ? DirectionResolver.getFor(direction) : Direction.NONE);
     }
 

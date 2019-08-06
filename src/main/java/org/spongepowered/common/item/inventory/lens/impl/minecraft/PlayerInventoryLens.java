@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.item.inventory.lens.impl.minecraft;
 
-import net.minecraft.inventory.Container;
+import net.minecraft.inventory.container.Container;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;

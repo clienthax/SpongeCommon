@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.datasync.entity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.AgeableEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
@@ -38,7 +38,7 @@ import java.util.Optional;
 public final class EntityBabyConverter extends DataParameterConverter<Boolean> {
 
     public EntityBabyConverter() {
-        super(EntityAgeable.BABY);
+        super(AgeableEntity.BABY);
     }
 
     @Override

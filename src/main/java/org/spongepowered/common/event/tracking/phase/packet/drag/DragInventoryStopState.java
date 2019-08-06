@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.event.tracking.phase.packet.drag;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.Packet;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.IPacket;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.query.QueryOperationTypes;
@@ -47,7 +47,7 @@ public abstract class DragInventoryStopState extends NamedInventoryState {
     }
 
     @Override
-    public void populateContext(EntityPlayerMP playerMP, Packet<?> packet, InventoryPacketContext context) {
+    public void populateContext(ServerPlayerEntity playerMP, IPacket<?> packet, InventoryPacketContext context) {
         super.populateContext(playerMP, packet, context);
         ((ContainerBridge) playerMP.openContainer).bridge$setFirePreview(false);
     }
@@ -59,7 +59,7 @@ public abstract class DragInventoryStopState extends NamedInventoryState {
     }
 
     public static void unwindCraftPreview(InventoryPacketContext context) {
-        final EntityPlayerMP player = context.getPacketPlayer();
+        final ServerPlayerEntity player = context.getPacketPlayer();
         ((ContainerBridge) player.openContainer).bridge$setFirePreview(true);
 
         Inventory craftInv = ((Inventory) player.openContainer).query(QueryOperationTypes.INVENTORY_TYPE.of(CraftingInventory.class));

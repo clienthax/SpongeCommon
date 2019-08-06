@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.event.tracking.phase.generation;
 
-import net.minecraft.world.chunk.IChunkProvider;
-import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraft.world.chunk.AbstractChunkProvider;
+import net.minecraft.world.gen.ChunkGenerator;
 import org.spongepowered.api.world.gen.PopulatorType;
 import org.spongepowered.asm.util.PrettyPrinter;
 import org.spongepowered.common.event.tracking.IPhaseState;
@@ -37,8 +37,8 @@ public class GenerationCompatibileContext extends GenerationContext<GenerationCo
 
     @Nullable private PopulatorType type;
     @Nullable SpongeChunkGenerator spongeGen;
-    @Nullable IChunkProvider provider;
-    @Nullable IChunkGenerator modGen;
+    @Nullable AbstractChunkProvider provider;
+    @Nullable ChunkGenerator modGen;
 
     GenerationCompatibileContext(
         final IPhaseState<? extends GenerationCompatibileContext> state) {
@@ -64,7 +64,7 @@ public class GenerationCompatibileContext extends GenerationContext<GenerationCo
 
     @SuppressWarnings("deprecation")
     public GenerationCompatibileContext assignModCompatiblity(
-        final SpongeChunkGenerator spongeGen, final IChunkProvider chunkProvider, final IChunkGenerator chunkGenerator) {
+        final SpongeChunkGenerator spongeGen, final AbstractChunkProvider chunkProvider, final ChunkGenerator chunkGenerator) {
         this.spongeGen = spongeGen;
         this.provider = chunkProvider;
         this.modGen = chunkGenerator;

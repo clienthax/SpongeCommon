@@ -26,29 +26,29 @@ package org.spongepowered.common.entity.projectile;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Maps;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.entity.item.EntityEnderPearl;
-import net.minecraft.entity.item.EntityExpBottle;
-import net.minecraft.entity.item.EntityFireworkRocket;
-import net.minecraft.entity.passive.EntityLlama;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityDragonFireball;
-import net.minecraft.entity.projectile.EntityEgg;
-import net.minecraft.entity.projectile.EntityFishHook;
-import net.minecraft.entity.projectile.EntityLargeFireball;
-import net.minecraft.entity.projectile.EntityLlamaSpit;
-import net.minecraft.entity.projectile.EntityPotion;
-import net.minecraft.entity.projectile.EntitySmallFireball;
-import net.minecraft.entity.projectile.EntitySnowball;
-import net.minecraft.entity.projectile.EntitySpectralArrow;
-import net.minecraft.entity.projectile.EntityThrowable;
-import net.minecraft.entity.projectile.EntityTippedArrow;
-import net.minecraft.entity.projectile.EntityWitherSkull;
-import net.minecraft.init.Items;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ArmorStandEntity;
+import net.minecraft.entity.item.EnderPearlEntity;
+import net.minecraft.entity.item.ExperienceBottleEntity;
+import net.minecraft.entity.item.FireworkRocketEntity;
+import net.minecraft.entity.passive.horse.LlamaEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.DragonFireballEntity;
+import net.minecraft.entity.projectile.EggEntity;
+import net.minecraft.entity.projectile.FishingBobberEntity;
+import net.minecraft.entity.projectile.FireballEntity;
+import net.minecraft.entity.projectile.LlamaSpitEntity;
+import net.minecraft.entity.projectile.PotionEntity;
+import net.minecraft.entity.projectile.SmallFireballEntity;
+import net.minecraft.entity.projectile.SnowballEntity;
+import net.minecraft.entity.projectile.SpectralArrowEntity;
+import net.minecraft.entity.projectile.ThrowableEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.entity.projectile.WitherSkullEntity;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityDispenser;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.tileentity.DispenserTileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.api.Sponge;
@@ -131,8 +131,8 @@ public class ProjectileLauncher {
         return projectile;
     }
 
-    // From EntityThrowable constructor
-    private static void configureThrowable(EntityThrowable entity) {
+    // From ThrowableEntity constructor
+    private static void configureThrowable(ThrowableEntity entity) {
         entity.posX -= MathHelper.cos(entity.rotationYaw / 180.0F * (float) Math.PI) * 0.16F;
         entity.posY -= 0.1D;
         entity.posZ -= MathHelper.sin(entity.rotationYaw / 180.0F * (float) Math.PI) * 0.16F;
@@ -179,8 +179,8 @@ public class ProjectileLauncher {
             return Optional.empty();
         }
         Entity projectile = loc.getExtent().createEntity(opType.get(), loc.getPosition());
-        if (projectile instanceof EntityThrowable) {
-            configureThrowable((EntityThrowable) projectile);
+        if (projectile instanceof ThrowableEntity) {
+            configureThrowable((ThrowableEntity) projectile);
         }
         return doLaunch(loc.getExtent(), (P) projectile);
     }
@@ -202,73 +202,73 @@ public class ProjectileLauncher {
         registerProjectileLogic(TippedArrow.class, new SimpleItemLaunchLogic<TippedArrow>(TippedArrow.class, Items.ARROW) {
 
             @Override
-            protected Optional<TippedArrow> createProjectile(EntityLivingBase source, Location<?> loc) {
-                TippedArrow arrow = (TippedArrow) new EntityTippedArrow(source.world, source);
-                ((EntityTippedArrow) arrow).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 3.0F, 0);
+            protected Optional<TippedArrow> createProjectile(LivingEntity source, Location<?> loc) {
+                TippedArrow arrow = (TippedArrow) new ArrowEntity(source.world, source);
+                ((ArrowEntity) arrow).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 3.0F, 0);
                 return doLaunch(loc.getExtent(), arrow);
             }
         });
         registerProjectileLogic(SpectralArrow.class, new SimpleItemLaunchLogic<SpectralArrow>(SpectralArrow.class, Items.SPECTRAL_ARROW) {
 
             @Override
-            protected Optional<SpectralArrow> createProjectile(EntityLivingBase source, Location<?> loc) {
-                SpectralArrow arrow = (SpectralArrow) new EntitySpectralArrow(source.world, source);
-                ((EntitySpectralArrow) arrow).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 3.0F, 0);
+            protected Optional<SpectralArrow> createProjectile(LivingEntity source, Location<?> loc) {
+                SpectralArrow arrow = (SpectralArrow) new SpectralArrowEntity(source.world, source);
+                ((SpectralArrowEntity) arrow).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 3.0F, 0);
                 return doLaunch(loc.getExtent(), arrow);
             }
         });
         registerProjectileLogic(Arrow.class, new SimpleItemLaunchLogic<Arrow>(Arrow.class, Items.ARROW) {
 
             @Override
-            protected Optional<Arrow> createProjectile(EntityLivingBase source, Location<?> loc) {
-                TippedArrow arrow = (TippedArrow) new EntityTippedArrow(source.world, source);
-                ((EntityTippedArrow) arrow).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 3.0F, 0);
+            protected Optional<Arrow> createProjectile(LivingEntity source, Location<?> loc) {
+                TippedArrow arrow = (TippedArrow) new ArrowEntity(source.world, source);
+                ((ArrowEntity) arrow).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 3.0F, 0);
                 return doLaunch(loc.getExtent(), arrow);
             }
         });
         registerProjectileLogic(Egg.class, new SimpleItemLaunchLogic<Egg>(Egg.class, Items.EGG) {
 
             @Override
-            protected Optional<Egg> createProjectile(EntityLivingBase source, Location<?> loc) {
-                Egg egg = (Egg) new EntityEgg(source.world, source);
-                ((EntityThrowable) egg).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 1.5F, 0);
+            protected Optional<Egg> createProjectile(LivingEntity source, Location<?> loc) {
+                Egg egg = (Egg) new EggEntity(source.world, source);
+                ((ThrowableEntity) egg).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 1.5F, 0);
                 return doLaunch(loc.getExtent(), egg);
             }
         });
         registerProjectileLogic(SmallFireball.class, new SimpleItemLaunchLogic<SmallFireball>(SmallFireball.class, Items.FIRE_CHARGE) {
 
             @Override
-            protected Optional<SmallFireball> createProjectile(EntityLivingBase source, Location<?> loc) {
+            protected Optional<SmallFireball> createProjectile(LivingEntity source, Location<?> loc) {
                 Vec3d lookVec = source.getLook(1);
-                SmallFireball fireball = (SmallFireball) new EntitySmallFireball(source.world, source,
+                SmallFireball fireball = (SmallFireball) new SmallFireballEntity(source.world, source,
                         lookVec.x * 4, lookVec.y * 4, lookVec.z * 4);
-                ((EntitySmallFireball) fireball).posY += source.getEyeHeight();
+                ((SmallFireballEntity) fireball).posY += source.getEyeHeight();
                 return doLaunch(loc.getExtent(), fireball);
             }
         });
         registerProjectileLogic(Firework.class, new SimpleItemLaunchLogic<Firework>(Firework.class, Items.FIREWORKS) {
 
             @Override
-            protected Optional<Firework> createProjectile(EntityLivingBase source, Location<?> loc) {
-                Firework firework = (Firework) new EntityFireworkRocket(source.world, loc.getX(), loc.getY(), loc.getZ(), ItemStack.EMPTY);
+            protected Optional<Firework> createProjectile(LivingEntity source, Location<?> loc) {
+                Firework firework = (Firework) new FireworkRocketEntity(source.world, loc.getX(), loc.getY(), loc.getZ(), ItemStack.EMPTY);
                 return doLaunch(loc.getExtent(), firework);
             }
         });
         registerProjectileLogic(Snowball.class, new SimpleItemLaunchLogic<Snowball>(Snowball.class, Items.SNOWBALL) {
 
             @Override
-            protected Optional<Snowball> createProjectile(EntityLivingBase source, Location<?> loc) {
-                Snowball snowball = (Snowball) new EntitySnowball(source.world, source);
-                ((EntityThrowable) snowball).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 1.5F, 0);
+            protected Optional<Snowball> createProjectile(LivingEntity source, Location<?> loc) {
+                Snowball snowball = (Snowball) new SnowballEntity(source.world, source);
+                ((ThrowableEntity) snowball).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 1.5F, 0);
                 return doLaunch(loc.getExtent(), snowball);
             }
         });
         registerProjectileLogic(ThrownExpBottle.class, new SimpleItemLaunchLogic<ThrownExpBottle>(ThrownExpBottle.class, Items.EXPERIENCE_BOTTLE) {
 
             @Override
-            protected Optional<ThrownExpBottle> createProjectile(EntityLivingBase source, Location<?> loc) {
-                ThrownExpBottle expBottle = (ThrownExpBottle) new EntityExpBottle(source.world, source);
-                ((EntityThrowable) expBottle).shoot(source, source.rotationPitch, source.rotationYaw, -20.0F, 0.7F, 0);
+            protected Optional<ThrownExpBottle> createProjectile(LivingEntity source, Location<?> loc) {
+                ThrownExpBottle expBottle = (ThrownExpBottle) new ExperienceBottleEntity(source.world, source);
+                ((ThrowableEntity) expBottle).shoot(source, source.rotationPitch, source.rotationYaw, -20.0F, 0.7F, 0);
                 return doLaunch(loc.getExtent(), expBottle);
             }
         });
@@ -276,48 +276,48 @@ public class ProjectileLauncher {
         registerProjectileLogic(EnderPearl.class, new SimpleDispenserLaunchLogic<EnderPearl>(EnderPearl.class) {
 
             @Override
-            protected Optional<EnderPearl> createProjectile(EntityLivingBase source, Location<?> loc) {
-                EnderPearl pearl = (EnderPearl) new EntityEnderPearl(source.world, source);
-                ((EntityThrowable) pearl).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 1.5F, 0);
+            protected Optional<EnderPearl> createProjectile(LivingEntity source, Location<?> loc) {
+                EnderPearl pearl = (EnderPearl) new EnderPearlEntity(source.world, source);
+                ((ThrowableEntity) pearl).shoot(source, source.rotationPitch, source.rotationYaw, 0.0F, 1.5F, 0);
                 return doLaunch(loc.getExtent(), pearl);
             }
         });
         registerProjectileLogic(LargeFireball.class, new SimpleDispenserLaunchLogic<LargeFireball>(LargeFireball.class) {
 
             @Override
-            protected Optional<LargeFireball> createProjectile(EntityLivingBase source, Location<?> loc) {
+            protected Optional<LargeFireball> createProjectile(LivingEntity source, Location<?> loc) {
                 Vec3d lookVec = source.getLook(1);
-                LargeFireball fireball = (LargeFireball) new EntityLargeFireball(source.world, source,
+                LargeFireball fireball = (LargeFireball) new FireballEntity(source.world, source,
                         lookVec.x * 4, lookVec.y * 4, lookVec.z * 4);
-                ((EntityLargeFireball) fireball).posY += source.getEyeHeight();
+                ((FireballEntity) fireball).posY += source.getEyeHeight();
                 return doLaunch(loc.getExtent(), fireball);
             }
 
             @Override
             public Optional<LargeFireball> createProjectile(ProjectileSource source, Class<LargeFireball> projectileClass, Location<?> loc) {
-                if (!(source instanceof TileEntityDispenser)) {
+                if (!(source instanceof DispenserTileEntity)) {
                     return super.createProjectile(source, projectileClass, loc);
                 }
-                TileEntityDispenser dispenser = (TileEntityDispenser) source;
-                EnumFacing enumfacing = DispenserSourceLogic.getFacing(dispenser);
+                DispenserTileEntity dispenser = (DispenserTileEntity) source;
+                Direction enumfacing = DispenserSourceLogic.getFacing(dispenser);
                 Random random = dispenser.getWorld().rand;
                 double d3 = random.nextGaussian() * 0.05D + enumfacing.getXOffset();
                 double d4 = random.nextGaussian() * 0.05D + enumfacing.getYOffset();
                 double d5 = random.nextGaussian() * 0.05D + enumfacing.getZOffset();
-                EntityLivingBase thrower = new EntityArmorStand(dispenser.getWorld(), loc.getX() + enumfacing.getXOffset(),
+                LivingEntity thrower = new ArmorStandEntity(dispenser.getWorld(), loc.getX() + enumfacing.getXOffset(),
                         loc.getY() + enumfacing.getYOffset(), loc.getZ() + enumfacing.getZOffset());
-                LargeFireball fireball = (LargeFireball) new EntityLargeFireball(dispenser.getWorld(), thrower, d3, d4, d5);
+                LargeFireball fireball = (LargeFireball) new FireballEntity(dispenser.getWorld(), thrower, d3, d4, d5);
                 return doLaunch(loc.getExtent(), fireball);
             }
         });
         registerProjectileLogic(WitherSkull.class, new SimpleDispenserLaunchLogic<WitherSkull>(WitherSkull.class) {
 
             @Override
-            protected Optional<WitherSkull> createProjectile(EntityLivingBase source, Location<?> loc) {
+            protected Optional<WitherSkull> createProjectile(LivingEntity source, Location<?> loc) {
                 Vec3d lookVec = source.getLook(1);
-                WitherSkull skull = (WitherSkull) new EntityWitherSkull(source.world, source,
+                WitherSkull skull = (WitherSkull) new WitherSkullEntity(source.world, source,
                         lookVec.x * 4, lookVec.y * 4, lookVec.z * 4);
-                ((EntityWitherSkull) skull).posY += source.getEyeHeight();
+                ((WitherSkullEntity) skull).posY += source.getEyeHeight();
                 return doLaunch(loc.getExtent(), skull);
             }
         });
@@ -325,9 +325,9 @@ public class ProjectileLauncher {
         registerProjectileLogic(FishHook.class, new SimpleDispenserLaunchLogic<FishHook>(FishHook.class) {
 
             @Override
-            protected Optional<FishHook> createProjectile(EntityLivingBase source, Location<?> loc) {
-                if (source instanceof EntityPlayer) {
-                    FishHook hook = (FishHook) new EntityFishHook(source.world, (EntityPlayer) source);
+            protected Optional<FishHook> createProjectile(LivingEntity source, Location<?> loc) {
+                if (source instanceof PlayerEntity) {
+                    FishHook hook = (FishHook) new FishingBobberEntity(source.world, (PlayerEntity) source);
                     return doLaunch(loc.getExtent(), hook);
                 }
                 return super.createProjectile(source, loc);
@@ -336,9 +336,9 @@ public class ProjectileLauncher {
         registerProjectileLogic(ThrownPotion.class, new SimpleDispenserLaunchLogic<ThrownPotion>(ThrownPotion.class) {
 
             @Override
-            protected Optional<ThrownPotion> createProjectile(EntityLivingBase source, Location<?> loc) {
-                ThrownPotion potion = (ThrownPotion) new EntityPotion(source.world, source, new ItemStack(Items.SPLASH_POTION, 1));
-                ((EntityThrowable) potion).shoot(source, source.rotationPitch, source.rotationYaw, -20.0F, 0.5F, 0);
+            protected Optional<ThrownPotion> createProjectile(LivingEntity source, Location<?> loc) {
+                ThrownPotion potion = (ThrownPotion) new PotionEntity(source.world, source, new ItemStack(Items.SPLASH_POTION, 1));
+                ((ThrowableEntity) potion).shoot(source, source.rotationPitch, source.rotationYaw, -20.0F, 0.5F, 0);
                 return doLaunch(loc.getExtent(), potion);
             }
         });
@@ -346,7 +346,7 @@ public class ProjectileLauncher {
 
             @Override
             public Optional<LlamaSpit> launch(ProjectileSource source) {
-                if (!(source instanceof EntityLlama)) {
+                if (!(source instanceof LlamaEntity)) {
                     return Optional.empty();
                 }
                 return super.launch(source);
@@ -354,21 +354,21 @@ public class ProjectileLauncher {
 
             @Override
             public Optional<LlamaSpit> createProjectile(ProjectileSource source, Class<LlamaSpit> projectileClass, Location<?> loc) {
-                EntityLlama llama = (EntityLlama) source;
-                LlamaSpit llamaSpit = (LlamaSpit) new EntityLlamaSpit(llama.world, (EntityLlama) source);
+                LlamaEntity llama = (LlamaEntity) source;
+                LlamaSpit llamaSpit = (LlamaSpit) new LlamaSpitEntity(llama.world, (LlamaEntity) source);
                 Vec3d lookVec = llama.getLook(1);
-                ((EntityLlamaSpit) llamaSpit).shoot(lookVec.x, lookVec.y, lookVec.z, 1.5F, 0);
+                ((LlamaSpitEntity) llamaSpit).shoot(lookVec.x, lookVec.y, lookVec.z, 1.5F, 0);
                 return doLaunch(loc.getExtent(), llamaSpit);
             }
         });
         registerProjectileLogic(DragonFireball.class, new SimpleDispenserLaunchLogic<DragonFireball>(DragonFireball.class) {
 
             @Override
-            protected Optional<DragonFireball> createProjectile(EntityLivingBase source, Location<?> loc) {
+            protected Optional<DragonFireball> createProjectile(LivingEntity source, Location<?> loc) {
                 Vec3d lookVec = source.getLook(1);
-                DragonFireball fireball = (DragonFireball) new EntityDragonFireball(source.world, source,
+                DragonFireball fireball = (DragonFireball) new DragonFireballEntity(source.world, source,
                         lookVec.x * 4, lookVec.y * 4, lookVec.z * 4);
-                ((EntityDragonFireball) fireball).posY += source.getEyeHeight();
+                ((DragonFireballEntity) fireball).posY += source.getEyeHeight();
                 return doLaunch(loc.getExtent(), fireball);
             }
         });

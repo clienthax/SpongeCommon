@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.processor.data.entity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableFlyingData;
@@ -58,8 +58,8 @@ public class FlyingDataProcessor extends AbstractEntitySingleDataProcessor<Entit
 
     @Override
     protected boolean set(Entity entity, Boolean value) {
-        if (entity instanceof EntityPlayer) {
-            EntityPlayer entityPlayer = (EntityPlayer)entity;
+        if (entity instanceof PlayerEntity) {
+            PlayerEntity entityPlayer = (PlayerEntity)entity;
             entityPlayer.capabilities.isFlying = value;
             entityPlayer.sendPlayerAbilities();
         } else {
@@ -70,8 +70,8 @@ public class FlyingDataProcessor extends AbstractEntitySingleDataProcessor<Entit
 
     @Override
     protected Optional<Boolean> getVal(Entity entity) {
-        if (entity instanceof EntityPlayer) {
-            return Optional.of(((EntityPlayer) entity).capabilities.isFlying);
+        if (entity instanceof PlayerEntity) {
+            return Optional.of(((PlayerEntity) entity).capabilities.isFlying);
         }
         return Optional.of(entity.isAirBorne);
     }

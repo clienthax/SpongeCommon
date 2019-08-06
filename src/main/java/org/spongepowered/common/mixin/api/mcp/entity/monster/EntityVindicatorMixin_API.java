@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.monster;
 
-import net.minecraft.entity.monster.EntityVindicator;
+import net.minecraft.entity.monster.VindicatorEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.value.mutable.Value;
@@ -36,7 +36,7 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 
 import java.util.Collection;
 
-@Mixin(EntityVindicator.class)
+@Mixin(VindicatorEntity.class)
 public abstract class EntityVindicatorMixin_API extends EntityMobMixin_API implements Vindicator {
 
     @Shadow private boolean johnny;

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.bridge.server;
 
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import org.spongepowered.api.resourcepack.ResourcePack;
 
 import javax.annotation.Nullable;
@@ -37,7 +37,7 @@ public interface MinecraftServerBridge {
 
     void bridge$removeWorldTickTimes(int dimensionId);
 
-    void bridge$prepareSpawnArea(WorldServer worldServer);
+    void bridge$prepareSpawnArea(ServerWorld worldServer);
 
     void bridge$setSaveEnabled(boolean enabled);
 

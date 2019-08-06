@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.ai;
 
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.ai.task.builtin.WatchClosestAITask;
@@ -38,8 +38,8 @@ import org.spongepowered.common.SpongeImpl;
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-@Mixin(EntityAIWatchClosest.class)
-public abstract class EntityAIWatchClosestMixin_API extends EntityAIBase implements WatchClosestAITask {
+@Mixin(LookAtGoal.class)
+public abstract class EntityAIWatchClosestMixin_API extends Goal implements WatchClosestAITask {
 
     @Shadow protected Class watchedClass;
     @Shadow protected float maxDistance;

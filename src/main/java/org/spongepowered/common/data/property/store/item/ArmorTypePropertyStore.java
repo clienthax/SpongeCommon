@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.property.store.item;
 
-import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.data.property.item.ArmorTypeProperty;
 import org.spongepowered.api.data.type.ArmorType;
@@ -36,9 +36,9 @@ public class ArmorTypePropertyStore extends AbstractItemStackPropertyStore<Armor
 
     @Override
     protected Optional<ArmorTypeProperty> getFor(ItemStack itemStack) {
-        if (itemStack.getItem() instanceof ItemArmor) {
-            final ItemArmor armor = (ItemArmor) itemStack.getItem();
-            final ItemArmor.ArmorMaterial armorMaterial = armor.getArmorMaterial();
+        if (itemStack.getItem() instanceof ArmorItem) {
+            final ArmorItem armor = (ArmorItem) itemStack.getItem();
+            final ArmorItem.ArmorMaterial armorMaterial = armor.getArmorMaterial();
             return Optional.of(new ArmorTypeProperty((ArmorType) (Object) armorMaterial));
         }
         return Optional.empty();

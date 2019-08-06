@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.server.management;
 
-import net.minecraft.server.management.UserListEntryBan;
+import net.minecraft.server.management.BanEntry;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.util.ban.Ban;
@@ -38,7 +38,7 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 
-@Mixin(UserListEntryBan.class)
+@Mixin(BanEntry.class)
 public abstract class UserListEntryBanMixin_API<T> extends UserListEntryMixin_API<T> implements Ban {
 
     @Shadow @Final protected Date banStartDate;

@@ -25,12 +25,12 @@
 package org.spongepowered.common.bridge.world.chunk;
 
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.chunk.ServerChunkProvider;
 
 import javax.annotation.Nullable;
 
 /**
- * Implemented for both {@link ChunkProviderServer} and the client version.
+ * Implemented for both {@link ServerChunkProvider} and the client version.
  */
 public interface ChunkProviderBridge {
 

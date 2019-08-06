@@ -26,8 +26,8 @@ package org.spongepowered.common.mixin.command.multiworld;
 
 import net.minecraft.command.CommandGameRule;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.Packet;
+import net.minecraft.network.play.ServerPlayNetHandler;
+import net.minecraft.network.IPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
@@ -62,8 +62,8 @@ public abstract class CommandGameRuleMixin_MultiWorldCommand {
     }
 
     @Redirect(method = "notifyGameRuleChange",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetHandlerPlayServer;sendPacket(Lnet/minecraft/network/Packet;)V"))
-    private static void multiWorldCommand$sendCurrentDimensionPacket(final NetHandlerPlayServer connection, final Packet<?> packet) {
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/network/ServerPlayNetHandler;sendPacket(Lnet/minecraft/network/IPacket;)V"))
+    private static void multiWorldCommand$sendCurrentDimensionPacket(final ServerPlayNetHandler connection, final IPacket<?> packet) {
         if (connection.player.dimension == currentDimension) {
             connection.sendPacket(packet);
         }

@@ -24,9 +24,9 @@
  */
 package org.spongepowered.common.data.processor.data.tileentity;
 
-import net.minecraft.block.BlockSkull;
-import net.minecraft.tileentity.TileEntitySkull;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.SkullBlock;
+import net.minecraft.tileentity.SkullTileEntity;
+import net.minecraft.util.Direction;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableDirectionalData;
@@ -45,10 +45,10 @@ import org.spongepowered.common.mixin.core.tileentity.TileEntitySkullAccessor;
 import java.util.Optional;
 
 public class SkullRotationDataProcessor
-        extends AbstractTileEntitySingleDataProcessor<TileEntitySkull, Direction, Value<Direction>, DirectionalData, ImmutableDirectionalData> {
+        extends AbstractTileEntitySingleDataProcessor<SkullTileEntity, Direction, Value<Direction>, DirectionalData, ImmutableDirectionalData> {
 
     public SkullRotationDataProcessor() {
-        super(TileEntitySkull.class, Keys.DIRECTION);
+        super(SkullTileEntity.class, Keys.DIRECTION);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class SkullRotationDataProcessor
     }
 
     @Override
-    protected boolean set(final TileEntitySkull skull, final Direction value) {
+    protected boolean set(final SkullTileEntity skull, final Direction value) {
         if (value.ordinal() > 15) {
             return false;
         }
@@ -72,8 +72,8 @@ public class SkullRotationDataProcessor
     }
 
     @Override
-    protected Optional<Direction> getVal(final TileEntitySkull skull) {
-        if (skull.getWorld().getBlockState(skull.getPos()).getValue(BlockSkull.FACING) != EnumFacing.UP) {
+    protected Optional<Direction> getVal(final SkullTileEntity skull) {
+        if (skull.getWorld().getBlockState(skull.getPos()).getValue(SkullBlock.FACING) != Direction.UP) {
             return Optional.empty();
         }
         final int rot = ((TileEntitySkullAccessor) skull).accessor$getSkullRotation() % 16;

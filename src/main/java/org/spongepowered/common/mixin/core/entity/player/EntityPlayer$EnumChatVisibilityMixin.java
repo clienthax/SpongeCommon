@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.core.entity.player;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.api.text.chat.ChatType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.common.bridge.entity.player.EnumChatVisibilityBridge;
@@ -32,8 +32,8 @@ import org.spongepowered.common.bridge.entity.player.EnumChatVisibilityBridge;
 import java.util.HashSet;
 import java.util.Set;
 
-@Mixin(EntityPlayer.EnumChatVisibility.class)
-public abstract class EntityPlayer$EnumChatVisibilityMixin implements EnumChatVisibilityBridge {
+@Mixin(PlayerEntity.EnumChatVisibility.class)
+public abstract class PlayerEntity$EnumChatVisibilityMixin implements EnumChatVisibilityBridge {
 
     private Set<ChatType> impl$visibleChatTypes = new HashSet<>();
 

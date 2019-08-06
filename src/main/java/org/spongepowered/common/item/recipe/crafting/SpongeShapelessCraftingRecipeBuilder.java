@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
 import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.item.crafting.ShapelessRecipe;
 import net.minecraft.util.NonNullList;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
@@ -84,8 +84,8 @@ public class SpongeShapelessCraftingRecipeBuilder extends SpongeCatalogBuilder<S
         value.getIngredientPredicates().forEach(i -> this.ingredients.add(IngredientUtil.toNative(i)));
 
         this.groupName = "";
-        if (value instanceof ShapelessRecipes) {
-            this.groupName = ((ShapelessRecipes) value).group;
+        if (value instanceof ShapelessRecipe) {
+            this.groupName = ((ShapelessRecipe) value).group;
         }
 
         super.reset();

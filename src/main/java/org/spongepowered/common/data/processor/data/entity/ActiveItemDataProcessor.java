@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableActiveItemData;
@@ -41,15 +41,15 @@ import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
 import java.util.Optional;
 
-public class ActiveItemDataProcessor extends AbstractSingleDataSingleTargetProcessor<EntityLivingBase, ItemStackSnapshot,
+public class ActiveItemDataProcessor extends AbstractSingleDataSingleTargetProcessor<LivingEntity, ItemStackSnapshot,
         Value<ItemStackSnapshot>, ActiveItemData, ImmutableActiveItemData> {
 
     public ActiveItemDataProcessor() {
-        super(Keys.ACTIVE_ITEM, EntityLivingBase.class);
+        super(Keys.ACTIVE_ITEM, LivingEntity.class);
     }
 
     @Override
-    protected boolean set(EntityLivingBase dataHolder, ItemStackSnapshot value) {
+    protected boolean set(LivingEntity dataHolder, ItemStackSnapshot value) {
         if (value == null || value.isEmpty()) {
             dataHolder.stopActiveHand();
             return true;
@@ -58,7 +58,7 @@ public class ActiveItemDataProcessor extends AbstractSingleDataSingleTargetProce
     }
 
     @Override
-    protected Optional<ItemStackSnapshot> getVal(EntityLivingBase dataHolder) {
+    protected Optional<ItemStackSnapshot> getVal(LivingEntity dataHolder) {
         return Optional.of(ItemStackUtil.snapshotOf(dataHolder.getActiveItemStack()));
     }
 

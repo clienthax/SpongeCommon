@@ -28,7 +28,7 @@ import static net.minecraft.inventory.SlotFurnaceFuel.isBucket;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.FurnaceRecipes;
-import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.tileentity.FurnaceTileEntity;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.api.Sponge;
@@ -66,7 +66,7 @@ import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
 import java.util.Collections;
 
-@Mixin(TileEntityFurnace.class)
+@Mixin(FurnaceTileEntity.class)
 public abstract class TileEntityFurnaceMixin extends TileEntityLockableMixin implements CustomNameableBridge {
 
     @Shadow private NonNullList<ItemStack> furnaceItemStacks;
@@ -83,10 +83,10 @@ public abstract class TileEntityFurnaceMixin extends TileEntityLockableMixin imp
 
     private SlotProvider impl$generateSlotProvider() {
         return new SlotCollection.Builder().add(InputSlotAdapter.class, InputSlotLensImpl::new)
-                .add(FuelSlotAdapter.class, (i) -> new FuelSlotLensImpl(i, (s) -> TileEntityFurnace.isItemFuel((ItemStack) s) || isBucket(
+                .add(FuelSlotAdapter.class, (i) -> new FuelSlotLensImpl(i, (s) -> FurnaceTileEntity.isItemFuel((ItemStack) s) || isBucket(
                         (ItemStack) s), t -> {
                     final ItemStack nmsStack = (ItemStack) org.spongepowered.api.item.inventory.ItemStack.of(t, 1);
-                    return TileEntityFurnace.isItemFuel(nmsStack) || isBucket(nmsStack);
+                    return FurnaceTileEntity.isItemFuel(nmsStack) || isBucket(nmsStack);
                 }))
                 // TODO represent the filtering in the API somehow
                 .add(OutputSlotAdapter.class, (i) -> new OutputSlotLensImpl(i, (s) -> true, (t) -> true))
@@ -99,7 +99,7 @@ public abstract class TileEntityFurnaceMixin extends TileEntityLockableMixin imp
 
     @Override
     public void bridge$setCustomDisplayName(final String customName) {
-        ((TileEntityFurnace) (Object) this).setCustomInventoryName(customName);
+        ((FurnaceTileEntity) (Object) this).setCustomInventoryName(customName);
     }
 
     // Shrink Fuel
@@ -130,8 +130,8 @@ public abstract class TileEntityFurnaceMixin extends TileEntityLockableMixin imp
     }
 
     // Tick up and Start
-    @Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/tileentity/TileEntityFurnace;canSmelt()Z", ordinal = 1))
-    private boolean impl$checkIfCanSmelt(final TileEntityFurnace furnace) {
+    @Redirect(method = "update", at = @At(value = "INVOKE", target = "Lnet/minecraft/tileentity/FurnaceTileEntity;canSmelt()Z", ordinal = 1))
+    private boolean impl$checkIfCanSmelt(final FurnaceTileEntity furnace) {
         if (!this.canSmelt()) {
             return false;
         }
@@ -171,7 +171,7 @@ public abstract class TileEntityFurnaceMixin extends TileEntityLockableMixin imp
         method = "setInventorySlotContents",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/tileentity/TileEntityFurnace;getCookTime(Lnet/minecraft/item/ItemStack;)I"
+            target = "Lnet/minecraft/tileentity/FurnaceTileEntity;getCookTime(Lnet/minecraft/item/ItemStack;)I"
         )
     )
     private void impl$interruptSmelt(final CallbackInfo ci) {
@@ -184,12 +184,12 @@ public abstract class TileEntityFurnaceMixin extends TileEntityLockableMixin imp
             shift = At.Shift.BEFORE,
             value = "FIELD",
             opcode = Opcodes.PUTFIELD,
-            target = "Lnet/minecraft/tileentity/TileEntityFurnace;cookTime:I"
+            target = "Lnet/minecraft/tileentity/FurnaceTileEntity;cookTime:I"
         ),
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/tileentity/TileEntityFurnace;smeltItem()V"
+                target = "Lnet/minecraft/tileentity/FurnaceTileEntity;smeltItem()V"
             ),
             to = @At(
                 value = "INVOKE",

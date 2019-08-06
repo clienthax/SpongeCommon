@@ -24,11 +24,11 @@
  */
 package org.spongepowered.common.data.processor.common;
 
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.NBTUtil;
-import net.minecraft.tileentity.TileEntitySkull;
+import net.minecraft.tileentity.SkullTileEntity;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.SkullType;
 import org.spongepowered.api.data.type.SkullTypes;
@@ -46,7 +46,7 @@ import javax.annotation.Nullable;
 public class SkullUtils {
 
     public static boolean supportsObject(final Object object) {
-        return object instanceof TileEntitySkull || isValidItemStack(object);
+        return object instanceof SkullTileEntity || isValidItemStack(object);
     }
 
     public static SkullType getSkullType(final int skullType) {
@@ -62,14 +62,14 @@ public class SkullUtils {
         return container instanceof ItemStack && ((ItemStack) container).getItem().equals(Items.SKULL);
     }
 
-    public static void setSkullType(final TileEntitySkull tileEntitySkull, final int skullType) {
+    public static void setSkullType(final SkullTileEntity tileEntitySkull, final int skullType) {
         tileEntitySkull.setType(skullType);
         tileEntitySkull.markDirty();
         tileEntitySkull.getWorld().notifyBlockUpdate(tileEntitySkull.getPos(), tileEntitySkull.getWorld().getBlockState(tileEntitySkull.getPos()), tileEntitySkull.getWorld()
                 .getBlockState(tileEntitySkull.getPos()), 3);
     }
 
-    public static boolean setProfile(final TileEntitySkull tileEntitySkull, @Nullable final GameProfile profile) {
+    public static boolean setProfile(final SkullTileEntity tileEntitySkull, @Nullable final GameProfile profile) {
         if (SkullUtils.getSkullType(tileEntitySkull.getSkullType()).equals(SkullTypes.PLAYER)) {
             final GameProfile newProfile = SpongeRepresentedPlayerData.NULL_PROFILE.equals(profile) ? null : resolveProfileIfNecessary(profile);
             tileEntitySkull.setPlayerProfile((com.mojang.authlib.GameProfile) newProfile);
@@ -88,7 +88,7 @@ public class SkullUtils {
                     skull.getTagCompound().removeTag(Constants.Item.Skull.ITEM_SKULL_OWNER);
                 }
             } else {
-                final NBTTagCompound nbt = new NBTTagCompound();
+                final CompoundNBT nbt = new CompoundNBT();
                 NBTUtil.writeGameProfile(nbt, (com.mojang.authlib.GameProfile) resolveProfileIfNecessary(profile));
                 skull.setTagInfo(Constants.Item.Skull.ITEM_SKULL_OWNER, nbt);
             }

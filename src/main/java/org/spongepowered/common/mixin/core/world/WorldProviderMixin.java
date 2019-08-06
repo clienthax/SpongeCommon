@@ -25,7 +25,7 @@
 package org.spongepowered.common.mixin.core.world;
 
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
+import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.WorldType;
 import net.minecraft.world.border.WorldBorder;
 import org.spongepowered.api.service.context.Context;
@@ -40,7 +40,7 @@ import org.spongepowered.common.bridge.world.DimensionTypeBridge;
 import org.spongepowered.common.bridge.world.WorldServerBridge;
 import org.spongepowered.common.bridge.world.WorldProviderBridge;
 
-@Mixin(WorldProvider.class)
+@Mixin(Dimension.class)
 public abstract class WorldProviderMixin implements Dimension, WorldProviderBridge {
 
     @Shadow private WorldType terrainType;

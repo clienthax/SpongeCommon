@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockFarmland;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.FarmlandBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -46,13 +46,13 @@ import org.spongepowered.common.data.manipulator.immutable.block.ImmutableSponge
 
 import java.util.Optional;
 
-@Mixin(BlockFarmland.class)
+@Mixin(FarmlandBlock.class)
 public abstract class BlockFarmlandMixin extends BlockMixin {
 
     @Shadow protected static void turnToDirt(final World world, final BlockPos pos) {}
 
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getMoistureData(blockState));
     }
 
@@ -62,37 +62,37 @@ public abstract class BlockFarmlandMixin extends BlockMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableMoistureData) {
             int moisture = ((ImmutableMoistureData) manipulator).moisture().get();
             if (moisture > 7) {
                 moisture = 7;
             }
-            return Optional.of((BlockState) blockState.withProperty(BlockFarmland.MOISTURE, moisture));
+            return Optional.of((BlockState) blockState.withProperty(FarmlandBlock.MOISTURE, moisture));
         }
         return super.bridge$getStateWithData(blockState, manipulator);
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.MOISTURE)) {
             int moisture = (Integer) value;
             if (moisture > 7) {
                 moisture = 7;
             }
-            return Optional.of((BlockState) blockState.withProperty(BlockFarmland.MOISTURE, moisture));
+            return Optional.of((BlockState) blockState.withProperty(FarmlandBlock.MOISTURE, moisture));
         }
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
-    private ImmutableMoistureData impl$getMoistureData(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeMoistureData.class, blockState.getValue(BlockFarmland.MOISTURE), 0, 7);
+    private ImmutableMoistureData impl$getMoistureData(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeMoistureData.class, blockState.getValue(FarmlandBlock.MOISTURE), 0, 7);
     }
 
     @Redirect(method = "onFallenUpon",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/block/BlockFarmland;turnToDirt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
+            target = "Lnet/minecraft/block/FarmlandBlock;turnToDirt(Lnet/minecraft/world/World;Lnet/minecraft/util/math/BlockPos;)V"
         )
     )
     private void impl$CheckIfGrieferCanGrief(final World world, final BlockPos pos, final World worldIn, final BlockPos samePos,

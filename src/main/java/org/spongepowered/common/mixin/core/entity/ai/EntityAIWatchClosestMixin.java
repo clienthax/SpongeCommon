@@ -24,9 +24,9 @@
  */
 package org.spongepowered.common.mixin.core.entity.ai;
 
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityAIWatchClosest;
-import net.minecraft.util.EntitySelectors;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.LookAtGoal;
+import net.minecraft.util.EntityPredicates;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,8 +39,8 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"unchecked", "rawtypes"})
-@Mixin(EntityAIWatchClosest.class)
-public abstract class EntityAIWatchClosestMixin extends EntityAIBase {
+@Mixin(LookAtGoal.class)
+public abstract class EntityAIWatchClosestMixin extends Goal {
 
     @Shadow protected Class watchedClass;
 
@@ -55,7 +55,7 @@ public abstract class EntityAIWatchClosestMixin extends EntityAIBase {
         double d0 = Double.MAX_VALUE;
 
         for (final net.minecraft.entity.Entity foundEntity: (List< net.minecraft.entity.Entity>) world.getEntities(this.watchedClass,
-                EntitySelectors.NOT_SPECTATING)) {
+                EntityPredicates.NOT_SPECTATING)) {
             if (foundEntity.getEntityBoundingBox().intersects(aabb) && foundEntity != entity) {
                 final double d1 = entity.getDistanceSq(foundEntity);
 

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.entity;
 
-import net.minecraft.entity.item.EntityMinecart;
+import net.minecraft.entity.item.minecart.AbstractMinecartEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -36,10 +36,10 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 
 import java.util.Optional;
 
-public class OffsetValueProcessor extends AbstractSpongeValueProcessor<EntityMinecart, Integer, Value<Integer>> {
+public class OffsetValueProcessor extends AbstractSpongeValueProcessor<AbstractMinecartEntity, Integer, Value<Integer>> {
 
     public OffsetValueProcessor() {
-        super(EntityMinecart.class, Keys.OFFSET);
+        super(AbstractMinecartEntity.class, Keys.OFFSET);
     }
 
     @Override
@@ -48,14 +48,14 @@ public class OffsetValueProcessor extends AbstractSpongeValueProcessor<EntityMin
     }
 
     @Override
-    protected boolean set(final EntityMinecart container, final Integer value) {
+    protected boolean set(final AbstractMinecartEntity container, final Integer value) {
         if(!container.hasDisplayTile()) return false;
         container.setDisplayTileOffset(value);
         return true;
     }
 
     @Override
-    protected Optional<Integer> getVal(final EntityMinecart container) {
+    protected Optional<Integer> getVal(final AbstractMinecartEntity container) {
         return Optional.of(container.getDisplayTileOffset());
     }
 

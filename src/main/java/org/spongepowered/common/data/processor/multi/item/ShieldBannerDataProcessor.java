@@ -25,11 +25,11 @@
 package org.spongepowered.common.data.processor.multi.item;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.init.Items;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.item.Items;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.tileentity.BannerPattern;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -63,24 +63,24 @@ public class ShieldBannerDataProcessor extends AbstractItemDataProcessor<BannerD
     @Override
     public boolean set(ItemStack itemStack, Map<Key<?>, Object> keyValues) {
         if (itemStack.getTagCompound() == null) {
-            itemStack.setTagCompound(new NBTTagCompound());
+            itemStack.setTagCompound(new CompoundNBT());
         }
-        final NBTTagCompound tagCompound = ItemStackUtil.getTagCompound(itemStack);
-        final NBTTagCompound blockEntity = new NBTTagCompound();
+        final CompoundNBT tagCompound = ItemStackUtil.getTagCompound(itemStack);
+        final CompoundNBT blockEntity = new CompoundNBT();
         final DyeColor baseColor = (DyeColor) keyValues.get(Keys.BANNER_BASE_COLOR);
         final PatternListValue patternLayers = (PatternListValue) keyValues.get(Keys.BANNER_PATTERNS);
         if (!patternLayers.isEmpty()) {
-            final NBTTagList patterns = new NBTTagList();
+            final ListNBT patterns = new ListNBT();
 
             for (PatternLayer layer : patternLayers) {
-                NBTTagCompound compound = new NBTTagCompound();
+                CompoundNBT compound = new CompoundNBT();
                 compound.setString(Constants.TileEntity.Banner.BANNER_PATTERN_ID, ((BannerPattern) (Object) layer.getShape()).getHashname());
-                compound.setInteger(Constants.TileEntity.Banner.BANNER_PATTERN_COLOR, ((EnumDyeColor) (Object) layer.getColor()).getDyeDamage());
+                compound.setInteger(Constants.TileEntity.Banner.BANNER_PATTERN_COLOR, ((DyeColor) (Object) layer.getColor()).getDyeDamage());
                 patterns.appendTag(compound);
             }
             blockEntity.setTag(Constants.TileEntity.Banner.BANNER_PATTERNS, patterns);
         }
-        blockEntity.setInteger(Constants.TileEntity.Banner.BANNER_BASE, ((EnumDyeColor) (Object) baseColor).getDyeDamage());
+        blockEntity.setInteger(Constants.TileEntity.Banner.BANNER_BASE, ((DyeColor) (Object) baseColor).getDyeDamage());
         tagCompound.setTag(Constants.Item.BLOCK_ENTITY_TAG, blockEntity);
         return true;
     }

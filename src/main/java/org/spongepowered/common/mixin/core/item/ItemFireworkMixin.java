@@ -25,15 +25,15 @@
 package org.spongepowered.common.mixin.core.item;
 
 import com.flowpowered.math.vector.Vector3d;
-import net.minecraft.entity.item.EntityFireworkRocket;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.item.FireworkRocketEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemFirework;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.ActionResultType;
+import net.minecraft.util.Direction;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.api.Sponge;
@@ -79,15 +79,15 @@ public class ItemFireworkMixin extends Item {
         method = "onItemRightClick",
         at = @At(
             value = "NEW",
-            target = "net/minecraft/entity/item/EntityFireworkRocket"
+            target = "net/minecraft/entity/item/FireworkRocketEntity"
         ),
         locals = LocalCapture.CAPTURE_FAILSOFT,
         cancellable = true
     )
-    private void spongeImpl$ThrowPreBeforeSpawning(World worldIn, EntityPlayer playerIn, EnumHand handIn,
+    private void spongeImpl$ThrowPreBeforeSpawning(World worldIn, PlayerEntity playerIn, Hand handIn,
         CallbackInfoReturnable<ActionResult<ItemStack>> cir, ItemStack stack) {
         if (spongeImpl$ThrowConstructPreEvent(worldIn, playerIn, stack)) {
-            cir.setReturnValue(new ActionResult<>(EnumActionResult.SUCCESS, stack));
+            cir.setReturnValue(new ActionResult<>(ActionResultType.SUCCESS, stack));
         }
     }
 
@@ -113,22 +113,22 @@ public class ItemFireworkMixin extends Item {
      * @param stack The ItemStack used from the hand
      */
     @Inject(method = "onItemUse",
-        at = @At(value = "NEW", target = "net/minecraft/entity/item/EntityFireworkRocket"),
+        at = @At(value = "NEW", target = "net/minecraft/entity/item/FireworkRocketEntity"),
         locals = LocalCapture.CAPTURE_FAILSOFT,
         cancellable = true
     )
-    private void spongeImpl$ThrowPrimeEventsIfCancelled(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing,
-        float hitX, float hitY, float hitZ, CallbackInfoReturnable<EnumActionResult> cir, ItemStack stack) {
+    private void spongeImpl$ThrowPrimeEventsIfCancelled(PlayerEntity player, World worldIn, BlockPos pos, Hand hand, Direction facing,
+        float hitX, float hitY, float hitZ, CallbackInfoReturnable<ActionResultType> cir, ItemStack stack) {
         if (spongeImpl$ThrowConstructPreEvent(worldIn, player, stack)) {
-            cir.setReturnValue(EnumActionResult.SUCCESS);
+            cir.setReturnValue(ActionResultType.SUCCESS);
         }
 
     }
 
     /**
      * Private method for bridging the duplicate between
-     * {@link #onItemRightClick(World, EntityPlayer, EnumHand)} and
-     * {@link #onItemUse(EntityPlayer, World, BlockPos, EnumHand, EnumFacing, float, float, float)}
+     * {@link #onItemRightClick(World, PlayerEntity, Hand)} and
+     * {@link #onItemUse(PlayerEntity, World, BlockPos, Hand, Direction, float, float, float)}
      * since both follow the same logic, but differ in how they are called.
      *
      * @param world The world
@@ -136,7 +136,7 @@ public class ItemFireworkMixin extends Item {
      * @param usedItem The used item
      * @return True if the event is cancelled and the callback needs to be cancelled
      */
-    private boolean spongeImpl$ThrowConstructPreEvent(World world, EntityPlayer player, ItemStack usedItem) {
+    private boolean spongeImpl$ThrowConstructPreEvent(World world, PlayerEntity player, ItemStack usedItem) {
         if (ShouldFire.CONSTRUCT_ENTITY_EVENT_PRE && !((WorldBridge) world).bridge$isFake()) {
             final Vector3d targetPosition = new Vector3d(player.posX, player.posY , player.posZ);
             final Transform<org.spongepowered.api.world.World> targetTransform = new Transform<>((org.spongepowered.api.world.World) world,
@@ -158,10 +158,10 @@ public class ItemFireworkMixin extends Item {
         locals = LocalCapture.CAPTURE_FAILSOFT,
         cancellable = true
     )
-    private void spongeImpl$InjectPrimeEventAndCancel(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX,
-        float hitY, float hitZ, CallbackInfoReturnable<EnumActionResult> cir, ItemStack usedItem, EntityFireworkRocket rocket) {
+    private void spongeImpl$InjectPrimeEventAndCancel(PlayerEntity player, World worldIn, BlockPos pos, Hand hand, Direction facing, float hitX,
+        float hitY, float hitZ, CallbackInfoReturnable<ActionResultType> cir, ItemStack usedItem, FireworkRocketEntity rocket) {
         if (spongeImpl$ThrowPrimeEventAndGetCancel(worldIn, player, rocket, usedItem)) {
-            cir.setReturnValue(EnumActionResult.SUCCESS);
+            cir.setReturnValue(ActionResultType.SUCCESS);
         }
     }
 
@@ -170,11 +170,11 @@ public class ItemFireworkMixin extends Item {
         locals = LocalCapture.CAPTURE_FAILSOFT,
         cancellable = true
     )
-    private void spongeImpl$InjectPrimeEventAndCancel(World worldIn, EntityPlayer player, EnumHand handIn,
-        CallbackInfoReturnable<ActionResult<ItemStack>> cir, ItemStack usedItem, EntityFireworkRocket rocket) {
+    private void spongeImpl$InjectPrimeEventAndCancel(World worldIn, PlayerEntity player, Hand handIn,
+        CallbackInfoReturnable<ActionResult<ItemStack>> cir, ItemStack usedItem, FireworkRocketEntity rocket) {
         if (spongeImpl$ThrowPrimeEventAndGetCancel(worldIn, player, rocket, usedItem)) {
             // We have to still return success because the server/client can get out of sync otherwise.
-            cir.setReturnValue(new ActionResult<>(EnumActionResult.SUCCESS, usedItem));
+            cir.setReturnValue(new ActionResult<>(ActionResultType.SUCCESS, usedItem));
         }
     }
 
@@ -182,8 +182,8 @@ public class ItemFireworkMixin extends Item {
      * Private method for throwing the prime events on the firework. If
      * the prime is cancelled, then the firework will not be spawned.
      * This is to bridge the same logic between
-     * {@link #onItemUse(EntityPlayer, World, BlockPos, EnumHand, EnumFacing, float, float, float)}
-     * {@link #onItemRightClick(World, EntityPlayer, EnumHand)}.
+     * {@link #onItemUse(PlayerEntity, World, BlockPos, Hand, Direction, float, float, float)}
+     * {@link #onItemRightClick(World, PlayerEntity, Hand)}.
      *
      * @param world The world
      * @param player The player using the item
@@ -191,7 +191,7 @@ public class ItemFireworkMixin extends Item {
      * @param usedItem The used item
      * @return True if the event is cancelled and the rocket should not be spawned
      */
-    private boolean spongeImpl$ThrowPrimeEventAndGetCancel(World world, EntityPlayer player, EntityFireworkRocket rocket, ItemStack usedItem) {
+    private boolean spongeImpl$ThrowPrimeEventAndGetCancel(World world, PlayerEntity player, FireworkRocketEntity rocket, ItemStack usedItem) {
         if (((WorldBridge) world).bridge$isFake() ) {
             return false;
         }

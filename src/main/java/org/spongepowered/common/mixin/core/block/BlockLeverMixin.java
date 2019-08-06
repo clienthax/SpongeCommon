@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockLever;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.LeverBlock;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -46,12 +46,12 @@ import org.spongepowered.common.data.util.DirectionResolver;
 
 import java.util.Optional;
 
-@Mixin(BlockLever.class)
+@Mixin(LeverBlock.class)
 public abstract class BlockLeverMixin extends BlockMixin {
 
     @SuppressWarnings("RedundantTypeArguments") // some java compilers will not calculate this generic correctly
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getIsPoweredFor(blockState), impl$getDirectionalData(blockState), impl$getAxisData(blockState));
     }
 
@@ -62,56 +62,56 @@ public abstract class BlockLeverMixin extends BlockMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutablePoweredData) {
-            return Optional.of((BlockState) blockState.withProperty(BlockLever.POWERED, ((ImmutablePoweredData) manipulator).powered().get()));
+            return Optional.of((BlockState) blockState.withProperty(LeverBlock.POWERED, ((ImmutablePoweredData) manipulator).powered().get()));
         }
         if (manipulator instanceof ImmutableDirectionalData) {
             final Direction dir = ((ImmutableDirectionalData) manipulator).direction().get();
-            final Axis axis = this.impl$getAxisFromOrientation(blockState.getValue(BlockLever.FACING));
-            return Optional.of((BlockState) blockState.withProperty(BlockLever.FACING, DirectionResolver.getAsOrientation(dir, axis)));
+            final Axis axis = this.impl$getAxisFromOrientation(blockState.getValue(LeverBlock.FACING));
+            return Optional.of((BlockState) blockState.withProperty(LeverBlock.FACING, DirectionResolver.getAsOrientation(dir, axis)));
         }
         if (manipulator instanceof ImmutableAxisData) {
             final Axis axis = ((ImmutableAxisData) manipulator).axis().get();
-            final Direction dir = DirectionResolver.getFor(blockState.getValue(BlockLever.FACING));
-            return Optional.of((BlockState) blockState.withProperty(BlockLever.FACING, DirectionResolver.getAsOrientation(dir, axis)));
+            final Direction dir = DirectionResolver.getFor(blockState.getValue(LeverBlock.FACING));
+            return Optional.of((BlockState) blockState.withProperty(LeverBlock.FACING, DirectionResolver.getAsOrientation(dir, axis)));
         }
         return super.bridge$getStateWithData(blockState, manipulator);
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.POWERED)) {
-            return Optional.of((BlockState) blockState.withProperty(BlockLever.POWERED, (Boolean) value));
+            return Optional.of((BlockState) blockState.withProperty(LeverBlock.POWERED, (Boolean) value));
         }
         if (key.equals(Keys.DIRECTION)) {
             final Direction dir = (Direction) value;
-            final Axis axis = this.impl$getAxisFromOrientation(blockState.getValue(BlockLever.FACING));
-            return Optional.of((BlockState) blockState.withProperty(BlockLever.FACING, DirectionResolver.getAsOrientation(dir, axis)));
+            final Axis axis = this.impl$getAxisFromOrientation(blockState.getValue(LeverBlock.FACING));
+            return Optional.of((BlockState) blockState.withProperty(LeverBlock.FACING, DirectionResolver.getAsOrientation(dir, axis)));
         }
         if (key.equals(Keys.AXIS)) {
             final Axis axis = (Axis) value;
-            final Direction dir = DirectionResolver.getFor(blockState.getValue(BlockLever.FACING));
-            return Optional.of((BlockState) blockState.withProperty(BlockLever.FACING, DirectionResolver.getAsOrientation(dir, axis)));
+            final Direction dir = DirectionResolver.getFor(blockState.getValue(LeverBlock.FACING));
+            return Optional.of((BlockState) blockState.withProperty(LeverBlock.FACING, DirectionResolver.getAsOrientation(dir, axis)));
         }
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
-    private ImmutablePoweredData impl$getIsPoweredFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePoweredData.class, blockState.getValue(BlockLever.POWERED));
+    private ImmutablePoweredData impl$getIsPoweredFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePoweredData.class, blockState.getValue(LeverBlock.POWERED));
     }
 
-    private ImmutableDirectionalData impl$getDirectionalData(final IBlockState blockState) {
-        final BlockLever.EnumOrientation intDir = blockState.getValue(BlockLever.FACING);
+    private ImmutableDirectionalData impl$getDirectionalData(final BlockState blockState) {
+        final LeverBlock.EnumOrientation intDir = blockState.getValue(LeverBlock.FACING);
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeDirectionalData.class, DirectionResolver.getFor(intDir));
     }
 
-    private ImmutableAxisData impl$getAxisData(final IBlockState blockState) {
-        final BlockLever.EnumOrientation orientation = blockState.getValue(BlockLever.FACING);
+    private ImmutableAxisData impl$getAxisData(final BlockState blockState) {
+        final LeverBlock.EnumOrientation orientation = blockState.getValue(LeverBlock.FACING);
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeAxisData.class, this.impl$getAxisFromOrientation(orientation));
     }
 
-    private Axis impl$getAxisFromOrientation(final BlockLever.EnumOrientation orientation) {
+    private Axis impl$getAxisFromOrientation(final LeverBlock.EnumOrientation orientation) {
         final Axis axis;
         switch (orientation) {
             case UP_X:

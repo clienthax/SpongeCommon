@@ -25,7 +25,7 @@
 package org.spongepowered.common.mixin.core.nbt;
 
 import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -49,7 +49,7 @@ import javax.annotation.Nullable;
  * prevents an NPE crashing the game. A pretty warning message will be printed
  * out for the client to see and report to both Sponge and the mod author.
  */
-@Mixin(NBTTagCompound.class)
+@Mixin(CompoundNBT.class)
 public abstract class NBTTagCompoundMixin extends NBTBase {
 
     @Shadow @Final private Map<String, NBTBase> tagMap;
@@ -89,11 +89,11 @@ public abstract class NBTTagCompoundMixin extends NBTBase {
         }
     }
 
-    @Redirect(method = "copy", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/NBTTagCompound;setTag(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V"))
-    private void onCopySet(final NBTTagCompound compound, final String string, @Nullable final NBTBase base) {
+    @Redirect(method = "copy", at = @At(value = "INVOKE", target = "Lnet/minecraft/nbt/CompoundNBT;setTag(Ljava/lang/String;Lnet/minecraft/nbt/NBTBase;)V"))
+    private void onCopySet(final CompoundNBT compound, final String string, @Nullable final NBTBase base) {
         if (base == null) {
             final IllegalStateException exception = new IllegalStateException("There is a null NBTBase in the compound for key: " + string);
-            SpongeImpl.getLogger().error("Printing out a stacktrace to catch an exception in performing an NBTTagCompound.copy!\n"
+            SpongeImpl.getLogger().error("Printing out a stacktrace to catch an exception in performing an CompoundNBT.copy!\n"
                                          + "If you are seeing this, then Sponge is preventing an exception from being thrown due to unforseen\n"
                                          + "possible bugs in any mods present. Please report this to SpongePowered and/or the relative mod\n"
                                          + "authors for the offending compound data!", exception);

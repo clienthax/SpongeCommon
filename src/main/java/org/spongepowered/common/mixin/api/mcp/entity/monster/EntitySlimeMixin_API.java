@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.monster;
 
-import net.minecraft.entity.monster.EntitySlime;
+import net.minecraft.entity.monster.SlimeEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.SlimeData;
@@ -38,7 +38,7 @@ import org.spongepowered.common.mixin.api.mcp.entity.EntityLivingMixin_API;
 
 import java.util.Collection;
 
-@Mixin(EntitySlime.class)
+@Mixin(SlimeEntity.class)
 public abstract class EntitySlimeMixin_API extends EntityLivingMixin_API implements Slime {
 
     @Shadow public abstract int getSlimeSize();

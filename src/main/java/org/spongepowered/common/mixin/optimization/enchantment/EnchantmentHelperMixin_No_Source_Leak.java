@@ -26,8 +26,8 @@ package org.spongepowered.common.mixin.optimization.enchantment;
 
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.DamageSource;
 import org.spongepowered.asm.mixin.Final;
@@ -74,7 +74,7 @@ public abstract class EnchantmentHelperMixin_No_Source_Leak {
      * Fixes MC-128547
      */
     @Overwrite
-    public static void applyThornEnchantments(@Nullable final EntityLivingBase p_151384_0_, final Entity p_151384_1_) {
+    public static void applyThornEnchantments(@Nullable final LivingEntity p_151384_0_, final Entity p_151384_1_) {
         ENCHANTMENT_ITERATOR_HURT.attacker = p_151384_1_;
         ENCHANTMENT_ITERATOR_HURT.user = p_151384_0_;
 
@@ -82,7 +82,7 @@ public abstract class EnchantmentHelperMixin_No_Source_Leak {
             applyEnchantmentModifierArray(ENCHANTMENT_ITERATOR_HURT, p_151384_0_.getEquipmentAndArmor());
         }
 
-        if (p_151384_1_ instanceof EntityPlayer) {
+        if (p_151384_1_ instanceof PlayerEntity) {
             applyEnchantmentModifier(ENCHANTMENT_ITERATOR_HURT, p_151384_0_.getHeldItemMainhand());
         }
         // Sponge Start - remove references to entity objects to avoid memory leaks
@@ -98,7 +98,7 @@ public abstract class EnchantmentHelperMixin_No_Source_Leak {
      * Fixes MC-128547
      */
     @Overwrite
-    public static void applyArthropodEnchantments(@Nullable final EntityLivingBase p_151385_0_, final Entity p_151385_1_) {
+    public static void applyArthropodEnchantments(@Nullable final LivingEntity p_151385_0_, final Entity p_151385_1_) {
         ENCHANTMENT_ITERATOR_DAMAGE.user = p_151385_0_;
         ENCHANTMENT_ITERATOR_DAMAGE.target = p_151385_1_;
 
@@ -106,7 +106,7 @@ public abstract class EnchantmentHelperMixin_No_Source_Leak {
             applyEnchantmentModifierArray(ENCHANTMENT_ITERATOR_DAMAGE, p_151385_0_.getEquipmentAndArmor());
         }
 
-        if (p_151385_0_ instanceof EntityPlayer) {
+        if (p_151385_0_ instanceof PlayerEntity) {
             applyEnchantmentModifier(ENCHANTMENT_ITERATOR_DAMAGE, p_151385_0_.getHeldItemMainhand());
         }
         // Sponge Start - remove references to entity objects to avoid memory leaks

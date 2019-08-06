@@ -26,7 +26,7 @@ package org.spongepowered.common.mixin.core.entity.item;
 
 import com.flowpowered.math.vector.Vector3d;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityMinecartTNT;
+import net.minecraft.entity.item.minecart.TNTMinecartEntity;
 import net.minecraft.util.DamageSource;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.vehicle.minecart.TNTMinecart;
@@ -55,7 +55,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityMinecartTNT.class)
+@Mixin(TNTMinecartEntity.class)
 public abstract class EntityMinecartTNTMixin extends EntityMinecartMixin implements FusedExplosiveBridge, ExplosiveBridge {
 
     @Shadow private int minecartTNTFuse;
@@ -158,7 +158,7 @@ public abstract class EntityMinecartTNTMixin extends EntityMinecartMixin impleme
         }
     }
 
-    @Inject(method = "attackEntityFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/EntityMinecartTNT;explodeCart(D)V"))
+    @Inject(method = "attackEntityFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/TNTMinecartEntity;explodeCart(D)V"))
     private void onAttackEntityFrom(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
         try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(source);

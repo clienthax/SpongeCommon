@@ -31,8 +31,8 @@ import static org.spongepowered.common.data.util.DataUtil.checkDataExists;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -73,7 +73,7 @@ public class SpongeBlockSnapshotBuilder extends AbstractDataBuilder<BlockSnapsho
     @Nullable UUID notifierUuid;
     Vector3i coords;
     @Nullable List<ImmutableDataManipulator<?, ?>> manipulators;
-    @Nullable NBTTagCompound compound;
+    @Nullable CompoundNBT compound;
     SpongeBlockChangeFlag flag = (SpongeBlockChangeFlag) BlockChangeFlags.ALL;
 
 
@@ -98,7 +98,7 @@ public class SpongeBlockSnapshotBuilder extends AbstractDataBuilder<BlockSnapsho
         return this;
     }
 
-    public SpongeBlockSnapshotBuilder blockState(final IBlockState blockState) {
+    public SpongeBlockSnapshotBuilder blockState(final BlockState blockState) {
         this.blockState = checkNotNull((BlockState) blockState);
         return this;
     }
@@ -109,7 +109,7 @@ public class SpongeBlockSnapshotBuilder extends AbstractDataBuilder<BlockSnapsho
     }
 
 
-    public SpongeBlockSnapshotBuilder extendedState(final IBlockState extended) {
+    public SpongeBlockSnapshotBuilder extendedState(final BlockState extended) {
         this.extendedState = checkNotNull((BlockState) extended);
         return this;
     }
@@ -132,7 +132,7 @@ public class SpongeBlockSnapshotBuilder extends AbstractDataBuilder<BlockSnapsho
         this.coords = location.getBlockPosition();
         if (this.blockState.getType() instanceof ITileEntityProvider) {
             if (location.hasTileEntity()) {
-                this.compound = new NBTTagCompound();
+                this.compound = new CompoundNBT();
                 final org.spongepowered.api.block.tileentity.TileEntity te = location.getTileEntity().get();
                 ((TileEntity) te).writeToNBT(this.compound);
                 this.manipulators = ((CustomDataHolderBridge) te).bridge$getCustomManipulators().stream()
@@ -155,7 +155,7 @@ public class SpongeBlockSnapshotBuilder extends AbstractDataBuilder<BlockSnapsho
         return this;
     }
 
-    public SpongeBlockSnapshotBuilder unsafeNbt(final NBTTagCompound compound) {
+    public SpongeBlockSnapshotBuilder unsafeNbt(final CompoundNBT compound) {
         this.compound = compound.copy();
         return this;
     }
@@ -210,7 +210,7 @@ public class SpongeBlockSnapshotBuilder extends AbstractDataBuilder<BlockSnapsho
         this.coords = holder.getPosition();
         this.manipulators = Lists.newArrayList(holder.getManipulators());
         if (holder instanceof SpongeBlockSnapshot) {
-            final NBTTagCompound compound = ((SpongeBlockSnapshot) holder).compound;
+            final CompoundNBT compound = ((SpongeBlockSnapshot) holder).compound;
             if (compound != null) {
                 this.compound = compound.copy();
             }
@@ -272,7 +272,7 @@ public class SpongeBlockSnapshotBuilder extends AbstractDataBuilder<BlockSnapsho
             builder.notifier(UUID.fromString(notifierUuid.get()));
         }
         final Optional<DataView> unsafeCompound = container.getView(Constants.Sponge.UNSAFE_NBT);
-        final NBTTagCompound compound = unsafeCompound.isPresent() ? NbtTranslator.getInstance().translateData(unsafeCompound.get()) : null;
+        final CompoundNBT compound = unsafeCompound.isPresent() ? NbtTranslator.getInstance().translateData(unsafeCompound.get()) : null;
         if (compound != null) {
             builder.unsafeNbt(compound);
         }

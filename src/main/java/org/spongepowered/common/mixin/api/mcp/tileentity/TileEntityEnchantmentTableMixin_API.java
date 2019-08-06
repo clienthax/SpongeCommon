@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.tileentity;
 
-import net.minecraft.tileentity.TileEntityEnchantmentTable;
+import net.minecraft.tileentity.EnchantingTableTileEntity;
 import org.spongepowered.api.block.tileentity.EnchantmentTable;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -37,7 +37,7 @@ import org.spongepowered.common.util.Constants;
 import java.util.List;
 
 @NonnullByDefault
-@Mixin(TileEntityEnchantmentTable.class)
+@Mixin(EnchantingTableTileEntity.class)
 public abstract class TileEntityEnchantmentTableMixin_API extends TileEntityMixin_API implements EnchantmentTable {
 
     @Shadow private String customName;
@@ -52,7 +52,7 @@ public abstract class TileEntityEnchantmentTableMixin_API extends TileEntityMixi
     @Override
     public void supplyVanillaManipulators(List<DataManipulator<?, ?>> manipulators) {
         super.supplyVanillaManipulators(manipulators);
-        if (((TileEntityEnchantmentTable) (Object) this).hasCustomName()) {
+        if (((EnchantingTableTileEntity) (Object) this).hasCustomName()) {
             manipulators.add(get(DisplayNameData.class).get());
         }
     }

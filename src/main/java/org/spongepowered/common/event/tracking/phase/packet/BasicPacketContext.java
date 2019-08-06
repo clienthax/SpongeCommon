@@ -26,7 +26,7 @@ package org.spongepowered.common.event.tracking.phase.packet;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import net.minecraft.inventory.Container;
+import net.minecraft.inventory.container.Container;
 import org.spongepowered.asm.util.PrettyPrinter;
 
 import javax.annotation.Nullable;

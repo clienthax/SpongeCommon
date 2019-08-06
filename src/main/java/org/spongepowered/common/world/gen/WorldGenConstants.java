@@ -25,21 +25,21 @@
 package org.spongepowered.common.world.gen;
 
 import net.minecraft.block.BlockDirt;
-import net.minecraft.block.BlockSand;
-import net.minecraft.block.BlockSilverfish;
+import net.minecraft.block.SandBlock;
+import net.minecraft.block.SilverfishBlock;
 import net.minecraft.block.BlockStone;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.biome.BiomeDecorator;
-import net.minecraft.world.biome.BiomeForest;
-import net.minecraft.world.biome.BiomeHills;
-import net.minecraft.world.biome.BiomeTaiga;
-import net.minecraft.world.gen.ChunkGeneratorEnd;
-import net.minecraft.world.gen.ChunkGeneratorFlat;
-import net.minecraft.world.gen.ChunkGeneratorHell;
-import net.minecraft.world.gen.ChunkGeneratorOverworld;
+import net.minecraft.world.biome.ForestBiome;
+import net.minecraft.world.biome.ExtremeHillsBiome;
+import net.minecraft.world.biome.TaigaBiome;
+import net.minecraft.world.gen.EndChunkGenerator;
+import net.minecraft.world.gen.FlatChunkGenerator;
+import net.minecraft.world.gen.NetherChunkGenerator;
+import net.minecraft.world.gen.OverworldChunkGenerator;
 import net.minecraft.world.gen.ChunkGeneratorSettings;
-import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraft.world.gen.ChunkGenerator;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.block.BlockTypes;
@@ -92,9 +92,9 @@ public final class WorldGenConstants {
     public static final String VILLAGE_FLAG = "VILLAGE";
 
     private static final Class<?>[] MIXINED_CHUNK_PROVIDERS =
-            new Class<?>[] {ChunkGeneratorOverworld.class, ChunkGeneratorFlat.class, ChunkGeneratorHell.class, ChunkGeneratorEnd.class};
+            new Class<?>[] {OverworldChunkGenerator.class, FlatChunkGenerator.class, NetherChunkGenerator.class, EndChunkGenerator.class};
 
-    public static boolean isValid(final IChunkGenerator cp, final Class<?> api_type) {
+    public static boolean isValid(final ChunkGenerator cp, final Class<?> api_type) {
         if (api_type.isInstance(cp)) {
             for (final Class<?> mixind : MIXINED_CHUNK_PROVIDERS) {
                 if (cp.getClass().equals(mixind)) {
@@ -293,14 +293,14 @@ public final class WorldGenConstants {
     }
 
     // Temporary while Mixins issue gets fixed for referencing accessor mixins within another mixin
-    public static void buildPopulators(final net.minecraft.world.World world, final SpongeBiomeGenerationSettings gensettings, final BiomeDecorator decorator, final IBlockState topBlock,
-        final IBlockState fillerBlock) {
+    public static void buildPopulators(final net.minecraft.world.World world, final SpongeBiomeGenerationSettings gensettings, final BiomeDecorator decorator, final BlockState topBlock,
+        final BlockState fillerBlock) {
 
         gensettings.getGroundCoverLayers().add(new GroundCoverLayer((BlockState) topBlock, SeededVariableAmount.fixed(1)));
         gensettings.getGroundCoverLayers().add(new GroundCoverLayer((BlockState) fillerBlock, GROUND_COVER_DEPTH));
         if (fillerBlock.getBlock() == Blocks.SAND) {
             final BlockType type;
-            if (fillerBlock.getValue(BlockSand.VARIANT) == BlockSand.EnumType.RED_SAND) {
+            if (fillerBlock.getValue(SandBlock.VARIANT) == SandBlock.EnumType.RED_SAND) {
                 type = BlockTypes.RED_SANDSTONE;
             } else {
                 type = BlockTypes.SANDSTONE;
@@ -599,16 +599,16 @@ public final class WorldGenConstants {
         gensettings.getPopulators().add(lava2);
     }
 
-    public static void buildForestPopulators(final SpongeBiomeGenerationSettings gensettings, final BiomeDecorator decorator, final BiomeForest.Type type) {
+    public static void buildForestPopulators(final SpongeBiomeGenerationSettings gensettings, final BiomeDecorator decorator, final ForestBiome.Type type) {
         gensettings.getPopulators().removeAll(gensettings.getPopulators(Forest.class));
         final BiomeDecoratorAccessor accessor = (BiomeDecoratorAccessor) decorator;
-        if (type == BiomeForest.Type.ROOFED) {
+        if (type == ForestBiome.Type.ROOFED) {
             final RoofedForestPopulator forest = new RoofedForestPopulator();
             gensettings.getPopulators().add(0, forest);
         } else {
             final Forest.Builder forest = Forest.builder();
             forest.perChunk(VariableAmount.baseWithOptionalAddition(accessor.accessor$getTreesPerChunk(), 1, 0.1));
-            if (type == BiomeForest.Type.BIRCH) {
+            if (type == ForestBiome.Type.BIRCH) {
                 forest.type(BiomeTreeTypes.BIRCH.getPopulatorObject(), 1);
             } else {
                 forest.type(BiomeTreeTypes.OAK.getPopulatorObject(), 4);
@@ -616,7 +616,7 @@ public final class WorldGenConstants {
             }
             gensettings.getPopulators().add(0, forest.build());
         }
-        if (type == BiomeForest.Type.FLOWER) {
+        if (type == ForestBiome.Type.FLOWER) {
             gensettings.getPopulators().removeAll(gensettings.getPopulators(Flower.class));
             final Flower flower = Flower.builder()
                     .perChunk(accessor.accessor$getFlowersPerChunk() * 64)
@@ -626,22 +626,22 @@ public final class WorldGenConstants {
         }
     }
 
-    public static void buildHillsPopulator(final SpongeBiomeGenerationSettings gensettings, final BiomeHills.Type type, final BiomeDecorator decorator) {
+    public static void buildHillsPopulator(final SpongeBiomeGenerationSettings gensettings, final ExtremeHillsBiome.Type type, final BiomeDecorator decorator) {
         gensettings.getGroundCoverLayers().clear();
         gensettings.getGroundCoverLayers().add(new GroundCoverLayer((stoneNoise) -> {
-            IBlockState result = Blocks.GRASS.getDefaultState();
-            if ((stoneNoise < -1.0D || stoneNoise > 2.0D) && type == BiomeHills.Type.MUTATED) {
+            BlockState result = Blocks.GRASS.getDefaultState();
+            if ((stoneNoise < -1.0D || stoneNoise > 2.0D) && type == ExtremeHillsBiome.Type.MUTATED) {
                 result = Blocks.GRAVEL.getDefaultState();
-            } else if (stoneNoise > 1.0D && type != BiomeHills.Type.EXTRA_TREES) {
+            } else if (stoneNoise > 1.0D && type != ExtremeHillsBiome.Type.EXTRA_TREES) {
                 result = Blocks.STONE.getDefaultState();
             }
             return (BlockState) result;
         } , SeededVariableAmount.fixed(1)));
         gensettings.getGroundCoverLayers().add(new GroundCoverLayer((stoneNoise) -> {
-            IBlockState result = Blocks.DIRT.getDefaultState();
-            if ((stoneNoise < -1.0D || stoneNoise > 2.0D) && type == BiomeHills.Type.MUTATED) {
+            BlockState result = Blocks.DIRT.getDefaultState();
+            if ((stoneNoise < -1.0D || stoneNoise > 2.0D) && type == ExtremeHillsBiome.Type.MUTATED) {
                 result = Blocks.GRAVEL.getDefaultState();
-            } else if (stoneNoise > 1.0D && type != BiomeHills.Type.EXTRA_TREES) {
+            } else if (stoneNoise > 1.0D && type != ExtremeHillsBiome.Type.EXTRA_TREES) {
                 result = Blocks.STONE.getDefaultState();
             }
             return (BlockState) result;
@@ -656,7 +656,7 @@ public final class WorldGenConstants {
         gensettings.getPopulators().add(emerald);
 
         final Ore silverfish = Ore.builder()
-                .ore((BlockState) Blocks.MONSTER_EGG.getDefaultState().withProperty(BlockSilverfish.VARIANT, BlockSilverfish.EnumType.STONE))
+                .ore((BlockState) Blocks.MONSTER_EGG.getDefaultState().withProperty(SilverfishBlock.VARIANT, SilverfishBlock.EnumType.STONE))
                 .perChunk(7)
                 .height(VariableAmount.baseWithRandomAddition(0, 64))
                 .size(9)
@@ -775,9 +775,9 @@ public final class WorldGenConstants {
         gensettings.getPopulators().add(Fossil.builder().probability(1 / 64.0).build());
     }
 
-    public static void buildTaigaPopulators(final SpongeBiomeGenerationSettings gensettings, final BiomeTaiga.Type type, final IBlockState fillerBlock,
+    public static void buildTaigaPopulators(final SpongeBiomeGenerationSettings gensettings, final TaigaBiome.Type type, final BlockState fillerBlock,
         final BiomeDecorator decorator) {
-        if (type == BiomeTaiga.Type.MEGA || type == BiomeTaiga.Type.MEGA_SPRUCE) {
+        if (type == TaigaBiome.Type.MEGA || type == TaigaBiome.Type.MEGA_SPRUCE) {
             gensettings.getGroundCoverLayers().clear();
             gensettings.getGroundCoverLayers().add(new GroundCoverLayer((Double seed) -> {
                 if (seed > 1.75D) {
@@ -810,8 +810,8 @@ public final class WorldGenConstants {
         gensettings.getPopulators().removeAll(gensettings.getPopulators(Forest.class));
         final Forest.Builder forest = Forest.builder();
         forest.perChunk(VariableAmount.baseWithOptionalAddition(accessor.accessor$getTreesPerChunk(), 1, 0.1));
-        if (type == BiomeTaiga.Type.MEGA || type == BiomeTaiga.Type.MEGA_SPRUCE) {
-            if (type == BiomeTaiga.Type.MEGA) {
+        if (type == TaigaBiome.Type.MEGA || type == TaigaBiome.Type.MEGA_SPRUCE) {
+            if (type == TaigaBiome.Type.MEGA) {
                 forest.type(BiomeTreeTypes.POINTY_TAIGA.getLargePopulatorObject().get(), 1);
                 forest.type(BiomeTreeTypes.TALL_TAIGA.getLargePopulatorObject().get(), 12);
             } else {

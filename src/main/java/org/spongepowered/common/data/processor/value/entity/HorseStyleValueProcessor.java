@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.entity;
 
-import net.minecraft.entity.passive.EntityHorse;
+import net.minecraft.entity.passive.horse.HorseEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.type.HorseStyle;
@@ -42,10 +42,10 @@ import org.spongepowered.common.registry.type.entity.HorseStyleRegistryModule;
 
 import java.util.Optional;
 
-public class HorseStyleValueProcessor extends AbstractSpongeValueProcessor<EntityHorse, HorseStyle, Value<HorseStyle>> {
+public class HorseStyleValueProcessor extends AbstractSpongeValueProcessor<HorseEntity, HorseStyle, Value<HorseStyle>> {
 
     public HorseStyleValueProcessor() {
-        super(EntityHorse.class, Keys.HORSE_STYLE);
+        super(HorseEntity.class, Keys.HORSE_STYLE);
     }
 
     @Override
@@ -54,14 +54,14 @@ public class HorseStyleValueProcessor extends AbstractSpongeValueProcessor<Entit
     }
 
     @Override
-    protected boolean set(EntityHorse container, HorseStyle value) {
+    protected boolean set(HorseEntity container, HorseStyle value) {
         SpongeHorseColor color = (SpongeHorseColor) HorseColorRegistryModule.getHorseColor(container);
         container.setHorseVariant((color.getBitMask() | ((SpongeHorseStyle) value).getBitMask()));
         return true;
     }
 
     @Override
-    protected Optional<HorseStyle> getVal(EntityHorse container) {
+    protected Optional<HorseStyle> getVal(HorseEntity container) {
         return Optional.of(HorseStyleRegistryModule.getHorseStyle(container));
     }
 

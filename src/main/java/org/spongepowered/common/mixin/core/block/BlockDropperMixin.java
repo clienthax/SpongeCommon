@@ -24,14 +24,14 @@
  */
 package org.spongepowered.common.mixin.core.block;
 
-import net.minecraft.block.BlockDispenser;
-import net.minecraft.block.BlockDropper;
-import net.minecraft.block.BlockSourceImpl;
+import net.minecraft.block.DispenserBlock;
+import net.minecraft.block.DropperBlock;
+import net.minecraft.dispenser.ProxyBlockSource;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityDispenser;
-import net.minecraft.tileentity.TileEntityHopper;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.tileentity.DispenserTileEntity;
+import net.minecraft.tileentity.HopperTileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -46,15 +46,15 @@ import org.spongepowered.common.event.SpongeCommonEventFactory;
 
 import javax.annotation.Nullable;
 
-@Mixin(BlockDropper.class)
+@Mixin(DropperBlock.class)
 public abstract class BlockDropperMixin {
 
     @Inject(method = "dispense", cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION,
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/tileentity/TileEntityDispenser;setInventorySlotContents(ILnet/minecraft/item/ItemStack;)V"))
+                    target = "Lnet/minecraft/tileentity/DispenserTileEntity;setInventorySlotContents(ILnet/minecraft/item/ItemStack;)V"))
     private void afterDispense(final World worldIn, final BlockPos pos, final CallbackInfo callbackInfo,
-            final BlockSourceImpl blocksourceimpl, final TileEntityDispenser tileentitydispenser, final int i, final ItemStack itemstack,
-            final EnumFacing enumfacing, final BlockPos blockpos, final IInventory iinventory, final ItemStack itemstack1) {
+            final ProxyBlockSource blocksourceimpl, final DispenserTileEntity tileentitydispenser, final int i, final ItemStack itemstack,
+            final Direction enumfacing, final BlockPos blockpos, final IInventory iinventory, final ItemStack itemstack1) {
         // after setInventorySlotContents
         tileentitydispenser.setInventorySlotContents(i, itemstack1);
         // Transfer worked if remainder is one less than the original stack
@@ -69,7 +69,7 @@ public abstract class BlockDropperMixin {
 
     @Surrogate
     private void afterDispense(final World worldIn, final BlockPos pos, final CallbackInfo callbackInfo,
-            final BlockSourceImpl blocksourceimpl, final TileEntityDispenser tileentitydispenser, final int i, final ItemStack itemstack,
+            final ProxyBlockSource blocksourceimpl, final DispenserTileEntity tileentitydispenser, final int i, final ItemStack itemstack,
             final ItemStack itemstack1) {
         // after setInventorySlotContents
         tileentitydispenser.setInventorySlotContents(i, itemstack1);
@@ -78,9 +78,9 @@ public abstract class BlockDropperMixin {
             final TrackedInventoryBridge capture = impl$forCapture(tileentitydispenser);
             final Inventory sourceInv = ((Inventory) tileentitydispenser);
             SpongeCommonEventFactory.captureTransaction(capture, sourceInv, i, itemstack);
-            final EnumFacing enumfacing = worldIn.getBlockState(pos).getValue(BlockDispenser.FACING);
+            final Direction enumfacing = worldIn.getBlockState(pos).getValue(DispenserBlock.FACING);
             final BlockPos blockpos = pos.offset(enumfacing);
-            final IInventory iinventory = TileEntityHopper.getInventoryAtPosition(worldIn, (double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ());
+            final IInventory iinventory = HopperTileEntity.getInventoryAtPosition(worldIn, (double)blockpos.getX(), (double)blockpos.getY(), (double)blockpos.getZ());
             SpongeCommonEventFactory.callTransferPost(capture, sourceInv, ((Inventory) iinventory));
         }
         callbackInfo.cancel();
@@ -88,10 +88,10 @@ public abstract class BlockDropperMixin {
 
     @Inject(method = "dispense", cancellable = true, locals = LocalCapture.CAPTURE_FAILEXCEPTION,
             at = @At(value = "INVOKE",
-                    target = "Lnet/minecraft/tileentity/TileEntityHopper;putStackInInventoryAllSlots(Lnet/minecraft/inventory/IInventory;Lnet/minecraft/inventory/IInventory;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/EnumFacing;)Lnet/minecraft/item/ItemStack;"))
+                    target = "Lnet/minecraft/tileentity/HopperTileEntity;putStackInInventoryAllSlots(Lnet/minecraft/inventory/IInventory;Lnet/minecraft/inventory/IInventory;Lnet/minecraft/item/ItemStack;Lnet/minecraft/util/Direction;)Lnet/minecraft/item/ItemStack;"))
     private void onDispense(final World world, final BlockPos pos, final CallbackInfo ci,
-            final BlockSourceImpl blocksourceimpl, final TileEntityDispenser tileentitydispenser, final int i, final ItemStack itemstack,
-            final EnumFacing enumfacing, final BlockPos blockpos, final IInventory iinventory) {
+            final ProxyBlockSource blocksourceimpl, final DispenserTileEntity tileentitydispenser, final int i, final ItemStack itemstack,
+            final Direction enumfacing, final BlockPos blockpos, final IInventory iinventory) {
         // Before putStackInInventoryAllSlots
         if (SpongeCommonEventFactory.callTransferPre(((Inventory) tileentitydispenser), ((Inventory) iinventory)).isCancelled()) {
             ci.cancel();

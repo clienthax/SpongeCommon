@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.block;
 
-import net.minecraft.block.BlockStairs;
+import net.minecraft.block.StairsBlock;
 import org.spongepowered.api.data.type.StairShape;
 import org.spongepowered.asm.mixin.Implements;
 import org.spongepowered.asm.mixin.Interface;
@@ -32,9 +32,9 @@ import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(BlockStairs.EnumShape.class)
+@Mixin(StairsBlock.EnumShape.class)
 @Implements(@Interface(iface = StairShape.class, prefix = "stair$"))
-public abstract class BlockStairs$EnumShapeMixin_API {
+public abstract class StairsBlock$EnumShapeMixin_API {
 
     @Shadow public abstract String shadow$getName();
 

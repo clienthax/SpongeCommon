@@ -25,9 +25,9 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockDoor;
+import net.minecraft.block.DoorBlock;
 import net.minecraft.block.BlockDoor.EnumDoorHalf;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -54,12 +54,12 @@ import org.spongepowered.common.data.util.DirectionResolver;
 
 import java.util.Optional;
 
-@Mixin(BlockDoor.class)
+@Mixin(DoorBlock.class)
 public abstract class BlockDoorMixin extends BlockMixin {
 
     @SuppressWarnings("RedundantTypeArguments") // some java compilers will not calculate this generic correctly
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getHingeFor(blockState), impl$getIsOpenFor(blockState),
                 impl$getIsPoweredFor(blockState), impl$getDirectionalData(blockState), impl$getPortionData(blockState));
     }
@@ -71,75 +71,75 @@ public abstract class BlockDoorMixin extends BlockMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableHingeData) {
-            final BlockDoor.EnumHingePosition hinge = (BlockDoor.EnumHingePosition) (Object) ((ImmutableHingeData) manipulator).type().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockDoor.HINGE, hinge));
+            final DoorBlock.EnumHingePosition hinge = (DoorBlock.EnumHingePosition) (Object) ((ImmutableHingeData) manipulator).type().get();
+            return Optional.of((BlockState) blockState.withProperty(DoorBlock.HINGE, hinge));
         }
         if (manipulator instanceof ImmutableOpenData) {
             final boolean isOpen = ((ImmutableOpenData) manipulator).open().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockDoor.OPEN, isOpen));
+            return Optional.of((BlockState) blockState.withProperty(DoorBlock.OPEN, isOpen));
         }
         if (manipulator instanceof ImmutablePoweredData) {
-            return Optional.of((BlockState) blockState.withProperty(BlockDoor.POWERED, ((ImmutablePoweredData) manipulator).powered().get()));
+            return Optional.of((BlockState) blockState.withProperty(DoorBlock.POWERED, ((ImmutablePoweredData) manipulator).powered().get()));
         }
         if (manipulator instanceof ImmutableDirectionalData) {
             final Direction dir = DirectionChecker.checkDirectionToHorizontal(((ImmutableDirectionalData) manipulator).direction().get());
-            return Optional.of((BlockState) blockState.withProperty(BlockDoor.FACING, DirectionResolver.getFor(dir)));
+            return Optional.of((BlockState) blockState.withProperty(DoorBlock.FACING, DirectionResolver.getFor(dir)));
         }
         if (manipulator instanceof ImmutablePortionData) {
-            return Optional.of((BlockState) blockState.withProperty(BlockDoor.HALF,
+            return Optional.of((BlockState) blockState.withProperty(DoorBlock.HALF,
                     impl$convertPortionType(((ImmutablePortionData) manipulator).type().get())));
         }
         return super.bridge$getStateWithData(blockState, manipulator);
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.HINGE_POSITION)) {
-            final BlockDoor.EnumHingePosition hinge = (BlockDoor.EnumHingePosition) value;
-            return Optional.of((BlockState) blockState.withProperty(BlockDoor.HINGE, hinge));
+            final DoorBlock.EnumHingePosition hinge = (DoorBlock.EnumHingePosition) value;
+            return Optional.of((BlockState) blockState.withProperty(DoorBlock.HINGE, hinge));
         }
         if (key.equals(Keys.OPEN)) {
             final boolean isOpen = (Boolean) value;
-            return Optional.of((BlockState) blockState.withProperty(BlockDoor.OPEN, isOpen));
+            return Optional.of((BlockState) blockState.withProperty(DoorBlock.OPEN, isOpen));
         }
         if (key.equals(Keys.POWERED)) {
-            return Optional.of((BlockState) blockState.withProperty(BlockDoor.POWERED, (Boolean) value));
+            return Optional.of((BlockState) blockState.withProperty(DoorBlock.POWERED, (Boolean) value));
         }
         if (key.equals(Keys.DIRECTION)) {
             final Direction dir = DirectionChecker.checkDirectionToHorizontal((Direction) value);
-            return Optional.of((BlockState) blockState.withProperty(BlockDoor.FACING, DirectionResolver.getFor(dir)));
+            return Optional.of((BlockState) blockState.withProperty(DoorBlock.FACING, DirectionResolver.getFor(dir)));
         }
         if (key.equals(Keys.PORTION_TYPE)) {
-            return Optional.of((BlockState) blockState.withProperty(BlockDoor.HALF, impl$convertPortionType((PortionType) value)));
+            return Optional.of((BlockState) blockState.withProperty(DoorBlock.HALF, impl$convertPortionType((PortionType) value)));
         }
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
-    private BlockDoor.EnumDoorHalf impl$convertPortionType(final PortionType portionType) {
-        return portionType == PortionTypes.BOTTOM ? BlockDoor.EnumDoorHalf.LOWER : BlockDoor.EnumDoorHalf.UPPER;
+    private DoorBlock.EnumDoorHalf impl$convertPortionType(final PortionType portionType) {
+        return portionType == PortionTypes.BOTTOM ? DoorBlock.EnumDoorHalf.LOWER : DoorBlock.EnumDoorHalf.UPPER;
     }
 
-    private ImmutableHingeData impl$getHingeFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeHingeData.class, (Hinge) (Object) blockState.getValue(BlockDoor.HINGE));
+    private ImmutableHingeData impl$getHingeFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeHingeData.class, (Hinge) (Object) blockState.getValue(DoorBlock.HINGE));
     }
 
-    private ImmutableOpenData impl$getIsOpenFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeOpenData.class, blockState.getValue(BlockDoor.OPEN));
+    private ImmutableOpenData impl$getIsOpenFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeOpenData.class, blockState.getValue(DoorBlock.OPEN));
     }
 
-    private ImmutablePoweredData impl$getIsPoweredFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePoweredData.class, blockState.getValue(BlockDoor.POWERED));
+    private ImmutablePoweredData impl$getIsPoweredFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePoweredData.class, blockState.getValue(DoorBlock.POWERED));
     }
 
-    private ImmutableDirectionalData impl$getDirectionalData(final IBlockState blockState) {
+    private ImmutableDirectionalData impl$getDirectionalData(final BlockState blockState) {
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeDirectionalData.class,
-                DirectionResolver.getFor(blockState.getValue(BlockDoor.FACING)));
+                DirectionResolver.getFor(blockState.getValue(DoorBlock.FACING)));
     }
 
-    private ImmutablePortionData impl$getPortionData(final IBlockState blockState) {
-        final EnumDoorHalf half = blockState.getValue(BlockDoor.HALF);
+    private ImmutablePortionData impl$getPortionData(final BlockState blockState) {
+        final EnumDoorHalf half = blockState.getValue(DoorBlock.HALF);
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePortionData.class,
                 half == EnumDoorHalf.LOWER ? PortionTypes.BOTTOM : PortionTypes.TOP);
     }

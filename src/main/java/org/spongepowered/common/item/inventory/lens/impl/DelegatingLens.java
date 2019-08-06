@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.item.inventory.lens.impl;
 
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.common.item.inventory.adapter.InventoryAdapter;
 import org.spongepowered.common.item.inventory.adapter.impl.VanillaAdapter;

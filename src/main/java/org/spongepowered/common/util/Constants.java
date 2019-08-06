@@ -28,9 +28,9 @@ import static org.spongepowered.api.data.DataQuery.of;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
-import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.item.ArmorStandEntity;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import org.spongepowered.api.block.BlockState;
@@ -317,8 +317,8 @@ public final class Constants {
          * using
          *  IBlockState#neighborChanged(net.minecraft.world.World, BlockPos, Block, BlockPos)
          */
-        public static final EnumFacing[] NOTIFY_DIRECTIONS = {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH};
-        public static final EnumSet<EnumFacing> NOTIFY_DIRECTION_SET = EnumSet.of(EnumFacing.WEST, EnumFacing.EAST, EnumFacing.DOWN, EnumFacing.UP, EnumFacing.NORTH, EnumFacing.SOUTH);
+        public static final Direction[] NOTIFY_DIRECTIONS = {Direction.WEST, Direction.EAST, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH};
+        public static final EnumSet<Direction> NOTIFY_DIRECTION_SET = EnumSet.of(Direction.WEST, Direction.EAST, Direction.DOWN, Direction.UP, Direction.NORTH, Direction.SOUTH);
         public static final UUID INVALID_WORLD_UUID = java.util.UUID.fromString("00000000-0000-0000-0000-000000000000");
         public static final int DEFAULT_CHUNK_UNLOAD_DELAY = 15000;
         public static final int MAX_CHUNK_UNLOADS = 100;
@@ -659,12 +659,12 @@ public final class Constants {
 
         public static final class ArmorStand {
 
-            public static final Vector3d DEFAULT_HEAD_ROTATION = VecHelper.toVector3d(EntityArmorStand.DEFAULT_HEAD_ROTATION);
-            public static final Vector3d DEFAULT_CHEST_ROTATION = VecHelper.toVector3d(EntityArmorStand.DEFAULT_BODY_ROTATION);
-            public static final Vector3d DEFAULT_LEFT_ARM_ROTATION = VecHelper.toVector3d(EntityArmorStand.DEFAULT_LEFTARM_ROTATION);
-            public static final Vector3d DEFAULT_RIGHT_ARM_ROTATION = VecHelper.toVector3d(EntityArmorStand.DEFAULT_RIGHTARM_ROTATION);
-            public static final Vector3d DEFAULT_LEFT_LEG_ROTATION = VecHelper.toVector3d(EntityArmorStand.DEFAULT_LEFTLEG_ROTATION);
-            public static final Vector3d DEFAULT_RIGHT_LEG_ROTATION = VecHelper.toVector3d(EntityArmorStand.DEFAULT_RIGHTLEG_ROTATION);
+            public static final Vector3d DEFAULT_HEAD_ROTATION = VecHelper.toVector3d(ArmorStandEntity.DEFAULT_HEAD_ROTATION);
+            public static final Vector3d DEFAULT_CHEST_ROTATION = VecHelper.toVector3d(ArmorStandEntity.DEFAULT_BODY_ROTATION);
+            public static final Vector3d DEFAULT_LEFT_ARM_ROTATION = VecHelper.toVector3d(ArmorStandEntity.DEFAULT_LEFTARM_ROTATION);
+            public static final Vector3d DEFAULT_RIGHT_ARM_ROTATION = VecHelper.toVector3d(ArmorStandEntity.DEFAULT_RIGHTARM_ROTATION);
+            public static final Vector3d DEFAULT_LEFT_LEG_ROTATION = VecHelper.toVector3d(ArmorStandEntity.DEFAULT_LEFTLEG_ROTATION);
+            public static final Vector3d DEFAULT_RIGHT_LEG_ROTATION = VecHelper.toVector3d(ArmorStandEntity.DEFAULT_RIGHTLEG_ROTATION);
         }
 
         public static final class Boat {

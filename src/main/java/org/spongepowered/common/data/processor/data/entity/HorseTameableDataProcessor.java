@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.passive.AbstractHorse;
+import net.minecraft.entity.passive.horse.AbstractHorseEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -42,14 +42,14 @@ import java.util.Optional;
 import java.util.UUID;
 
 public class HorseTameableDataProcessor
-        extends AbstractEntitySingleDataProcessor<AbstractHorse, Optional<UUID>, OptionalValue<UUID>, TameableData, ImmutableTameableData> {
+        extends AbstractEntitySingleDataProcessor<AbstractHorseEntity, Optional<UUID>, OptionalValue<UUID>, TameableData, ImmutableTameableData> {
 
     public HorseTameableDataProcessor() {
-        super(AbstractHorse.class, Keys.TAMED_OWNER);
+        super(AbstractHorseEntity.class, Keys.TAMED_OWNER);
     }
 
     @Override
-    protected Optional<Optional<UUID>> getVal(AbstractHorse tameable) {
+    protected Optional<Optional<UUID>> getVal(AbstractHorseEntity tameable) {
         return Optional.of(Optional.ofNullable(tameable.getOwnerUniqueId()));
     }
 
@@ -67,7 +67,7 @@ public class HorseTameableDataProcessor
     }
 
     @Override
-    protected boolean set(AbstractHorse horse, Optional<UUID> uuidOptional) {
+    protected boolean set(AbstractHorseEntity horse, Optional<UUID> uuidOptional) {
         horse.setOwnerUniqueId(uuidOptional.orElse(null));
         horse.setHorseTamed(uuidOptional.isPresent());
         return true;

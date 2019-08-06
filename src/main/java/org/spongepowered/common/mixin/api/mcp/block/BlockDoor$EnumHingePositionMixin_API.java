@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.block;
 
-import net.minecraft.block.BlockDoor;
+import net.minecraft.block.DoorBlock;
 import org.spongepowered.api.data.type.Hinge;
 import org.spongepowered.api.data.type.Hinges;
 import org.spongepowered.asm.mixin.Implements;
@@ -33,9 +33,9 @@ import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(BlockDoor.EnumHingePosition.class)
+@Mixin(DoorBlock.EnumHingePosition.class)
 @Implements(@Interface(iface = Hinge.class, prefix = "hinge$"))
-public abstract class BlockDoor$EnumHingePositionMixin_API implements Hinge {
+public abstract class DoorBlock$EnumHingePositionMixin_API implements Hinge {
 
     @Shadow public abstract String shadow$getName();
 

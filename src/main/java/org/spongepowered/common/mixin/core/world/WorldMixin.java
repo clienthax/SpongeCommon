@@ -26,28 +26,28 @@ package org.spongepowered.common.mixin.core.world;
 
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.profiler.Profiler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.DifficultyInstance;
-import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.world.LightType;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldProvider;
+import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.IChunkProvider;
+import net.minecraft.world.chunk.AbstractChunkProvider;
 import net.minecraft.world.storage.WorldInfo;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -97,10 +97,10 @@ public abstract class WorldMixin implements WorldBridge {
 
     // @formatter:off
     @Shadow @Final public boolean isRemote;
-    @Shadow @Final public WorldProvider provider;
+    @Shadow @Final public Dimension provider;
     @Shadow @Final public Random rand;
     @Shadow @Final public Profiler profiler;
-    @Shadow @Final public List<EntityPlayer> playerEntities;
+    @Shadow @Final public List<PlayerEntity> playerEntities;
     @Shadow @Final public List<net.minecraft.entity.Entity> loadedEntityList;
     @Shadow @Final public List<net.minecraft.entity.Entity> weatherEffects;
     @Shadow @Final protected List<net.minecraft.entity.Entity> unloadedEntityList;
@@ -112,7 +112,7 @@ public abstract class WorldMixin implements WorldBridge {
     @Shadow private boolean processingLoadedTiles;
     @Shadow protected boolean scheduledUpdatesAreImmediate;
     @Shadow protected WorldInfo worldInfo;
-    @Shadow protected IChunkProvider chunkProvider;
+    @Shadow protected AbstractChunkProvider chunkProvider;
     @Shadow @Final private net.minecraft.world.border.WorldBorder worldBorder;
     @Shadow protected int updateLCG;
 
@@ -125,11 +125,11 @@ public abstract class WorldMixin implements WorldBridge {
     // To be overridden in MixinWorldServer_Lighting
     @Shadow public abstract int getLight(BlockPos pos);
     @Shadow public abstract int getLight(BlockPos pos, boolean checkNeighbors);
-    @Shadow protected abstract int getRawLight(BlockPos pos, EnumSkyBlock lightType);
+    @Shadow protected abstract int getRawLight(BlockPos pos, LightType lightType);
     @Shadow public abstract int getSkylightSubtracted();
     @Shadow @Nullable public abstract Chunk getChunk(BlockPos pos);
     @Shadow public abstract WorldInfo getWorldInfo();
-    @Shadow public abstract boolean checkLightFor(EnumSkyBlock lightType, BlockPos pos);
+    @Shadow public abstract boolean checkLightFor(LightType lightType, BlockPos pos);
     @Shadow public abstract boolean addTileEntity(TileEntity tile);
     @Shadow protected abstract void onEntityAdded(net.minecraft.entity.Entity entityIn);
     @Shadow public abstract boolean isAreaLoaded(BlockPos center, int radius, boolean allowEmpty);
@@ -147,17 +147,17 @@ public abstract class WorldMixin implements WorldBridge {
     @Shadow public abstract MinecraftServer getMinecraftServer();
     @Shadow public abstract boolean spawnEntity(net.minecraft.entity.Entity entity); // This is overridden in WorldServerMixin
     @Shadow public abstract void updateAllPlayersSleepingFlag();
-    @Shadow public abstract boolean setBlockState(BlockPos pos, IBlockState state);
-    @Shadow public abstract boolean setBlockState(BlockPos pos, IBlockState state, int flags);
+    @Shadow public abstract boolean setBlockState(BlockPos pos, BlockState state);
+    @Shadow public abstract boolean setBlockState(BlockPos pos, BlockState state, int flags);
     @Shadow public abstract void updateComparatorOutputLevel(BlockPos pos, Block blockIn);
     @Shadow public abstract void neighborChanged(BlockPos pos, final Block blockIn, BlockPos otherPos);
-    @Shadow public abstract void notifyNeighborsOfStateExcept(BlockPos pos, Block blockType, EnumFacing skipSide);
+    @Shadow public abstract void notifyNeighborsOfStateExcept(BlockPos pos, Block blockType, Direction skipSide);
     @Shadow public abstract void updateObservingBlocksAt(BlockPos pos, Block blockType);
     @Shadow public abstract void notifyNeighborsRespectDebug(BlockPos pos, Block blockType, boolean updateObserverBlocks);
     @Shadow public abstract void notifyNeighborsOfStateChange(BlockPos pos, Block blockType, boolean updateObserverBlocks);
-    @Shadow public abstract void notifyBlockUpdate(BlockPos pos, IBlockState oldState, IBlockState newState, int flags);
+    @Shadow public abstract void notifyBlockUpdate(BlockPos pos, BlockState oldState, BlockState newState, int flags);
     @Shadow public abstract void updateBlockTick(BlockPos pos, Block blockIn, int delay, int priority); // this is really scheduleUpdate
-    @Shadow public abstract void playSound(EntityPlayer p_184148_1_, double p_184148_2_, double p_184148_4_, double p_184148_6_, SoundEvent p_184148_8_, net.minecraft.util.SoundCategory p_184148_9_, float p_184148_10_, float p_184148_11_);
+    @Shadow public abstract void playSound(PlayerEntity p_184148_1_, double p_184148_2_, double p_184148_4_, double p_184148_6_, SoundEvent p_184148_8_, net.minecraft.util.SoundCategory p_184148_9_, float p_184148_10_, float p_184148_11_);
     @Shadow protected abstract void updateBlocks();
     @Shadow public abstract GameRules shadow$getGameRules();
     @Shadow public abstract boolean isRaining();
@@ -184,11 +184,11 @@ public abstract class WorldMixin implements WorldBridge {
     @Shadow public void updateEntities() { }
     @Shadow @Nullable public abstract TileEntity getTileEntity(BlockPos pos);
 
-    @Shadow public abstract IChunkProvider shadow$getChunkProvider();
+    @Shadow public abstract AbstractChunkProvider shadow$getChunkProvider();
 
-    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldProvider;"
+    @Redirect(method = "<init>", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/Dimension;"
                                                                      + "createWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
-    private net.minecraft.world.border.WorldBorder onCreateWorldBorder(final WorldProvider provider) {
+    private net.minecraft.world.border.WorldBorder onCreateWorldBorder(final Dimension provider) {
         if (this.bridge$isFake()) {
             return provider.createWorldBorder();
         }
@@ -303,8 +303,8 @@ public abstract class WorldMixin implements WorldBridge {
 
     @SuppressWarnings("Guava")
     @Redirect(method = "isAnyPlayerWithinRangeAt", at = @At(value = "INVOKE", target = "Lcom/google/common/base/Predicate;apply(Ljava/lang/Object;)Z", remap = false))
-    private boolean onIsAnyPlayerWithinRangePredicate(final com.google.common.base.Predicate<EntityPlayer> predicate, final Object object) {
-        final EntityPlayer player = (EntityPlayer) object;
+    private boolean onIsAnyPlayerWithinRangePredicate(final com.google.common.base.Predicate<PlayerEntity> predicate, final Object object) {
+        final PlayerEntity player = (PlayerEntity) object;
         return !(player.isDead || !((EntityPlayerBridge) player).bridge$affectsSpawning()) && predicate.apply(player);
     }
 
@@ -318,13 +318,13 @@ public abstract class WorldMixin implements WorldBridge {
     }
 
     @SuppressWarnings("Guava")
-    @Redirect(method = "getClosestPlayer(DDDDLcom/google/common/base/Predicate;)Lnet/minecraft/entity/player/EntityPlayer;", at = @At(value = "INVOKE", target = "Lcom/google/common/base/Predicate;apply(Ljava/lang/Object;)Z", remap = false))
+    @Redirect(method = "getClosestPlayer(DDDDLcom/google/common/base/Predicate;)Lnet/minecraft/entity/player/PlayerEntity;", at = @At(value = "INVOKE", target = "Lcom/google/common/base/Predicate;apply(Ljava/lang/Object;)Z", remap = false))
     private boolean onGetClosestPlayerCheck(final com.google.common.base.Predicate<net.minecraft.entity.Entity> predicate, final Object entityPlayer) {
-        return predicate.apply((EntityPlayer) entityPlayer) && !((VanishableBridge) entityPlayer).bridge$isVanished();
+        return predicate.apply((PlayerEntity) entityPlayer) && !((VanishableBridge) entityPlayer).bridge$isVanished();
     }
 
-    @Inject(method = "playSound(Lnet/minecraft/entity/player/EntityPlayer;DDDLnet/minecraft/util/SoundEvent;Lnet/minecraft/util/SoundCategory;FF)V", at = @At("HEAD"), cancellable = true)
-    private void spongePlaySoundAtEntity(final EntityPlayer entity, final double x, final double y, final double z, final SoundEvent name, final net.minecraft.util.SoundCategory category, final float volume, final float pitch, final CallbackInfo callbackInfo) {
+    @Inject(method = "playSound(Lnet/minecraft/entity/player/PlayerEntity;DDDLnet/minecraft/util/SoundEvent;Lnet/minecraft/util/SoundCategory;FF)V", at = @At("HEAD"), cancellable = true)
+    private void spongePlaySoundAtEntity(final PlayerEntity entity, final double x, final double y, final double z, final SoundEvent name, final net.minecraft.util.SoundCategory category, final float volume, final float pitch, final CallbackInfo callbackInfo) {
         if (entity instanceof EntityBridge) {
             if (((VanishableBridge) entity).bridge$isVanished()) {
                 callbackInfo.cancel();
@@ -475,8 +475,8 @@ public abstract class WorldMixin implements WorldBridge {
      * @param enumSkyBlock The light type
      */
     @Inject(method = "getRawLight", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;getBlockState" +
-            "(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;"), cancellable = true)
-    protected void impl$getRawLightWithoutMarkingChunkActive(final BlockPos pos, final EnumSkyBlock enumSkyBlock, final CallbackInfoReturnable<Integer> cir) {
+            "(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/BlockState;"), cancellable = true)
+    protected void impl$getRawLightWithoutMarkingChunkActive(final BlockPos pos, final LightType enumSkyBlock, final CallbackInfoReturnable<Integer> cir) {
         final Chunk chunk;
         chunk = this.getChunk(pos);
         if (chunk == null || chunk.unloadQueued) {
@@ -492,7 +492,7 @@ public abstract class WorldMixin implements WorldBridge {
      * @return The block state at the desired position
      */
     @Overwrite
-    public IBlockState getBlockState(final BlockPos pos) {
+    public BlockState getBlockState(final BlockPos pos) {
         // Sponge - Replace with inlined method
         // if (this.isOutsideBuildHeight(pos)) // Vanilla
         if (((BlockPosBridge) pos).bridge$isInvalidYPosition()) {
@@ -582,7 +582,7 @@ public abstract class WorldMixin implements WorldBridge {
      */
     @Redirect(method = "checkLightFor", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;isAreaLoaded(Lnet/minecraft/util/math/BlockPos;IZ)Z"))
     protected boolean spongeIsAreaLoadedForCheckingLight(
-        final net.minecraft.world.World thisWorld, final BlockPos pos, final int radius, final boolean allowEmtpy, final EnumSkyBlock lightType, final BlockPos samePosition) {
+        final net.minecraft.world.World thisWorld, final BlockPos pos, final int radius, final boolean allowEmtpy, final LightType lightType, final BlockPos samePosition) {
         return isAreaLoaded(pos, radius, allowEmtpy);
     }
 
@@ -619,7 +619,7 @@ public abstract class WorldMixin implements WorldBridge {
      * @return The light for the defined sky type and block position
      */
     @Overwrite
-    public int getLightFor(final EnumSkyBlock type, BlockPos pos) {
+    public int getLightFor(final LightType type, BlockPos pos) {
         if (pos.getY() < 0) {
             pos = new BlockPos(pos.getX(), 0, pos.getZ());
         }
@@ -644,7 +644,7 @@ public abstract class WorldMixin implements WorldBridge {
      * @param lightValue The light value to set to
      */
     @Overwrite
-    public void setLightFor(final EnumSkyBlock type, final BlockPos pos, final int lightValue) {
+    public void setLightFor(final LightType type, final BlockPos pos, final int lightValue) {
         // Sponge Start - Replace with inlined Valid position check
         // if (this.isValid(pos)) // Vanilla
         if (((BlockPosBridge) pos).bridge$isValidPosition()) { // Sponge - Replace with inlined method to check
@@ -705,7 +705,7 @@ public abstract class WorldMixin implements WorldBridge {
                                     return true;
                                 }
 
-                                final IBlockState iblockstate = this.getBlockState(blockpos$pooledmutableblockpos);
+                                final BlockState iblockstate = this.getBlockState(blockpos$pooledmutableblockpos);
                                 iblockstate.addCollisionBoxToList((net.minecraft.world.World) (Object) this, blockpos$pooledmutableblockpos, bbox, list, (net.minecraft.entity.Entity) null, false);
 
                                 if (!list.isEmpty()) {

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.tileentity;
 
-import net.minecraft.tileentity.TileEntityCommandBlock;
+import net.minecraft.tileentity.CommandBlockTileEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -35,10 +35,10 @@ import org.spongepowered.common.data.value.SpongeValueFactory;
 
 import java.util.Optional;
 
-public class TileEntitySuccessCountValueProcessor extends AbstractSpongeValueProcessor<TileEntityCommandBlock, Integer, MutableBoundedValue<Integer>> {
+public class TileEntitySuccessCountValueProcessor extends AbstractSpongeValueProcessor<CommandBlockTileEntity, Integer, MutableBoundedValue<Integer>> {
 
     public TileEntitySuccessCountValueProcessor() {
-        super(TileEntityCommandBlock.class, Keys.SUCCESS_COUNT);
+        super(CommandBlockTileEntity.class, Keys.SUCCESS_COUNT);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class TileEntitySuccessCountValueProcessor extends AbstractSpongeValuePro
     }
 
     @Override
-    protected boolean set(final TileEntityCommandBlock container, final Integer value) {
+    protected boolean set(final CommandBlockTileEntity container, final Integer value) {
         container.getCommandBlockLogic().setSuccessCount(value);
         container.getCommandBlockLogic().updateCommand();
         container.markDirty();
@@ -65,7 +65,7 @@ public class TileEntitySuccessCountValueProcessor extends AbstractSpongeValuePro
     }
 
     @Override
-    protected Optional<Integer> getVal(final TileEntityCommandBlock container) {
+    protected Optional<Integer> getVal(final CommandBlockTileEntity container) {
         return Optional.of(container.getCommandBlockLogic().getSuccessCount());
     }
 

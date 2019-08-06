@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.realtime.network;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.NetHandlerPlayServer;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.play.ServerPlayNetHandler;
 import net.minecraft.server.MinecraftServer;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Final;
@@ -37,24 +37,24 @@ import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.bridge.world.WorldBridge;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
-@Mixin(NetHandlerPlayServer.class)
+@Mixin(ServerPlayNetHandler.class)
 public abstract class NetHandlerPlayServerMixin_RealTime {
 
     @Shadow private int chatSpamThresholdCount;
     @Shadow private int itemDropThreshold;
     @Shadow @Final private MinecraftServer server;
-    @Shadow public EntityPlayerMP player;
+    @Shadow public ServerPlayerEntity player;
 
     @Redirect(
         method = "update",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/network/NetHandlerPlayServer;chatSpamThresholdCount:I",
+            target = "Lnet/minecraft/network/ServerPlayNetHandler;chatSpamThresholdCount:I",
             opcode = Opcodes.PUTFIELD,
             ordinal = 0
         )
     )
-    private void realTimeImpl$adjustForRealTimeChatSpamCheck(final NetHandlerPlayServer self, final int modifier) {
+    private void realTimeImpl$adjustForRealTimeChatSpamCheck(final ServerPlayNetHandler self, final int modifier) {
         if (SpongeImplHooks.isFakePlayer(this.player) || ((WorldBridge) this.player.world).bridge$isFake()) {
             this.chatSpamThresholdCount = modifier;
             return;
@@ -67,11 +67,11 @@ public abstract class NetHandlerPlayServerMixin_RealTime {
         method = "update",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/network/NetHandlerPlayServer;itemDropThreshold:I",
+            target = "Lnet/minecraft/network/ServerPlayNetHandler;itemDropThreshold:I",
             opcode = Opcodes.PUTFIELD, ordinal = 0
         )
     )
-    private void realTimeImpl$adjustForRealTimeDropSpamCheck(final NetHandlerPlayServer self, final int modifier) {
+    private void realTimeImpl$adjustForRealTimeDropSpamCheck(final ServerPlayNetHandler self, final int modifier) {
         if (SpongeImplHooks.isFakePlayer(this.player) || ((WorldBridge) this.player.world).bridge$isFake()) {
             this.itemDropThreshold = modifier;
             return;

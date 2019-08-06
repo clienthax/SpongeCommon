@@ -27,9 +27,9 @@ package org.spongepowered.common.world.storage;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Lists;
 import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.WorldServer;
-import net.minecraft.world.chunk.storage.IChunkLoader;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.ServerWorld;
+import net.minecraft.world.chunk.storage.ChunkLoader;
 import net.minecraft.world.chunk.storage.RegionFile;
 import net.minecraft.world.chunk.storage.RegionFileCache;
 import org.spongepowered.api.data.DataContainer;
@@ -53,15 +53,15 @@ import java.util.function.Function;
 
 public class WorldStorageUtil {
 
-    public static CompletableFuture<Boolean> doesChunkExist(WorldServer world, IChunkLoader chunkLoader, Vector3i chunkCoords) {
+    public static CompletableFuture<Boolean> doesChunkExist(ServerWorld world, ChunkLoader chunkLoader, Vector3i chunkCoords) {
         return doesChunkExist(world, chunkLoader, chunkCoords, SpongeImpl.getScheduler()::submitAsyncTask);
     }
 
-    public static CompletableFuture<Boolean> doesChunkExistSync(WorldServer world, IChunkLoader chunkLoader, Vector3i chunkCoords) {
+    public static CompletableFuture<Boolean> doesChunkExistSync(ServerWorld world, ChunkLoader chunkLoader, Vector3i chunkCoords) {
         return doesChunkExist(world, chunkLoader, chunkCoords, Functional::failableFuture);
     }
 
-    public static CompletableFuture<Boolean> doesChunkExist(WorldServer world, IChunkLoader chunkLoader, Vector3i chunkCoords,
+    public static CompletableFuture<Boolean> doesChunkExist(ServerWorld world, ChunkLoader chunkLoader, Vector3i chunkCoords,
             Function<Callable<Boolean>, CompletableFuture<Boolean>> completableFutureProvider) {
         int x = chunkCoords.getX();
         int z = chunkCoords.getZ();
@@ -71,7 +71,7 @@ public class WorldStorageUtil {
         return completableFutureProvider.apply(() -> ((AnvilChunkLoaderBridge) chunkLoader).bridge$chunkExists(world, x, z));
     }
 
-    public static CompletableFuture<Optional<DataContainer>> getChunkData(WorldServer world, IChunkLoader chunkLoader, Vector3i chunkCoords) {
+    public static CompletableFuture<Optional<DataContainer>> getChunkData(ServerWorld world, ChunkLoader chunkLoader, Vector3i chunkCoords) {
         int x = chunkCoords.getX();
         int y = chunkCoords.getY();
         int z = chunkCoords.getZ();
@@ -89,14 +89,14 @@ public class WorldStorageUtil {
         if (stream == null) {
             return null;
         }
-        NBTTagCompound data = CompressedStreamTools.read(stream);
+        CompoundNBT data = CompressedStreamTools.read(stream);
 
         // Checks are based on AnvilChunkLoader#checkedReadChunkFromNBT
 
         if (!data.hasKey(Constants.Chunk.CHUNK_DATA_LEVEL, Constants.NBT.TAG_COMPOUND)) {
             return null;
         }
-        NBTTagCompound level = data.getCompoundTag(Constants.Chunk.CHUNK_DATA_LEVEL);
+        CompoundNBT level = data.getCompoundTag(Constants.Chunk.CHUNK_DATA_LEVEL);
         if (!level.hasKey(Constants.Chunk.CHUNK_DATA_SECTIONS, Constants.NBT.TAG_LIST)) {
             return null;
         }

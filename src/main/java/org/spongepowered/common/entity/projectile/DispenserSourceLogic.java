@@ -24,15 +24,15 @@
  */
 package org.spongepowered.common.entity.projectile;
 
-import net.minecraft.block.BlockDispenser;
-import net.minecraft.block.BlockSourceImpl;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
+import net.minecraft.block.DispenserBlock;
+import net.minecraft.dispenser.ProxyBlockSource;
+import net.minecraft.block.BlockState;
+import net.minecraft.dispenser.DefaultDispenseItemBehavior;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityDispenser;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.tileentity.DispenserTileEntity;
+import net.minecraft.util.Direction;
 import org.spongepowered.api.block.tileentity.carrier.Dispenser;
 import org.spongepowered.api.entity.projectile.Projectile;
 
@@ -47,11 +47,11 @@ public class DispenserSourceLogic implements ProjectileSourceLogic<Dispenser> {
     @Override
     public <P extends Projectile> Optional<P> launch(ProjectileLogic<P> logic, Dispenser source, Class<P> projectileClass, Object... args) {
         if (args.length == 1 && args[0] instanceof Item) {
-            return launch((TileEntityDispenser) source, projectileClass, (Item) args[0]);
+            return launch((DispenserTileEntity) source, projectileClass, (Item) args[0]);
         }
         Optional<P> projectile = logic.createProjectile(source, projectileClass, source.getLocation());
         if (projectile.isPresent()) {
-            EnumFacing enumfacing = getFacing((TileEntityDispenser) source);
+            Direction enumfacing = getFacing((DispenserTileEntity) source);
             net.minecraft.entity.Entity projectileEntity = (net.minecraft.entity.Entity) projectile.get();
             projectileEntity.motionX = enumfacing.getXOffset();
             projectileEntity.motionY = enumfacing.getYOffset() + 0.1F;
@@ -60,17 +60,17 @@ public class DispenserSourceLogic implements ProjectileSourceLogic<Dispenser> {
         return projectile;
     }
 
-    public static EnumFacing getFacing(TileEntityDispenser dispenser) {
-        IBlockState state = dispenser.getWorld().getBlockState(dispenser.getPos());
-        return state.getValue(BlockDispenser.FACING);
+    public static Direction getFacing(DispenserTileEntity dispenser) {
+        BlockState state = dispenser.getWorld().getBlockState(dispenser.getPos());
+        return state.getValue(DispenserBlock.FACING);
     }
 
     @SuppressWarnings("unchecked")
-    private <P extends Projectile> Optional<P> launch(TileEntityDispenser dispenser, Class<P> projectileClass, Item item) {
-        BehaviorDefaultDispenseItem behavior = (BehaviorDefaultDispenseItem) BlockDispenser.DISPENSE_BEHAVIOR_REGISTRY.getObject(item);
+    private <P extends Projectile> Optional<P> launch(DispenserTileEntity dispenser, Class<P> projectileClass, Item item) {
+        DefaultDispenseItemBehavior behavior = (DefaultDispenseItemBehavior) DispenserBlock.DISPENSE_BEHAVIOR_REGISTRY.getObject(item);
         List<Entity> entityList = dispenser.getWorld().loadedEntityList;
         int numEntities = entityList.size();
-        behavior.dispense(new BlockSourceImpl(dispenser.getWorld(), dispenser.getPos()), new ItemStack(item));
+        behavior.dispense(new ProxyBlockSource(dispenser.getWorld(), dispenser.getPos()), new ItemStack(item));
         // Hack - get the projectile that was spawned from dispense()
         for (int i = entityList.size() - 1; i >= numEntities; i--) {
             if (projectileClass.isInstance(entityList.get(i))) {

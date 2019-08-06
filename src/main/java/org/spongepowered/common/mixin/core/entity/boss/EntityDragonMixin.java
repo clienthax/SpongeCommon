@@ -25,11 +25,11 @@
 package org.spongepowered.common.mixin.core.entity.boss;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.boss.EntityDragon;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.boss.dragon.EnderDragonEntity;
 import net.minecraft.entity.boss.dragon.phase.IPhase;
-import net.minecraft.entity.boss.dragon.phase.PhaseHover;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.boss.dragon.phase.HoverPhase;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
@@ -41,7 +41,7 @@ import org.spongepowered.common.mixin.core.entity.EntityLivingMixin;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityDragon.class)
+@Mixin(EnderDragonEntity.class)
 public abstract class EntityDragonMixin extends EntityLivingMixin {
 
     /**
@@ -54,12 +54,12 @@ public abstract class EntityDragonMixin extends EntityLivingMixin {
         method = "destroyBlocksInAABB",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/block/state/IBlockState;getBlock()Lnet/minecraft/block/Block;"
+            target = "Lnet/minecraft/block/state/BlockState;getBlock()Lnet/minecraft/block/Block;"
         ),
         slice = @Slice(
             from = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/IBlockState;"
+                target = "Lnet/minecraft/world/World;getBlockState(Lnet/minecraft/util/math/BlockPos;)Lnet/minecraft/block/state/BlockState;"
             ),
             to = @At(
                 value = "FIELD",
@@ -69,12 +69,12 @@ public abstract class EntityDragonMixin extends EntityLivingMixin {
         ),
         require = 0 // Forge rewrites the material request to block.isAir
     )
-    private Block spongeImpl$onCanGrief(IBlockState state) {
+    private Block spongeImpl$onCanGrief(BlockState state) {
         return ((GrieferBridge) this).bridge$CanGrief() ? state.getBlock() : Blocks.AIR;
     }
 
     /**
-     * Fixes a hidden divide-by-zero error when {@link PhaseHover} returns the
+     * Fixes a hidden divide-by-zero error when {@link HoverPhase} returns the
      * current location as the target location.
      *
      * @author JBYoshi

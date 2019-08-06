@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 
-import net.minecraft.potion.Potion;
+import net.minecraft.potion.Effect;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -49,7 +49,7 @@ public class SpongePotionBuilder extends AbstractDataBuilder<PotionEffect> imple
     private boolean showParticles;
 
     public SpongePotionBuilder() {
-        super(PotionEffect.class, DataVersions.Potion.CURRENT_VERSION);
+        super(PotionEffect.class, DataVersions.Effect.CURRENT_VERSION);
     }
 
     @Override
@@ -91,7 +91,7 @@ public class SpongePotionBuilder extends AbstractDataBuilder<PotionEffect> imple
 
     @Override
     public PotionEffect.Builder potionType(PotionEffectType potionEffectType) {
-        checkNotNull(potionEffectType, "Potion effect type cannot be null");
+        checkNotNull(potionEffectType, "Effect effect type cannot be null");
         this.potionType = potionEffectType;
         return this;
     }
@@ -124,9 +124,9 @@ public class SpongePotionBuilder extends AbstractDataBuilder<PotionEffect> imple
 
     @Override
     public PotionEffect build() throws IllegalStateException {
-        checkState(this.potionType != null, "Potion type has not been set");
+        checkState(this.potionType != null, "Effect type has not been set");
         checkState(this.duration > 0, "Duration has not been set");
-        return (PotionEffect) new net.minecraft.potion.PotionEffect((Potion) this.potionType, this.duration,
+        return (PotionEffect) new net.minecraft.potion.PotionEffect((Effect) this.potionType, this.duration,
                 this.amplifier,
                 this.isAmbient,
                 this.showParticles);

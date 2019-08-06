@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.optimization.entity.item;
 
-import net.minecraft.entity.item.EntityItemFrame;
-import net.minecraft.item.ItemMap;
+import net.minecraft.entity.item.ItemFrameEntity;
+import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,7 +36,7 @@ import org.spongepowered.common.bridge.optimization.OptimizedMapDataBridge;
 import org.spongepowered.common.bridge.world.WorldBridge;
 import org.spongepowered.common.mixin.core.entity.EntityMixin;
 
-@Mixin(EntityItemFrame.class)
+@Mixin(ItemFrameEntity.class)
 public abstract class EntityItemFrameMixin_MapOptimization extends EntityMixin {
 
     @Shadow public abstract ItemStack getDisplayedItem();
@@ -47,10 +47,10 @@ public abstract class EntityItemFrameMixin_MapOptimization extends EntityMixin {
             return;
         }
 
-        if (stack.getItem() instanceof ItemMap) {
-            ((OptimizedMapDataBridge) ((ItemMap) stack.getItem()).getMapData(stack, this.world)).mapOptimizationBridge$updateItemFrameDecoration((EntityItemFrame) (Object) this);
-        } else if (this.getDisplayedItem().getItem() instanceof ItemMap && stack.isEmpty()) {
-            ((OptimizedMapDataBridge) ((ItemMap) this.getDisplayedItem().getItem()).getMapData(stack, this.world)).mapOptimizationBridge$removeItemFrame((EntityItemFrame) (Object) this);
+        if (stack.getItem() instanceof FilledMapItem) {
+            ((OptimizedMapDataBridge) ((FilledMapItem) stack.getItem()).getMapData(stack, this.world)).mapOptimizationBridge$updateItemFrameDecoration((ItemFrameEntity) (Object) this);
+        } else if (this.getDisplayedItem().getItem() instanceof FilledMapItem && stack.isEmpty()) {
+            ((OptimizedMapDataBridge) ((FilledMapItem) this.getDisplayedItem().getItem()).getMapData(stack, this.world)).mapOptimizationBridge$removeItemFrame((ItemFrameEntity) (Object) this);
         }
     }
 

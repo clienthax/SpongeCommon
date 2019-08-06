@@ -25,7 +25,7 @@
 package org.spongepowered.common.event.tracking.phase.tick;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.world.LocatableBlock;
@@ -40,7 +40,7 @@ public final class NeighborNotificationContext extends LocationBasedTickContext<
     @Nullable private BlockPos sourceNotification;
     @Nullable private Block sourceNotifier;
     @Nullable private BlockPos notifiedBlockPos;
-    @Nullable private IBlockState notifiedBlockState;
+    @Nullable private BlockState notifiedBlockState;
     @Nullable BlockSnapshot notificationSnapshot;
     private int depth;
 
@@ -53,7 +53,7 @@ public final class NeighborNotificationContext extends LocationBasedTickContext<
         super.source(owner);
         if (owner instanceof LocatableBlock) {
 
-            final Block block = ((IBlockState) ((LocatableBlock) owner).getBlockState()).getBlock();
+            final Block block = ((BlockState) ((LocatableBlock) owner).getBlockState()).getBlock();
             if (block instanceof TrackableBridge) {
                 final TrackableBridge mixinBlock = (TrackableBridge) block;
                 this.setBlockEvents(mixinBlock.bridge$allowsBlockEventCreation())
@@ -110,7 +110,7 @@ public final class NeighborNotificationContext extends LocationBasedTickContext<
         return this;
     }
 
-    public NeighborNotificationContext setNotifiedBlockState(@Nullable IBlockState notifiedBlockState) {
+    public NeighborNotificationContext setNotifiedBlockState(@Nullable BlockState notifiedBlockState) {
         this.notifiedBlockState = notifiedBlockState;
         return this;
     }

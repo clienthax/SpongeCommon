@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.property.store.item;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.potion.PotionUtils;
 import org.spongepowered.api.data.property.item.ApplicableEffectProperty;
 import org.spongepowered.common.data.property.store.common.AbstractItemStackPropertyStore;
@@ -39,11 +39,11 @@ public class ApplicableEffectPropertyStore extends AbstractItemStackPropertyStor
     @SuppressWarnings("unchecked")
     @Override
     public Optional<ApplicableEffectProperty> getFor(final ItemStack propertyHolder) {
-        final List<PotionEffect> effectsFromStack = PotionUtils.getEffectsFromStack(propertyHolder);
+        final List<EffectInstance> effectsFromStack = PotionUtils.getEffectsFromStack(propertyHolder);
         if (effectsFromStack.isEmpty()) {
             return Optional.empty();
         }
-        return Optional.of(new ApplicableEffectProperty(new HashSet<>((List < org.spongepowered.api.effect.potion.PotionEffect >) (List<?>) effectsFromStack)));
+        return Optional.of(new ApplicableEffectProperty(new HashSet<>((List < org.spongepowered.api.effect.potion.EffectInstance >) (List<?>) effectsFromStack)));
     }
 
 }

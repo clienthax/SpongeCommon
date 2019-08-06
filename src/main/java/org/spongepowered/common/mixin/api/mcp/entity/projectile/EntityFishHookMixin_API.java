@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.projectile;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityFishHook;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.FishingBobberEntity;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.projectile.FishHook;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
@@ -37,10 +37,10 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityFishHook.class)
+@Mixin(FishingBobberEntity.class)
 public abstract class EntityFishHookMixin_API extends EntityMixin_API implements FishHook {
 
-    @Shadow @Nullable private EntityPlayer angler;
+    @Shadow @Nullable private PlayerEntity angler;
     @Shadow @Nullable public net.minecraft.entity.Entity caughtEntity;
 
     @Nullable
@@ -58,9 +58,9 @@ public abstract class EntityFishHookMixin_API extends EntityMixin_API implements
 
     @Override
     public void setShooter(ProjectileSource shooter) {
-        if (shooter instanceof EntityPlayer) {
+        if (shooter instanceof PlayerEntity) {
             // This allows things like Vanilla kill attribution to take place
-            this.angler = (EntityPlayer) shooter;
+            this.angler = (PlayerEntity) shooter;
         } else {
             this.angler = null;
         }

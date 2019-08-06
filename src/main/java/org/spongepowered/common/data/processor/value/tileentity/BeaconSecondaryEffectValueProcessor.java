@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.data.processor.value.tileentity;
 
-import net.minecraft.potion.Potion;
-import net.minecraft.tileentity.TileEntityBeacon;
+import net.minecraft.potion.Effect;
+import net.minecraft.tileentity.BeaconTileEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -39,10 +39,10 @@ import org.spongepowered.common.bridge.tileentity.TileEntityBeaconBridge;
 import java.util.Optional;
 
 public class BeaconSecondaryEffectValueProcessor
-        extends AbstractSpongeValueProcessor<TileEntityBeacon, Optional<PotionEffectType>, OptionalValue<PotionEffectType>> {
+        extends AbstractSpongeValueProcessor<BeaconTileEntity, Optional<PotionEffectType>, OptionalValue<PotionEffectType>> {
 
     public BeaconSecondaryEffectValueProcessor() {
-        super(TileEntityBeacon.class, Keys.BEACON_SECONDARY_EFFECT);
+        super(BeaconTileEntity.class, Keys.BEACON_SECONDARY_EFFECT);
     }
 
     @Override
@@ -51,23 +51,23 @@ public class BeaconSecondaryEffectValueProcessor
     }
 
     @Override
-    protected boolean set(TileEntityBeacon container, Optional<PotionEffectType> value) {
+    protected boolean set(BeaconTileEntity container, Optional<PotionEffectType> value) {
         if (container.getField(0) != 4) {
             return false;
         }
-        ((TileEntityBeaconBridge) container).bridge$forceSetSecondaryEffect((Potion) value.orElse(null));
+        ((TileEntityBeaconBridge) container).bridge$forceSetSecondaryEffect((Effect) value.orElse(null));
         container.markDirty();
         return true;
     }
 
     @Override
-    protected Optional<Optional<PotionEffectType>> getVal(TileEntityBeacon container) {
+    protected Optional<Optional<PotionEffectType>> getVal(BeaconTileEntity container) {
         if (container.getField(0) != 4) {
             return Optional.of(Optional.empty());
         }
         int id = container.getField(2);
         if (id > 0) {
-            return Optional.of(Optional.of((PotionEffectType) Potion.getPotionById(id)));
+            return Optional.of(Optional.of((PotionEffectType) Effect.getPotionById(id)));
         }
         return Optional.of(Optional.empty());
     }

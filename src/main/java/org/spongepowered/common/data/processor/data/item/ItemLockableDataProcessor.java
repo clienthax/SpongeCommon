@@ -27,11 +27,11 @@ package org.spongepowered.common.data.processor.data.item;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityLockable;
+import net.minecraft.tileentity.LockableTileEntity;
 import net.minecraft.world.LockCode;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -54,15 +54,15 @@ public final class ItemLockableDataProcessor extends AbstractItemSingleDataProce
     public ItemLockableDataProcessor() {
         super(stack -> {
             Item item = stack.getItem();
-            if (!(item instanceof ItemBlock)) {
+            if (!(item instanceof BlockItem)) {
                 return false;
             }
-            Block block = ((ItemBlock) item).getBlock();
+            Block block = ((BlockItem) item).getBlock();
             if (!(block instanceof ITileEntityProvider)) {
                 return false;
             }
             TileEntity tile = ((ITileEntityProvider) block).createNewTileEntity(null, item.getMetadata(stack.getItemDamage()));
-            return tile instanceof TileEntityLockable;
+            return tile instanceof LockableTileEntity;
         } , Keys.LOCK_TOKEN);
     }
 
@@ -77,8 +77,8 @@ public final class ItemLockableDataProcessor extends AbstractItemSingleDataProce
 
     @Override
     protected boolean set(ItemStack stack, String value) {
-        NBTTagCompound mainCompound = NbtDataUtil.getOrCreateCompound(stack);
-        NBTTagCompound tileCompound = NbtDataUtil.getOrCreateSubCompound(mainCompound, Constants.Item.BLOCK_ENTITY_TAG);
+        CompoundNBT mainCompound = NbtDataUtil.getOrCreateCompound(stack);
+        CompoundNBT tileCompound = NbtDataUtil.getOrCreateSubCompound(mainCompound, Constants.Item.BLOCK_ENTITY_TAG);
         LockCode code = new LockCode(value);
         if (code.isEmpty()) {
             tileCompound.removeTag("Lock");
@@ -93,7 +93,7 @@ public final class ItemLockableDataProcessor extends AbstractItemSingleDataProce
         if (container.getTagCompound() == null) {
             return Optional.of("");
         }
-        NBTTagCompound tileCompound = container.getTagCompound().getCompoundTag(Constants.Item.BLOCK_ENTITY_TAG);
+        CompoundNBT tileCompound = container.getTagCompound().getCompoundTag(Constants.Item.BLOCK_ENTITY_TAG);
         LockCode code = LockCode.fromNBT(tileCompound);
         if (code.isEmpty()) {
             return Optional.empty();

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.entity;
 
-import net.minecraft.entity.EntityAreaEffectCloud;
+import net.minecraft.entity.AreaEffectCloudEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -36,10 +36,10 @@ import org.spongepowered.common.mixin.core.entity.EntityAreaEffectCloudAccessor;
 
 import java.util.Optional;
 
-public class AreaEffectCloudRadiusOnUseProcessor extends AbstractSpongeValueProcessor<EntityAreaEffectCloud, Double, MutableBoundedValue<Double>> {
+public class AreaEffectCloudRadiusOnUseProcessor extends AbstractSpongeValueProcessor<AreaEffectCloudEntity, Double, MutableBoundedValue<Double>> {
 
     public AreaEffectCloudRadiusOnUseProcessor() {
-        super(EntityAreaEffectCloud.class, Keys.AREA_EFFECT_CLOUD_RADIUS_ON_USE);
+        super(AreaEffectCloudEntity.class, Keys.AREA_EFFECT_CLOUD_RADIUS_ON_USE);
     }
 
     @Override
@@ -53,13 +53,13 @@ public class AreaEffectCloudRadiusOnUseProcessor extends AbstractSpongeValueProc
     }
 
     @Override
-    protected boolean set(EntityAreaEffectCloud container, Double value) {
+    protected boolean set(AreaEffectCloudEntity container, Double value) {
         container.setRadiusOnUse(value.floatValue());
         return true;
     }
 
     @Override
-    protected Optional<Double> getVal(EntityAreaEffectCloud container) {
+    protected Optional<Double> getVal(AreaEffectCloudEntity container) {
         return Optional.of((double) ((EntityAreaEffectCloudAccessor) container).getRadiusOnUse());
     }
 

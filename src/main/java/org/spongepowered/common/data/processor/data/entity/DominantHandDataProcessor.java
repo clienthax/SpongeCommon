@@ -26,7 +26,7 @@ package org.spongepowered.common.data.processor.data.entity;
 
 import static org.spongepowered.common.util.Constants.Catalog.DEFAULT_HAND;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableDominantHandData;
@@ -43,21 +43,21 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 
 import java.util.Optional;
 
-public class DominantHandDataProcessor extends AbstractEntitySingleDataProcessor<EntityLiving, HandPreference, Value<HandPreference>, DominantHandData, ImmutableDominantHandData> {
+public class DominantHandDataProcessor extends AbstractEntitySingleDataProcessor<MobEntity, HandPreference, Value<HandPreference>, DominantHandData, ImmutableDominantHandData> {
 
     public DominantHandDataProcessor() {
-        super(EntityLiving.class, Keys.DOMINANT_HAND);
+        super(MobEntity.class, Keys.DOMINANT_HAND);
     }
 
     @Override
-    protected boolean set(EntityLiving dataHolder, HandPreference value) {
+    protected boolean set(MobEntity dataHolder, HandPreference value) {
         // What happens with custom EnumHandSide?
         dataHolder.setLeftHanded(value.equals(HandPreferences.LEFT));
         return true;
     }
 
     @Override
-    protected Optional<HandPreference> getVal(EntityLiving dataHolder) {
+    protected Optional<HandPreference> getVal(MobEntity dataHolder) {
         return Optional.of((HandPreference) (Object) dataHolder.getPrimaryHand());
     }
 

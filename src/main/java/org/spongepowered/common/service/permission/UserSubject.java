@@ -26,7 +26,7 @@ package org.spongepowered.common.service.permission;
 
 import com.google.common.base.Preconditions;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.server.management.UserListOpsEntry;
+import net.minecraft.server.management.OpEntry;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.service.context.Context;
@@ -71,7 +71,7 @@ public class UserSubject extends SpongeSubject {
                 }
                 if (opLevel > 0) {
                     // TODO: Should bypassesPlayerLimit be true or false?
-                    SpongePermissionService.getOps().addEntry(new UserListOpsEntry(player, opLevel, false));
+                    SpongePermissionService.getOps().addEntry(new OpEntry(player, opLevel, false));
                 } else {
                     SpongePermissionService.getOps().removeEntry(player);
                 }
@@ -102,7 +102,7 @@ public class UserSubject extends SpongeSubject {
         Preconditions.checkState(Sponge.isServerAvailable(), "Server is not available!");
 
         // Query op level from server ops list based on player's game profile
-        UserListOpsEntry entry = SpongePermissionService.getOps().getEntry(this.player);
+        OpEntry entry = SpongePermissionService.getOps().getEntry(this.player);
         if (entry == null) {
             // Take care of singleplayer commands -- unless an op level is specified, this player follows global rules
             return SpongeImpl.getServer().getPlayerList().canSendCommands(this.player) ? SpongeImpl.getServer().getOpPermissionLevel() : 0;

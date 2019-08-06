@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.data.fixer.world;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.datafix.IFixableData;
 import org.spongepowered.common.data.util.DataVersions;
 import org.spongepowered.common.util.Constants;
@@ -40,7 +40,7 @@ public class SpongeLevelFixer implements IFixableData {
     }
 
     @Override
-    public NBTTagCompound fixTagCompound(NBTTagCompound compound) {
+    public CompoundNBT fixTagCompound(CompoundNBT compound) {
         { // Fixes the world unique id
             final long least = compound.getLong(Constants.Legacy.World.WORLD_UUID_LEAST_1_8);
             final long most = compound.getLong(Constants.Legacy.World.WORLD_UUID_MOST_1_8);
@@ -52,9 +52,9 @@ public class SpongeLevelFixer implements IFixableData {
         }
         // Fixes the Player Id Table
         if (compound.hasKey(Constants.Sponge.SPONGE_PLAYER_UUID_TABLE, Constants.NBT.TAG_LIST)) {
-            final NBTTagList playerIdList = compound.getTagList(Constants.Sponge.SPONGE_PLAYER_UUID_TABLE, Constants.NBT.TAG_COMPOUND);
+            final ListNBT playerIdList = compound.getTagList(Constants.Sponge.SPONGE_PLAYER_UUID_TABLE, Constants.NBT.TAG_COMPOUND);
             for (int i = 0; i < playerIdList.tagCount(); i++) {
-                final NBTTagCompound playerIdCompound = playerIdList.getCompoundTagAt(i);
+                final CompoundNBT playerIdCompound = playerIdList.getCompoundTagAt(i);
                 final long least = playerIdCompound.getLong(Constants.Legacy.World.WORLD_UUID_LEAST_1_8);
                 final long most = playerIdCompound.getLong(Constants.Legacy.World.WORLD_UUID_MOST_1_8);
                 playerIdCompound.removeTag(Constants.Legacy.World.WORLD_UUID_LEAST_1_8);

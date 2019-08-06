@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockWall;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.WallBlock;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -45,12 +45,12 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-@Mixin(BlockWall.class)
+@Mixin(WallBlock.class)
 public abstract class BlockWallMixin extends BlockMixin {
 
     @SuppressWarnings("RedundantTypeArguments") // some JDK's can fail to compile without the explicit type generics
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getWallTypeFor(blockState), impl$getConnectedDirectionData(blockState));
     }
 
@@ -61,10 +61,10 @@ public abstract class BlockWallMixin extends BlockMixin {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableWallData) {
-            final BlockWall.EnumType wallType = (BlockWall.EnumType) (Object) ((ImmutableWallData) manipulator).type().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockWall.VARIANT, wallType));
+            final WallBlock.EnumType wallType = (WallBlock.EnumType) (Object) ((ImmutableWallData) manipulator).type().get();
+            return Optional.of((BlockState) blockState.withProperty(WallBlock.VARIANT, wallType));
         }
         if (manipulator instanceof ImmutableConnectedDirectionData) {
             return Optional.of((BlockState) blockState);
@@ -73,10 +73,10 @@ public abstract class BlockWallMixin extends BlockMixin {
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.WALL_TYPE)) {
-            final BlockWall.EnumType wallType = (BlockWall.EnumType) value;
-            return Optional.of((BlockState) blockState.withProperty(BlockWall.VARIANT, wallType));
+            final WallBlock.EnumType wallType = (WallBlock.EnumType) value;
+            return Optional.of((BlockState) blockState.withProperty(WallBlock.VARIANT, wallType));
         }
         if (key.equals(Keys.CONNECTED_DIRECTIONS) || key.equals(Keys.CONNECTED_EAST) || key.equals(Keys.CONNECTED_NORTH)
                 || key.equals(Keys.CONNECTED_SOUTH) || key.equals(Keys.CONNECTED_WEST)) {
@@ -86,17 +86,17 @@ public abstract class BlockWallMixin extends BlockMixin {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private ImmutableWallData impl$getWallTypeFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeWallData.class, (WallType) (Object) blockState.getValue(BlockWall.VARIANT));
+    private ImmutableWallData impl$getWallTypeFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeWallData.class, (WallType) (Object) blockState.getValue(WallBlock.VARIANT));
     }
 
-    private ImmutableConnectedDirectionData impl$getConnectedDirectionData(final IBlockState blockState) {
+    private ImmutableConnectedDirectionData impl$getConnectedDirectionData(final BlockState blockState) {
         final Set<Direction> directions = new HashSet<>();
-        final Boolean north = blockState.getValue(BlockWall.NORTH);
-        final Boolean east = blockState.getValue(BlockWall.EAST);
-        final Boolean west = blockState.getValue(BlockWall.WEST);
-        final Boolean south = blockState.getValue(BlockWall.SOUTH);
-        final Boolean up = blockState.getValue(BlockWall.UP);
+        final Boolean north = blockState.getValue(WallBlock.NORTH);
+        final Boolean east = blockState.getValue(WallBlock.EAST);
+        final Boolean west = blockState.getValue(WallBlock.WEST);
+        final Boolean south = blockState.getValue(WallBlock.SOUTH);
+        final Boolean up = blockState.getValue(WallBlock.UP);
         if (north) {
             directions.add(Direction.NORTH);
         }

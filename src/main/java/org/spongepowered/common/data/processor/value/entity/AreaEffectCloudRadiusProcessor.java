@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.entity;
 
-import net.minecraft.entity.EntityAreaEffectCloud;
+import net.minecraft.entity.AreaEffectCloudEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -35,10 +35,10 @@ import org.spongepowered.common.data.value.SpongeValueFactory;
 
 import java.util.Optional;
 
-public class AreaEffectCloudRadiusProcessor extends AbstractSpongeValueProcessor<EntityAreaEffectCloud, Double, MutableBoundedValue<Double>> {
+public class AreaEffectCloudRadiusProcessor extends AbstractSpongeValueProcessor<AreaEffectCloudEntity, Double, MutableBoundedValue<Double>> {
 
     public AreaEffectCloudRadiusProcessor() {
-        super(EntityAreaEffectCloud.class, Keys.AREA_EFFECT_CLOUD_RADIUS);
+        super(AreaEffectCloudEntity.class, Keys.AREA_EFFECT_CLOUD_RADIUS);
     }
 
     @Override
@@ -52,13 +52,13 @@ public class AreaEffectCloudRadiusProcessor extends AbstractSpongeValueProcessor
     }
 
     @Override
-    protected boolean set(EntityAreaEffectCloud container, Double value) {
+    protected boolean set(AreaEffectCloudEntity container, Double value) {
         container.setRadius(value.floatValue());
         return true;
     }
 
     @Override
-    protected Optional<Double> getVal(EntityAreaEffectCloud container) {
+    protected Optional<Double> getVal(AreaEffectCloudEntity container) {
         return Optional.of((double) container.getRadius());
     }
 

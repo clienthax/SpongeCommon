@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.core.world;
 
-import net.minecraft.world.DimensionType;
-import net.minecraft.world.WorldProvider;
+import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.dimension.Dimension;
 import org.spongepowered.api.service.context.Context;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
@@ -54,7 +54,7 @@ public abstract class DimensionTypeMixin implements DimensionTypeBridge {
 
     @Inject(method = "<init>", at = @At("RETURN"))
     private void impl$setUpBridgeFields(
-        final String enumName, final int ordinal, final int idIn, final String nameIn, final String suffixIn, final Class <? extends WorldProvider > clazzIn,
+        final String enumName, final int ordinal, final int idIn, final String nameIn, final String suffixIn, final Class <? extends Dimension > clazzIn,
             final CallbackInfo ci) {
         final String dimName = enumName.toLowerCase().replace(" ", "_").replaceAll("[^A-Za-z0-9_]", "");
         final String modId = SpongeImplHooks.getModIdFromClass(clazzIn);

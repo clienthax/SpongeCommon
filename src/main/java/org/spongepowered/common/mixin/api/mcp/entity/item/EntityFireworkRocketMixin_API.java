@@ -27,7 +27,7 @@ package org.spongepowered.common.mixin.api.mcp.entity.item;
 import static com.google.common.base.Preconditions.checkState;
 
 import com.google.common.collect.Lists;
-import net.minecraft.entity.item.EntityFireworkRocket;
+import net.minecraft.entity.item.FireworkRocketEntity;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.FireworkEffectData;
 import org.spongepowered.api.entity.projectile.Firework;
@@ -41,7 +41,7 @@ import org.spongepowered.common.mixin.api.mcp.entity.EntityMixin_API;
 
 import java.util.Collection;
 
-@Mixin(EntityFireworkRocket.class)
+@Mixin(FireworkRocketEntity.class)
 public abstract class EntityFireworkRocketMixin_API extends EntityMixin_API implements Firework {
 
     @Shadow private int fireworkAge;

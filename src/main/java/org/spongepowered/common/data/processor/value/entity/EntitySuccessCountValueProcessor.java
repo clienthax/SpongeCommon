@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.entity;
 
-import net.minecraft.entity.item.EntityMinecartCommandBlock;
+import net.minecraft.entity.item.minecart.MinecartCommandBlockEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -35,10 +35,10 @@ import org.spongepowered.common.data.value.SpongeValueFactory;
 
 import java.util.Optional;
 
-public class EntitySuccessCountValueProcessor extends AbstractSpongeValueProcessor<EntityMinecartCommandBlock, Integer, MutableBoundedValue<Integer>> {
+public class EntitySuccessCountValueProcessor extends AbstractSpongeValueProcessor<MinecartCommandBlockEntity, Integer, MutableBoundedValue<Integer>> {
 
     public EntitySuccessCountValueProcessor() {
-        super(EntityMinecartCommandBlock.class, Keys.SUCCESS_COUNT);
+        super(MinecartCommandBlockEntity.class, Keys.SUCCESS_COUNT);
     }
 
     @Override
@@ -57,13 +57,13 @@ public class EntitySuccessCountValueProcessor extends AbstractSpongeValueProcess
     }
 
     @Override
-    protected boolean set(final EntityMinecartCommandBlock container, final Integer value) {
+    protected boolean set(final MinecartCommandBlockEntity container, final Integer value) {
         container.getCommandBlockLogic().setSuccessCount(value);
         return true;
     }
 
     @Override
-    protected Optional<Integer> getVal(final EntityMinecartCommandBlock container) {
+    protected Optional<Integer> getVal(final MinecartCommandBlockEntity container) {
         return Optional.of(container.getCommandBlockLogic().getSuccessCount());
     }
 

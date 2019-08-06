@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.passive.EntityPig;
+import net.minecraft.entity.passive.PigEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutablePigSaddleData;
@@ -40,20 +40,20 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 import java.util.Optional;
 
 public class PigSaddleDataProcessor
-        extends AbstractEntitySingleDataProcessor<EntityPig, Boolean, Value<Boolean>, PigSaddleData, ImmutablePigSaddleData> {
+        extends AbstractEntitySingleDataProcessor<PigEntity, Boolean, Value<Boolean>, PigSaddleData, ImmutablePigSaddleData> {
 
     public PigSaddleDataProcessor() {
-        super(EntityPig.class, Keys.PIG_SADDLE);
+        super(PigEntity.class, Keys.PIG_SADDLE);
     }
 
     @Override
-    protected boolean set(EntityPig entity, Boolean value) {
+    protected boolean set(PigEntity entity, Boolean value) {
         entity.setSaddled(value);
         return true;
     }
 
     @Override
-    protected Optional<Boolean> getVal(EntityPig entity) {
+    protected Optional<Boolean> getVal(PigEntity entity) {
         return Optional.of(entity.getSaddled());
     }
 

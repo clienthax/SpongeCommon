@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.tileentity;
 
-import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.tileentity.FurnaceTileEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -35,10 +35,10 @@ import org.spongepowered.common.data.value.SpongeValueFactory;
 
 import java.util.Optional;
 
-public class MaxCookTimeValueProcessor extends AbstractSpongeValueProcessor<TileEntityFurnace, Integer, MutableBoundedValue<Integer>> {
+public class MaxCookTimeValueProcessor extends AbstractSpongeValueProcessor<FurnaceTileEntity, Integer, MutableBoundedValue<Integer>> {
 
     public MaxCookTimeValueProcessor() {
-        super(TileEntityFurnace.class, Keys.MAX_COOK_TIME);
+        super(FurnaceTileEntity.class, Keys.MAX_COOK_TIME);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class MaxCookTimeValueProcessor extends AbstractSpongeValueProcessor<Tile
     }
 
     @Override
-    protected boolean set(TileEntityFurnace container, Integer value) {
+    protected boolean set(FurnaceTileEntity container, Integer value) {
         if(container.getStackInSlot(0).isEmpty()) return false; //Item cannot be null, the time depends on it
 
         container.setField(3, value);
@@ -60,7 +60,7 @@ public class MaxCookTimeValueProcessor extends AbstractSpongeValueProcessor<Tile
     }
 
     @Override
-    protected Optional<Integer> getVal(TileEntityFurnace container) {
+    protected Optional<Integer> getVal(FurnaceTileEntity container) {
         return Optional.of(container.getStackInSlot(0).isEmpty() ? 0 : container.getField(3)); //Item cannot be null, the time depends on it
     }
 

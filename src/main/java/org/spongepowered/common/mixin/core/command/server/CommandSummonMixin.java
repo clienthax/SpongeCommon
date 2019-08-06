@@ -29,8 +29,8 @@ import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.command.server.CommandSummon;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityMinecart;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.item.minecart.AbstractMinecartEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -64,12 +64,12 @@ public abstract class CommandSummonMixin extends CommandBase {
     @Redirect(method = "execute",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/chunk/storage/AnvilChunkLoader;readWorldEntityPos(Lnet/minecraft/nbt/NBTTagCompound;Lnet/minecraft/world/World;DDDZ)Lnet/minecraft/entity/Entity;"))
-    private Entity impl$throwConstructEvent(final NBTTagCompound nbt, final World world, final double x, final double y, final double z, final boolean b,
+            target = "Lnet/minecraft/world/chunk/storage/AnvilChunkLoader;readWorldEntityPos(Lnet/minecraft/nbt/CompoundNBT;Lnet/minecraft/world/World;DDDZ)Lnet/minecraft/entity/Entity;"))
+    private Entity impl$throwConstructEvent(final CompoundNBT nbt, final World world, final double x, final double y, final double z, final boolean b,
         final MinecraftServer server, final ICommandSender sender, final String[] args) {
         if ("Minecart".equals(nbt.getString(Constants.Entity.ENTITY_TYPE_ID))) {
             nbt.setString(Constants.Entity.ENTITY_TYPE_ID,
-                    EntityMinecart.Type.values()[nbt.getInteger(Constants.Entity.Minecart.MINECART_TYPE)].getName());
+                    AbstractMinecartEntity.Type.values()[nbt.getInteger(Constants.Entity.Minecart.MINECART_TYPE)].getName());
             nbt.removeTag(Constants.Entity.Minecart.MINECART_TYPE);
         }
         final Class<? extends Entity> entityClass = SpongeImplHooks.getEntityClass(new ResourceLocation(nbt.getString(Constants.Entity.ENTITY_TYPE_ID)));

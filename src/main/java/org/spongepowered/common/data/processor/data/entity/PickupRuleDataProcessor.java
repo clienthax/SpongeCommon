@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutablePickupRuleData;
@@ -42,21 +42,21 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 
 import java.util.Optional;
 
-public final class PickupRuleDataProcessor extends AbstractEntitySingleDataProcessor<EntityArrow, PickupRule, Value<PickupRule>,
+public final class PickupRuleDataProcessor extends AbstractEntitySingleDataProcessor<AbstractArrowEntity, PickupRule, Value<PickupRule>,
         PickupRuleData, ImmutablePickupRuleData> {
 
     public PickupRuleDataProcessor() {
-        super(EntityArrow.class, Keys.PICKUP_RULE);
+        super(AbstractArrowEntity.class, Keys.PICKUP_RULE);
     }
 
     @Override
-    protected boolean set(EntityArrow arrow, PickupRule value) {
-        arrow.pickupStatus = (EntityArrow.PickupStatus) (Object) value;
+    protected boolean set(AbstractArrowEntity arrow, PickupRule value) {
+        arrow.pickupStatus = (AbstractArrowEntity.PickupStatus) (Object) value;
         return true;
     }
 
     @Override
-    protected Optional<PickupRule> getVal(EntityArrow arrow) {
+    protected Optional<PickupRule> getVal(AbstractArrowEntity arrow) {
         return Optional.of((PickupRule) (Object) arrow.pickupStatus);
     }
 

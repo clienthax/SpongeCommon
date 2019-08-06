@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.tileentity;
 
-import net.minecraft.tileentity.TileEntitySkull;
+import net.minecraft.tileentity.SkullTileEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -47,19 +47,19 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 import java.util.Optional;
 
 public class TileEntitySkullDataProcessor
-        extends AbstractTileEntitySingleDataProcessor<TileEntitySkull, SkullType, Value<SkullType>, SkullData, ImmutableSkullData> {
+        extends AbstractTileEntitySingleDataProcessor<SkullTileEntity, SkullType, Value<SkullType>, SkullData, ImmutableSkullData> {
 
     public TileEntitySkullDataProcessor() {
-        super(TileEntitySkull.class, Keys.SKULL_TYPE);
+        super(SkullTileEntity.class, Keys.SKULL_TYPE);
     }
 
     @Override
-    protected boolean supports(TileEntitySkull skull) {
+    protected boolean supports(SkullTileEntity skull) {
         return SkullUtils.supportsObject(skull);
     }
 
     @Override
-    protected Optional<SkullType> getVal(TileEntitySkull skull) {
+    protected Optional<SkullType> getVal(SkullTileEntity skull) {
         return Optional.of(SkullUtils.getSkullType(skull.getSkullType()));
     }
 
@@ -70,7 +70,7 @@ public class TileEntitySkullDataProcessor
     }
 
     @Override
-    protected boolean set(TileEntitySkull skull, SkullType type) {
+    protected boolean set(SkullTileEntity skull, SkullType type) {
         SkullUtils.setSkullType(skull, ((SpongeSkullType) type).getByteId());
         return true;
     }

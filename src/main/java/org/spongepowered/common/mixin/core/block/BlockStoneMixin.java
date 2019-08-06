@@ -26,7 +26,7 @@ package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.BlockStone;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -45,7 +45,7 @@ public abstract class BlockStoneMixin extends BlockMixin {
 
     @SuppressWarnings("RedundantTypeArguments") // some JDK's can fail to compile without the explicit type generics
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getStoneTypeFor(blockState));
     }
 
@@ -55,7 +55,7 @@ public abstract class BlockStoneMixin extends BlockMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableStoneData) {
             final BlockStone.EnumType stoneType = (BlockStone.EnumType) (Object) ((ImmutableStoneData) manipulator).type().get();
             return Optional.of((BlockState) blockState.withProperty(BlockStone.VARIANT, stoneType));
@@ -64,7 +64,7 @@ public abstract class BlockStoneMixin extends BlockMixin {
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.STONE_TYPE)) {
             final BlockStone.EnumType stoneType = (BlockStone.EnumType) value;
             return Optional.of((BlockState) blockState.withProperty(BlockStone.VARIANT, stoneType));
@@ -72,7 +72,7 @@ public abstract class BlockStoneMixin extends BlockMixin {
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
-    private ImmutableStoneData impl$getStoneTypeFor(final IBlockState blockState) {
+    private ImmutableStoneData impl$getStoneTypeFor(final BlockState blockState) {
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeStoneData.class, (StoneType) (Object) blockState.getValue(BlockStone.VARIANT));
     }
 

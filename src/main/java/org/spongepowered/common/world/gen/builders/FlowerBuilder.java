@@ -26,9 +26,9 @@ package org.spongepowered.common.world.gen.builders;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import net.minecraft.block.BlockFlower;
-import net.minecraft.init.Blocks;
-import net.minecraft.world.gen.feature.WorldGenFlowers;
+import net.minecraft.block.FlowerBlock;
+import net.minecraft.block.Blocks;
+import net.minecraft.world.gen.feature.FlowersFeature;
 import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.util.weighted.VariableAmount;
 import org.spongepowered.api.util.weighted.WeightedObject;
@@ -100,7 +100,7 @@ public class FlowerBuilder implements Flower.Builder {
     public Flower build() throws IllegalStateException {
         // these values passed in really don't matter, they are set immediately
         // before the populator is first called from the chunk
-        Flower populator = (Flower) new WorldGenFlowers(Blocks.YELLOW_FLOWER, BlockFlower.EnumFlowerType.DANDELION);
+        Flower populator = (Flower) new FlowersFeature(Blocks.YELLOW_FLOWER, FlowerBlock.EnumFlowerType.DANDELION);
         populator.setFlowersPerChunk(this.count);
         populator.getFlowerTypes().addAll(this.flowers);
         populator.setSupplierOverride(this.override);

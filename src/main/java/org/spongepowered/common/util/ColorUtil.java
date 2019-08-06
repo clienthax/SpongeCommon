@@ -26,13 +26,13 @@ package org.spongepowered.common.util;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import net.minecraft.entity.passive.EntitySheep;
-import net.minecraft.item.EnumDyeColor;
+import net.minecraft.entity.passive.SheepEntity;
+import net.minecraft.item.DyeColor;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ItemArmor.ArmorMaterial;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.data.type.DyeColor;
 import org.spongepowered.api.util.Color;
 import org.spongepowered.common.data.util.NbtDataUtil;
@@ -44,12 +44,12 @@ public final class ColorUtil {
     public static Optional<Color> getItemStackColor(ItemStack stack) {
         // Special case for armor: it has a special method
         final Item item = stack.getItem();
-        if (item instanceof ItemArmor) {
-            final NBTTagCompound tagCompound = stack.getTagCompound();
+        if (item instanceof ArmorItem) {
+            final CompoundNBT tagCompound = stack.getTagCompound();
             if (tagCompound == null || !tagCompound.hasKey(Constants.Item.Armor.ARMOR_COLOR_DISPLAY_TAG)) {
                 return Optional.empty();
             }
-            final int color = ((ItemArmor) item).getColor(stack);
+            final int color = ((ArmorItem) item).getColor(stack);
             return color == -1 ? Optional.empty() : Optional.of(Color.ofRgb(color));
         }
         return NbtDataUtil.getItemCompound(stack).flatMap(NbtDataUtil::getColorFromNBT);
@@ -62,7 +62,7 @@ public final class ColorUtil {
 
     public static int dyeColorToMojangColor(DyeColor dyeColor) {
         // For the dye
-        final float[] dyeRgbArray = EntitySheep.createSheepColor(EnumDyeColor.valueOf(dyeColor.getName().toUpperCase()));
+        final float[] dyeRgbArray = SheepEntity.createSheepColor(DyeColor.valueOf(dyeColor.getName().toUpperCase()));
 
         // Convert!
         final int trueRed = (int) (dyeRgbArray[0] * 255.0F);
@@ -74,21 +74,21 @@ public final class ColorUtil {
     }
 
     public static Color fromDyeColor(DyeColor dyeColor) {
-        final float[] dyeRgbArray = EntitySheep.createSheepColor(EnumDyeColor.valueOf(dyeColor.getName().toUpperCase()));
+        final float[] dyeRgbArray = SheepEntity.createSheepColor(DyeColor.valueOf(dyeColor.getName().toUpperCase()));
         final int trueRed = (int) (dyeRgbArray[0] * 255.0F);
         final int trueGreen = (int) (dyeRgbArray[1] * 255.0F);
         final int trueBlue = (int) (dyeRgbArray[2] * 255.0F);
         return Color.ofRgb(trueRed, trueGreen, trueBlue);
     }
 
-    public static EnumDyeColor fromColor(Color color) {
-        for (EnumDyeColor enumDyeColor : EnumDyeColor.values()) {
+    public static DyeColor fromColor(Color color) {
+        for (DyeColor enumDyeColor : DyeColor.values()) {
             Color color1 = fromDyeColor((DyeColor) (Object) enumDyeColor);
             if (color.equals(color1)) {
                 return enumDyeColor;
             }
         }
-        return EnumDyeColor.WHITE;
+        return DyeColor.WHITE;
     }
 
     public static void setItemStackColor(ItemStack stack, Color value) {
@@ -106,8 +106,8 @@ public final class ColorUtil {
 
     public static boolean hasColor(ItemStack stack) {
         final Item item = stack.getItem();
-        return item instanceof ItemArmor &&
-                ((ItemArmor) item).getArmorMaterial() == ArmorMaterial.LEATHER;
+        return item instanceof ArmorItem &&
+                ((ArmorItem) item).getArmorMaterial() == ArmorMaterial.LEATHER;
     }
 
     private ColorUtil() {

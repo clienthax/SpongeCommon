@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.projectile.EntityArrow;
+import net.minecraft.entity.projectile.AbstractArrowEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableCriticalHitData;
@@ -39,10 +39,10 @@ import org.spongepowered.common.data.value.SpongeValueFactory;
 import java.util.Optional;
 
 public class CriticalHitDataProcessor
-        extends AbstractEntitySingleDataProcessor<EntityArrow, Boolean, Value<Boolean>, CriticalHitData, ImmutableCriticalHitData> {
+        extends AbstractEntitySingleDataProcessor<AbstractArrowEntity, Boolean, Value<Boolean>, CriticalHitData, ImmutableCriticalHitData> {
 
     public CriticalHitDataProcessor() {
-        super(EntityArrow.class, Keys.CRITICAL_HIT);
+        super(AbstractArrowEntity.class, Keys.CRITICAL_HIT);
     }
 
     @Override
@@ -51,13 +51,13 @@ public class CriticalHitDataProcessor
     }
 
     @Override
-    protected boolean set(EntityArrow entity, Boolean value) {
+    protected boolean set(AbstractArrowEntity entity, Boolean value) {
         entity.setIsCritical(value);
         return true;
     }
 
     @Override
-    protected Optional<Boolean> getVal(EntityArrow entity) {
+    protected Optional<Boolean> getVal(AbstractArrowEntity entity) {
         return Optional.of(entity.getIsCritical());
     }
 

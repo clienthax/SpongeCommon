@@ -26,9 +26,9 @@ package org.spongepowered.common.data.processor.common;
 
 import com.google.common.collect.Sets;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.nbt.NBTTagString;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.nbt.StringNBT;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.common.SpongeImpl;
 import org.spongepowered.common.util.Constants;
@@ -39,7 +39,7 @@ import java.util.Set;
 public final class BreakablePlaceableUtils {
 
     public static boolean set(ItemStack stack, String nbtKey, Set<BlockType> value) {
-        NBTTagCompound stackTag = stack.getTagCompound();
+        CompoundNBT stackTag = stack.getTagCompound();
 
         if (value.isEmpty()) {
             if (stackTag != null) {
@@ -49,16 +49,16 @@ public final class BreakablePlaceableUtils {
                 }
             }
         } else {
-            NBTTagList breakableIds = new NBTTagList();
+            ListNBT breakableIds = new ListNBT();
             for (BlockType breakable : value) {
                 String id = breakable.getId();
                 if (id.startsWith("minecraft:")) {
                     id = id.substring("minecraft:".length());
                 }
-                breakableIds.appendTag(new NBTTagString(id));
+                breakableIds.appendTag(new StringNBT(id));
             }
             if (stackTag == null) {
-                stackTag = new NBTTagCompound();
+                stackTag = new CompoundNBT();
                 stack.setTagCompound(stackTag);
             }
             stackTag.setTag(nbtKey, breakableIds);
@@ -68,11 +68,11 @@ public final class BreakablePlaceableUtils {
     }
 
     public static Optional<Set<BlockType>> get(ItemStack stack, String nbtKey) {
-        NBTTagCompound tag = stack.getTagCompound();
+        CompoundNBT tag = stack.getTagCompound();
         if (tag == null) {
             return Optional.empty();
         }
-        NBTTagList blockIds = tag.getTagList(nbtKey, Constants.NBT.TAG_STRING);
+        ListNBT blockIds = tag.getTagList(nbtKey, Constants.NBT.TAG_STRING);
         if (blockIds.isEmpty()) {
             return Optional.empty();
         }

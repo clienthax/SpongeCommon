@@ -25,7 +25,7 @@
 package org.spongepowered.common.item.inventory;
 
 import net.minecraft.inventory.ISidedInventory;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import org.spongepowered.api.item.inventory.BlockCarrier;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.SingleBlockCarrier;
@@ -43,7 +43,7 @@ public interface DefaultSingleBlockCarrier extends SingleBlockCarrier {
     @SuppressWarnings("deprecation")
     static Inventory getInventory(Direction from, BlockCarrier thisThing) {
         if (thisThing instanceof ISidedInventory) {
-            EnumFacing facing = DirectionFacingProvider.getInstance().get(from).get();
+            Direction facing = DirectionFacingProvider.getInstance().get(from).get();
             int[] slots = ((ISidedInventory) thisThing).getSlotsForFace(facing);
             SlotIndex[] indices = new SlotIndex[slots.length];
             for (int i = 0; i < slots.length; i++) {

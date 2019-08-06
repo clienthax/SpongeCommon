@@ -35,16 +35,16 @@ import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Lists;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEventData;
-import net.minecraft.block.BlockRedstoneLight;
-import net.minecraft.block.BlockRedstoneRepeater;
-import net.minecraft.block.BlockRedstoneTorch;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.RedstoneLampBlock;
+import net.minecraft.block.RepeaterBlock;
+import net.minecraft.block.RedstoneTorchBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldProvider;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.dimension.Dimension;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.chunk.Chunk;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.api.Sponge;
@@ -247,8 +247,8 @@ public final class TrackingUtil {
 
     @SuppressWarnings("rawtypes")
     public static void updateTickBlock(
-            final WorldServerBridge mixinWorld, final Block block, final BlockPos pos, final IBlockState state, final Random random) {
-        final WorldServer world = (WorldServer) mixinWorld;
+            final WorldServerBridge mixinWorld, final Block block, final BlockPos pos, final BlockState state, final Random random) {
+        final ServerWorld world = (ServerWorld) mixinWorld;
         final World apiWorld = (World) world;
 
         if (ShouldFire.TICK_BLOCK_EVENT) {
@@ -282,8 +282,8 @@ public final class TrackingUtil {
 
     @SuppressWarnings("rawtypes")
     public static void randomTickBlock(final WorldServerBridge mixinWorld, final Block block,
-                                       final BlockPos pos, final IBlockState state, final Random random) {
-        final WorldServer world = (WorldServer) mixinWorld;
+                                       final BlockPos pos, final BlockState state, final Random random) {
+        final ServerWorld world = (ServerWorld) mixinWorld;
         final World apiWorld = (World) world;
 
         if (ShouldFire.TICK_BLOCK_EVENT) {
@@ -315,15 +315,15 @@ public final class TrackingUtil {
 
 
     public static void tickWorldProvider(final WorldServerBridge worldServer) {
-        final WorldProvider worldProvider = ((WorldServer) worldServer).provider;
+        final Dimension worldProvider = ((ServerWorld) worldServer).provider;
         try (final DimensionContext context = TickPhase.Tick.DIMENSION.createPhaseContext().source(worldProvider)) {
             context.buildAndSwitch();
             worldProvider.onWorldUpdateEntities();
         }
     }
 
-    public static boolean fireMinecraftBlockEvent(final WorldServer worldIn, final BlockEventData event) {
-        final IBlockState currentState = worldIn.getBlockState(event.getPosition());
+    public static boolean fireMinecraftBlockEvent(final ServerWorld worldIn, final BlockEventData event) {
+        final BlockState currentState = worldIn.getBlockState(event.getPosition());
         final BlockEventDataBridge blockEvent = (BlockEventDataBridge) event;
         final BlockEventTickContext phaseContext = TickPhase.Tick.BLOCK_EVENT.createPhaseContext();
 
@@ -350,19 +350,19 @@ public final class TrackingUtil {
     }
 
     static boolean forceModify(final Block originalBlock, final Block newBlock) {
-        if (originalBlock instanceof BlockRedstoneRepeater && newBlock instanceof BlockRedstoneRepeater) {
+        if (originalBlock instanceof RepeaterBlock && newBlock instanceof RepeaterBlock) {
             return true;
-        } else if (originalBlock instanceof BlockRedstoneTorch && newBlock instanceof BlockRedstoneTorch) {
+        } else if (originalBlock instanceof RedstoneTorchBlock && newBlock instanceof RedstoneTorchBlock) {
             return true;
         } else
-            return originalBlock instanceof BlockRedstoneLight && newBlock instanceof BlockRedstoneLight;
+            return originalBlock instanceof RedstoneLampBlock && newBlock instanceof RedstoneLampBlock;
     }
 
     private TrackingUtil() {
     }
 
     @Nullable
-    public static User getNotifierOrOwnerFromBlock(final WorldServer world, final BlockPos blockPos) {
+    public static User getNotifierOrOwnerFromBlock(final ServerWorld world, final BlockPos blockPos) {
         final ChunkBridge mixinChunk = (ChunkBridge) world.getChunk(blockPos);
         final User notifier = mixinChunk.bridge$getBlockNotifier(blockPos).orElse(null);
         if (notifier != null) {
@@ -607,11 +607,11 @@ public final class TrackingUtil {
 
     /**
      * The heart of all that is chaos. If you're reading this... well.. Let me explain it to you..
-     * Based on the provided transaction, pulling from the original block and new {@link IBlockState},
-     * we can perform physics such as {@link Block#onBlockAdded(net.minecraft.world.World, BlockPos, IBlockState)}
+     * Based on the provided transaction, pulling from the original block and new {@link BlockState},
+     * we can perform physics such as {@link Block#onBlockAdded(net.minecraft.world.World, BlockPos, BlockState)}
      * and notify neighbors. It is important that this method is replicated based on a combination of
-     * {@link net.minecraft.world.World#setBlockState(BlockPos, IBlockState, int)} and
-     * {@link Chunk#setBlockState(BlockPos, IBlockState)} as various "physics" and "notification" operations
+     * {@link net.minecraft.world.World#setBlockState(BlockPos, BlockState, int)} and
+     * {@link Chunk#setBlockState(BlockPos, BlockState)} as various "physics" and "notification" operations
      * are performed in precise order. This method is utilized in both bulk and non-bulk captures when
      * an event is required to be thrown. The deterministic requirement to know whether a bulk capture
      * is being performed or not is with the provided {@link IPhaseState} itself.
@@ -633,7 +633,7 @@ public final class TrackingUtil {
         final SpongeBlockSnapshot newBlockSnapshot = (SpongeBlockSnapshot) transaction.getFinal();
 
         // Handle item drops captured
-        final Optional<WorldServer> worldServer = oldBlockSnapshot.getWorldServer();
+        final Optional<ServerWorld> worldServer = oldBlockSnapshot.getWorldServer();
         if (!worldServer.isPresent()) {
             // Emit a log warning about a missing world
             final String transactionForLogging = MoreObjects.toStringHelper("Transaction")
@@ -650,11 +650,11 @@ public final class TrackingUtil {
         final BlockPos pos = oldBlockSnapshot.getBlockPos();
         performBlockEntitySpawns(phaseState, phaseContext, oldBlockSnapshot, pos);
 
-        final WorldServer world = (WorldServer) mixinWorld;
+        final ServerWorld world = (ServerWorld) mixinWorld;
         SpongeHooks.logBlockAction(world, oldBlockSnapshot.blockChange, transaction);
         final SpongeBlockChangeFlag originalChangeFlag = oldBlockSnapshot.getChangeFlag();
-        final IBlockState originalState = (IBlockState) oldBlockSnapshot.getState();
-        final IBlockState newState = (IBlockState) newBlockSnapshot.getState();
+        final BlockState originalState = (BlockState) oldBlockSnapshot.getState();
+        final BlockState newState = (BlockState) newBlockSnapshot.getState();
         // So basically, the gist is this: If we have intermediary states during captures, we want to process the states
         // in the order in which they were applied. The issue is that since some changes end up having "don't tell clients about this, but tell clients about that"
         // flags, we have to abide by the changes accordingly. Likewise, this interacts with neighbor notifications being performed.
@@ -672,12 +672,12 @@ public final class TrackingUtil {
 
             performNeighborAndClientNotifications(phaseContext, currentDepth, newBlockSnapshot, mixinWorld, pos, newState, originalChangeFlag);
         }
-        IBlockState previousIntermediary = originalState;
+        BlockState previousIntermediary = originalState;
         boolean processedOriginal = false;
         for (final Iterator<? extends BlockSnapshot> iterator = transaction.getIntermediary().iterator(); iterator.hasNext();) {
             final SpongeBlockSnapshot intermediary = (SpongeBlockSnapshot) iterator.next();
             final SpongeBlockChangeFlag intermediaryChangeFlag = intermediary.getChangeFlag();
-            final IBlockState intermediaryState = (IBlockState) intermediary.getState();
+            final BlockState intermediaryState = (BlockState) intermediary.getState();
             // We have to process the original block change (since it's not part of the intermediary changes)
             // as a original -> intermediary
             if (!processedOriginal) {
@@ -704,8 +704,8 @@ public final class TrackingUtil {
         }
     }
 
-    private static void performOnBlockAdded(final IPhaseState phaseState, final PhaseContext<?> phaseContext, final int currentDepth, final BlockPos pos, final WorldServer world,
-        final SpongeBlockChangeFlag changeFlag, final IBlockState originalState, final IBlockState newState) {
+    private static void performOnBlockAdded(final IPhaseState phaseState, final PhaseContext<?> phaseContext, final int currentDepth, final BlockPos pos, final ServerWorld world,
+        final SpongeBlockChangeFlag changeFlag, final BlockState originalState, final BlockState newState) {
         final Block newBlock = newState.getBlock();
         if (originalState.getBlock() != newBlock && changeFlag.performBlockPhysics()
             && (!SpongeImplHooks.hasBlockTileEntity(newBlock, newState))) {
@@ -716,7 +716,7 @@ public final class TrackingUtil {
 
     public static void performNeighborAndClientNotifications(final PhaseContext<?> phaseContext, final int currentDepth,
                                                              final SpongeBlockSnapshot newBlockSnapshot, final WorldServerBridge mixinWorld, final BlockPos pos,
-                                                             final IBlockState newState, final SpongeBlockChangeFlag changeFlag) {
+                                                             final BlockState newState, final SpongeBlockChangeFlag changeFlag) {
         final Block newBlock = newState.getBlock();
         final IPhaseState phaseState = phaseContext.state;
         if (changeFlag.updateNeighbors()) { // Notify neighbors only if the change flag allowed it.
@@ -727,10 +727,10 @@ public final class TrackingUtil {
             final BlockSnapshot previousNeighbor = context.neighborNotificationSource;
             context.neighborNotificationSource = newBlockSnapshot;
             if (changeFlag.updateNeighbors()) {
-                ((WorldServer) mixinWorld).notifyNeighborsRespectDebug(pos, newState.getBlock(), changeFlag.notifyObservers());
+                ((ServerWorld) mixinWorld).notifyNeighborsRespectDebug(pos, newState.getBlock(), changeFlag.notifyObservers());
 
                 if (newState.hasComparatorInputOverride()) {
-                    ((WorldServer) mixinWorld).updateComparatorOutputLevel(pos, newState.getBlock());
+                    ((ServerWorld) mixinWorld).updateComparatorOutputLevel(pos, newState.getBlock());
                 }
             }
             context.neighborNotificationSource = previousNeighbor;
@@ -756,7 +756,7 @@ public final class TrackingUtil {
         }
     }
 
-    private static void spawnItemEntitiesForBlockDrops(final Collection<EntityItem> entityItems, final BlockSnapshot newBlockSnapshot,
+    private static void spawnItemEntitiesForBlockDrops(final Collection<ItemEntity> entityItems, final BlockSnapshot newBlockSnapshot,
         final PhaseContext<?> phaseContext) {
         // Now we can spawn the entity items appropriately
         final List<Entity> itemDrops = entityItems.stream()
@@ -790,7 +790,7 @@ public final class TrackingUtil {
         }
         final Location<World> worldLocation = oldBlockSnapshot.getLocation().get();
         final World world = worldLocation.getExtent();
-        final WorldServer worldServer = (WorldServer) world;
+        final ServerWorld worldServer = (ServerWorld) world;
         // Now we can spawn the entity items appropriately
         final List<Entity> itemDrops = itemStacks.stream().map(itemStack -> {
                     final net.minecraft.item.ItemStack minecraftStack = itemStack.getStack();
@@ -801,7 +801,7 @@ public final class TrackingUtil {
                     final double x = position.getX() + offsetX;
                     final double y = position.getY() + offsetY;
                     final double z = position.getZ() + offsetZ;
-                    EntityItem entityitem = new EntityItem(worldServer, x, y, z, minecraftStack);
+                    ItemEntity entityitem = new ItemEntity(worldServer, x, y, z, minecraftStack);
                     entityitem.setDefaultPickupDelay();
                     return entityitem;
                 })
@@ -863,7 +863,7 @@ public final class TrackingUtil {
         final BlockSnapshot finalSnapshot = transaction.getFinal();
         final SpongeBlockSnapshot spongeSnapshot = (SpongeBlockSnapshot) finalSnapshot;
         final BlockPos pos = spongeSnapshot.getBlockPos();
-        final Block block = ((IBlockState) spongeSnapshot.getState()).getBlock();
+        final Block block = ((BlockState) spongeSnapshot.getState()).getBlock();
         spongeSnapshot.getWorldServer()
             .map(world -> world.getChunk(pos))
             .map(chunk -> (ChunkBridge) chunk)
@@ -879,7 +879,7 @@ public final class TrackingUtil {
         for (final DataManipulator<?, ?> manipulator : ((CustomDataHolderBridge) tile).bridge$getCustomManipulators()) {
             builder.add(manipulator);
         }
-        final NBTTagCompound nbt = new NBTTagCompound();
+        final CompoundNBT nbt = new CompoundNBT();
         // Some mods like OpenComputers assert if attempting to save robot while moving
         try {
             existing.writeToNBT(nbt);

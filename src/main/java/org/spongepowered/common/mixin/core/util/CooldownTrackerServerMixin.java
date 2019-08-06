@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.core.util;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.CooldownTrackerServer;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.ServerCooldownTracker;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.CooldownTracker;
 import org.spongepowered.api.entity.living.player.Player;
@@ -36,10 +36,10 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(CooldownTrackerServer.class)
+@Mixin(ServerCooldownTracker.class)
 public abstract class CooldownTrackerServerMixin extends CooldownTrackerMixin {
 
-    @Shadow @Final private EntityPlayerMP player;
+    @Shadow @Final private ServerPlayerEntity player;
 
     @Override
     protected boolean impl$throwSetCooldownEvent(final ItemType type, final int ticks) {

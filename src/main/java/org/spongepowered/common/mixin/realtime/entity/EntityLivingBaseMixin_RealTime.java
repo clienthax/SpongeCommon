@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -33,15 +33,15 @@ import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.world.WorldBridge;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 
-@Mixin(EntityLivingBase.class)
+@Mixin(LivingEntity.class)
 public abstract class EntityLivingBaseMixin_RealTime extends EntityMixin_RealTime {
 
     @Shadow public int deathTime;
     @Shadow protected int idleTime;
 
     @Redirect(method = "onDeathUpdate",
-        at = @At(value = "FIELD", target = "Lnet/minecraft/entity/EntityLivingBase;deathTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
-    private void realTimeImpl$adjustForRealTimeDeathTime(final EntityLivingBase self, final int vanillaNewDeathTime) {
+        at = @At(value = "FIELD", target = "Lnet/minecraft/entity/LivingEntity;deathTime:I", opcode = Opcodes.PUTFIELD, ordinal = 0))
+    private void realTimeImpl$adjustForRealTimeDeathTime(final LivingEntity self, final int vanillaNewDeathTime) {
         if (((WorldBridge) this.world).bridge$isFake()) {
             this.deathTime = vanillaNewDeathTime;
             return;

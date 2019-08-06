@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.entity.monster.EndermanEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableScreamingData;
@@ -40,10 +40,10 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 import java.util.Optional;
 
 public class ScreamingDataProcessor
-        extends AbstractEntitySingleDataProcessor<EntityEnderman, Boolean, Value<Boolean>, ScreamingData, ImmutableScreamingData> {
+        extends AbstractEntitySingleDataProcessor<EndermanEntity, Boolean, Value<Boolean>, ScreamingData, ImmutableScreamingData> {
 
     public ScreamingDataProcessor() {
-        super(EntityEnderman.class, Keys.IS_SCREAMING);
+        super(EndermanEntity.class, Keys.IS_SCREAMING);
     }
 
     @Override
@@ -52,13 +52,13 @@ public class ScreamingDataProcessor
     }
 
     @Override
-    protected boolean set(EntityEnderman entity, Boolean value) {
-        entity.getDataManager().set(EntityEnderman.SCREAMING, value);
+    protected boolean set(EndermanEntity entity, Boolean value) {
+        entity.getDataManager().set(EndermanEntity.SCREAMING, value);
         return true;
     }
 
     @Override
-    protected Optional<Boolean> getVal(EntityEnderman entity) {
+    protected Optional<Boolean> getVal(EndermanEntity entity) {
         return Optional.of(entity.isScreaming());
     }
 

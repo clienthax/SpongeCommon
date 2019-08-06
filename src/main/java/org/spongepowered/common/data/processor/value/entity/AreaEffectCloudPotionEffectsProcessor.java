@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.entity;
 
-import net.minecraft.entity.EntityAreaEffectCloud;
+import net.minecraft.entity.AreaEffectCloudEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -39,10 +39,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-public class AreaEffectCloudPotionEffectsProcessor extends AbstractSpongeValueProcessor<EntityAreaEffectCloud, List<PotionEffect>, ListValue<PotionEffect>> {
+public class AreaEffectCloudPotionEffectsProcessor extends AbstractSpongeValueProcessor<AreaEffectCloudEntity, List<PotionEffect>, ListValue<PotionEffect>> {
 
     public AreaEffectCloudPotionEffectsProcessor() {
-        super(EntityAreaEffectCloud.class, Keys.POTION_EFFECTS);
+        super(AreaEffectCloudEntity.class, Keys.POTION_EFFECTS);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class AreaEffectCloudPotionEffectsProcessor extends AbstractSpongeValuePr
     }
 
     @Override
-    protected boolean set(EntityAreaEffectCloud container, List<PotionEffect> value) {
+    protected boolean set(AreaEffectCloudEntity container, List<PotionEffect> value) {
         final List<net.minecraft.potion.PotionEffect> effects = new ArrayList<>(value.size());
         for (PotionEffect effect : value) {
             effects.add((net.minecraft.potion.PotionEffect) effect);
@@ -62,7 +62,7 @@ public class AreaEffectCloudPotionEffectsProcessor extends AbstractSpongeValuePr
 
     @SuppressWarnings("unchecked")
     @Override
-    protected Optional<List<PotionEffect>> getVal(EntityAreaEffectCloud container) {
+    protected Optional<List<PotionEffect>> getVal(AreaEffectCloudEntity container) {
         return Optional.of(((List<PotionEffect>) (List<?>) ((EntityAreaEffectCloudAccessor) container).getPotionEffects()));
     }
 

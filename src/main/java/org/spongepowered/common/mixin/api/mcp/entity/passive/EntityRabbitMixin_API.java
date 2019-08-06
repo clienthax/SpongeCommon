@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.passive;
 
-import net.minecraft.entity.passive.EntityRabbit;
+import net.minecraft.entity.passive.RabbitEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.RabbitData;
@@ -40,7 +40,7 @@ import org.spongepowered.common.util.Constants;
 
 import java.util.Collection;
 
-@Mixin(EntityRabbit.class)
+@Mixin(RabbitEntity.class)
 public abstract class EntityRabbitMixin_API extends EntityAnimalMixin_API implements Rabbit {
 
     @Shadow public abstract int getRabbitType();

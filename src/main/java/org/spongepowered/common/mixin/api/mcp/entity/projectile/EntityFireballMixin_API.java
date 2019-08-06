@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.projectile;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.projectile.EntityFireball;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.projectile.DamagingProjectileEntity;
 import org.spongepowered.api.entity.projectile.explosive.fireball.Fireball;
 import org.spongepowered.api.entity.projectile.source.ProjectileSource;
 import org.spongepowered.asm.mixin.Mixin;
@@ -34,10 +34,10 @@ import org.spongepowered.common.mixin.api.mcp.entity.EntityMixin_API;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityFireball.class)
+@Mixin(DamagingProjectileEntity.class)
 public abstract class EntityFireballMixin_API extends EntityMixin_API implements Fireball {
 
-    @Shadow @Nullable public EntityLivingBase shootingEntity;
+    @Shadow @Nullable public LivingEntity shootingEntity;
 
     @Nullable private ProjectileSource projectileSource = null;
 
@@ -57,8 +57,8 @@ public abstract class EntityFireballMixin_API extends EntityMixin_API implements
     @Override
     public void setShooter(ProjectileSource shooter) {
         this.projectileSource = shooter;
-        if (shooter instanceof EntityLivingBase) {
-            this.shootingEntity = (EntityLivingBase) shooter;
+        if (shooter instanceof LivingEntity) {
+            this.shootingEntity = (LivingEntity) shooter;
         } else {
             this.shootingEntity = null;
         }

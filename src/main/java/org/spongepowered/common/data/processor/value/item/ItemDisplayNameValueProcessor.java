@@ -24,9 +24,9 @@
  */
 package org.spongepowered.common.data.processor.value.item;
 
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -68,14 +68,14 @@ public class ItemDisplayNameValueProcessor extends AbstractSpongeValueProcessor<
     @Override
     protected Optional<Text> getVal(ItemStack container) {
         if (container.getItem() == Items.WRITTEN_BOOK) {
-            final NBTTagCompound mainCompound = container.getTagCompound();
+            final CompoundNBT mainCompound = container.getTagCompound();
             if (mainCompound == null) {
                 return Optional.empty(); // Basically, this book wasn't initialized properly.
             }
             final String titleString = mainCompound.getString(Constants.Item.Book.ITEM_BOOK_TITLE);
             return Optional.of(SpongeTexts.fromLegacy(titleString));
         }
-        final NBTTagCompound mainCompound = container.getSubCompound(Constants.Item.ITEM_DISPLAY);
+        final CompoundNBT mainCompound = container.getSubCompound(Constants.Item.ITEM_DISPLAY);
         if (mainCompound != null && mainCompound.hasKey(Constants.Item.ITEM_DISPLAY_NAME, Constants.NBT.TAG_STRING)) {
             final String displayString = mainCompound.getString(Constants.Item.ITEM_DISPLAY_NAME);
             return Optional.of(SpongeTexts.fromLegacy(displayString));

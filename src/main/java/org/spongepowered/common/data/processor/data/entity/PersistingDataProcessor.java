@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutablePersistingData;
@@ -41,20 +41,20 @@ import org.spongepowered.common.mixin.core.entity.EntityLivingAccessor;
 import java.util.Optional;
 
 public class PersistingDataProcessor
-        extends AbstractEntitySingleDataProcessor<EntityLiving, Boolean, Value<Boolean>, PersistingData, ImmutablePersistingData> {
+        extends AbstractEntitySingleDataProcessor<MobEntity, Boolean, Value<Boolean>, PersistingData, ImmutablePersistingData> {
 
     public PersistingDataProcessor() {
-        super(EntityLiving.class, Keys.PERSISTS);
+        super(MobEntity.class, Keys.PERSISTS);
     }
 
     @Override
-    protected boolean set(final EntityLiving entity, final Boolean value) {
+    protected boolean set(final MobEntity entity, final Boolean value) {
         ((EntityLivingAccessor) entity).accessor$setPersisting(value);
         return true;
     }
 
     @Override
-    protected Optional<Boolean> getVal(final EntityLiving entity) {
+    protected Optional<Boolean> getVal(final MobEntity entity) {
         return Optional.of(entity.isNoDespawnRequired());
     }
 

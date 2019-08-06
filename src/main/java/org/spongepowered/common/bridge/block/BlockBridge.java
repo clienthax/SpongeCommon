@@ -26,7 +26,7 @@ package org.spongepowered.common.bridge.block;
 
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.Property;
 import org.spongepowered.api.data.key.Key;
@@ -60,12 +60,12 @@ public interface BlockBridge {
 
     /**
      * Gets all the {@link ImmutableDataManipulator}s for the provided
-     * {@link IBlockState}.
+     * {@link BlockState}.
      *
      * @param blockState The block state being passed in
      * @return The list of immutable manipulators
      */
-    List<ImmutableDataManipulator<?, ?>> bridge$getManipulators(IBlockState blockState);
+    List<ImmutableDataManipulator<?, ?>> bridge$getManipulators(BlockState blockState);
 
     /**
      * A simple check whether the class is supported by the block or not.
@@ -90,7 +90,7 @@ public interface BlockBridge {
      * @param <E> The type of value, for type checking
      * @return The blockstate with the new value, if available and compatible
      */
-    <E> Optional<BlockState> bridge$getStateWithValue(IBlockState blockState, Key<? extends BaseValue<E>> key, E value);
+    <E> Optional<BlockState> bridge$getStateWithValue(BlockState blockState, Key<? extends BaseValue<E>> key, E value);
 
     /**
      * Again, another delegate method directly to the block, usually not all
@@ -107,7 +107,7 @@ public interface BlockBridge {
      * @param manipulator The manipulator being offered
      * @return The block state with the requested data, if available
      */
-    Optional<BlockState> bridge$getStateWithData(IBlockState blockState, ImmutableDataManipulator<?, ?> manipulator);
+    Optional<BlockState> bridge$getStateWithData(BlockState blockState, ImmutableDataManipulator<?, ?> manipulator);
 
     // Normal API methods
 
@@ -137,7 +137,7 @@ public interface BlockBridge {
         return false;
     }
 
-    ImmutableMap<Class<? extends Property<?,?>>,Property<?,?>> bridge$getProperties(IBlockState mixinStateImplementation);
+    ImmutableMap<Class<? extends Property<?,?>>,Property<?,?>> bridge$getProperties(BlockState mixinStateImplementation);
 
     void bridge$initializeTrackerState();
 

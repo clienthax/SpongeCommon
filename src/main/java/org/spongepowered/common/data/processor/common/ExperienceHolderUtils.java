@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.common;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 
 public class ExperienceHolderUtils {
 
@@ -35,7 +35,7 @@ public class ExperienceHolderUtils {
     // run ExperienceHolderUtilsTest to check your results.
 
     /**
-     * A static version of {@link EntityPlayer#xpBarCap()}.
+     * A static version of {@link PlayerEntity#xpBarCap()}.
      *
      * @param level The player's level
      * @return The amount of XP between the specified level and the next level
@@ -47,7 +47,7 @@ public class ExperienceHolderUtils {
     /**
      * Utility method for getting the total experience at an arbitrary level.
      * The formulas here are basically (slightly modified) integrals of those
-     * of {@link EntityPlayer#xpBarCap()}.
+     * of {@link PlayerEntity#xpBarCap()}.
      *
      * @param level The player's level
      * @return The total amount of XP a player would have if they are exactly

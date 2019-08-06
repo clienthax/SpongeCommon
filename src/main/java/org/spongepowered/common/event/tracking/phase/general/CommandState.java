@@ -25,9 +25,9 @@
 package org.spongepowered.common.event.tracking.phase.general;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.command.CommandSource;
@@ -103,7 +103,7 @@ final class CommandState extends GeneralState<CommandPhaseContext> {
 
     @Override
     public void associateNeighborStateNotifier(final CommandPhaseContext context, final BlockPos sourcePos, final Block block, final BlockPos notifyPos,
-        final WorldServer minecraftWorld, final PlayerTracker.Type notifier) {
+        final ServerWorld minecraftWorld, final PlayerTracker.Type notifier) {
         context.getSource(Player.class)
             .ifPresent(player -> ((ChunkBridge) minecraftWorld.getChunk(notifyPos))
                 .bridge$addTrackedBlockPosition(block, notifyPos, player, PlayerTracker.Type.NOTIFIER));
@@ -111,7 +111,7 @@ final class CommandState extends GeneralState<CommandPhaseContext> {
 
     @Override
     public void unwind(final CommandPhaseContext phaseContext) {
-        final Optional<EntityPlayer> playerSource = phaseContext.getSource(EntityPlayer.class);
+        final Optional<PlayerEntity> playerSource = phaseContext.getSource(PlayerEntity.class);
         final CauseStackManager csm = Sponge.getCauseStackManager();
         if (playerSource.isPresent()) {
             // Post event for inventory changes
@@ -147,7 +147,7 @@ final class CommandState extends GeneralState<CommandPhaseContext> {
                     final UUID key = entry.getKey();
                     @Nullable
                     net.minecraft.entity.Entity foundEntity = null;
-                    for (final WorldServer worldServer : WorldManager.getWorlds())
+                    for (final ServerWorld worldServer : WorldManager.getWorlds())
                     {
                         final net.minecraft.entity.Entity entityFromUuid = worldServer.getEntityFromUuid(key);
                         if (entityFromUuid != null)
@@ -170,7 +170,7 @@ final class CommandState extends GeneralState<CommandPhaseContext> {
                     items.addAll(itemStacks);
                     itemStacks.clear();
 
-                    final WorldServer minecraftWorld = (WorldServer) affectedEntity.get().getWorld();
+                    final ServerWorld minecraftWorld = (ServerWorld) affectedEntity.get().getWorld();
                     if (!items.isEmpty())
                     {
                         csm.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.DROPPED_ITEM);

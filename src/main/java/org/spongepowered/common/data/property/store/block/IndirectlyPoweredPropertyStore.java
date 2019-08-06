@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.property.store.block;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import org.spongepowered.api.data.property.block.IndirectlyPoweredProperty;
 import org.spongepowered.api.util.Direction;
 import org.spongepowered.api.world.Location;
@@ -49,7 +49,7 @@ public class IndirectlyPoweredPropertyStore extends AbstractSpongePropertyStore<
     @Override
     public Optional<IndirectlyPoweredProperty> getFor(Location<World> location, Direction direction) {
         final net.minecraft.world.World world = (net.minecraft.world.World) location.getExtent();
-        final EnumFacing facing = toEnumFacing(direction);
+        final Direction facing = toEnumFacing(direction);
         final boolean powered = world.getRedstonePower(VecHelper.toBlockPos(location).offset(facing), facing) > 0;
         return Optional.of(powered ? TRUE : FALSE);
     }

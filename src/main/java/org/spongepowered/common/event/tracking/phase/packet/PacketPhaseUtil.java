@@ -24,20 +24,20 @@
  */
 package org.spongepowered.common.event.tracking.phase.packet;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.INetHandler;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.CPacketClientSettings;
-import net.minecraft.network.play.client.CPacketClientStatus;
-import net.minecraft.network.play.client.CPacketPlayer;
-import net.minecraft.network.play.server.SPacketSetSlot;
-import net.minecraft.util.EnumHand;
+import net.minecraft.network.play.ServerPlayNetHandler;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.play.client.CClientSettingsPacket;
+import net.minecraft.network.play.client.CClientStatusPacket;
+import net.minecraft.network.play.client.CPlayerPacket;
+import net.minecraft.network.play.server.SSetSlotPacket;
+import net.minecraft.util.Hand;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.CauseStackManager;
@@ -59,7 +59,7 @@ import javax.annotation.Nullable;
 public final class PacketPhaseUtil {
 
     @SuppressWarnings("rawtypes")
-    public static void handleSlotRestore(final EntityPlayer player, @Nullable final Container openContainer, final List<SlotTransaction> slotTransactions, final boolean eventCancelled) {
+    public static void handleSlotRestore(final PlayerEntity player, @Nullable final Container openContainer, final List<SlotTransaction> slotTransactions, final boolean eventCancelled) {
         for (final SlotTransaction slotTransaction : slotTransactions) {
 
             if ((!slotTransaction.getCustom().isPresent() && slotTransaction.isValid()) && !eventCancelled) {
@@ -85,16 +85,16 @@ public final class PacketPhaseUtil {
             ((TrackedInventoryBridge) openContainer).bridge$setCaptureInventory(capture);
             // If event is cancelled, always resync with player
             // we must also validate the player still has the same container open after the event has been processed
-            if (eventCancelled && player.openContainer == openContainer && player instanceof EntityPlayerMP) {
-                ((EntityPlayerMP) player).sendContainerToPlayer(openContainer);
+            if (eventCancelled && player.openContainer == openContainer && player instanceof ServerPlayerEntity) {
+                ((ServerPlayerEntity) player).sendContainerToPlayer(openContainer);
             }
         }
     }
 
-    public static void handleCustomCursor(final EntityPlayerMP player, final ItemStackSnapshot customCursor) {
+    public static void handleCustomCursor(final ServerPlayerEntity player, final ItemStackSnapshot customCursor) {
         final ItemStack cursor = ItemStackUtil.fromSnapshotToNative(customCursor);
         player.inventory.setItemStack(cursor);
-        player.connection.sendPacket(new SPacketSetSlot(-1, -1, cursor));
+        player.connection.sendPacket(new SSetSlotPacket(-1, -1, cursor));
     }
 
     public static void validateCapturedTransactions(final int slotId, final Container openContainer, final List<SlotTransaction> capturedTransactions) {
@@ -108,16 +108,16 @@ public final class PacketPhaseUtil {
         }
     }
 
-    public static void handlePlayerSlotRestore(final EntityPlayerMP player, final ItemStack itemStack, final EnumHand hand) {
+    public static void handlePlayerSlotRestore(final ServerPlayerEntity player, final ItemStack itemStack, final Hand hand) {
         if (itemStack.isEmpty()) { // No need to check if it's NONE, NONE is checked by isEmpty.
             return;
         }
 
         player.isChangingQuantityOnly = false;
         int slotId = 0;
-        if (hand == EnumHand.OFF_HAND) {
+        if (hand == Hand.OFF_HAND) {
             player.inventory.offHandInventory.set(0, itemStack);
-            slotId = (player.inventory.mainInventory.size() + InventoryPlayer.getHotbarSize());
+            slotId = (player.inventory.mainInventory.size() + PlayerInventory.getHotbarSize());
         } else {
             player.inventory.mainInventory.set(player.inventory.currentItem, itemStack);
             final Slot slot = player.openContainer.getSlotFromInventory(player.inventory, player.inventory.currentItem);
@@ -126,7 +126,7 @@ public final class PacketPhaseUtil {
 
         player.openContainer.detectAndSendChanges();
         player.isChangingQuantityOnly = false;
-        player.connection.sendPacket(new SPacketSetSlot(player.openContainer.windowId, slotId, itemStack));
+        player.connection.sendPacket(new SSetSlotPacket(player.openContainer.windowId, slotId, itemStack));
     }
 
     // Check if all transactions are invalid
@@ -145,10 +145,10 @@ public final class PacketPhaseUtil {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public static void onProcessPacket(final Packet packetIn, final INetHandler netHandler) {
-        if (netHandler instanceof NetHandlerPlayServer) {
+    public static void onProcessPacket(final IPacket packetIn, final INetHandler netHandler) {
+        if (netHandler instanceof ServerPlayNetHandler) {
             try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
-                EntityPlayerMP packetPlayer = ((NetHandlerPlayServer) netHandler).player;
+                ServerPlayerEntity packetPlayer = ((ServerPlayNetHandler) netHandler).player;
                 frame.pushCause(packetPlayer);
                 if (SpongeImplHooks.creativeExploitCheck(packetIn, packetPlayer)) {
                     return;
@@ -156,9 +156,9 @@ public final class PacketPhaseUtil {
 
                 // Don't process movement capture logic if player hasn't moved
                 final boolean ignoreMovementCapture;
-                if (packetIn instanceof CPacketPlayer) {
-                    final CPacketPlayer movingPacket = ((CPacketPlayer) packetIn);
-                    if (movingPacket instanceof CPacketPlayer.Rotation) {
+                if (packetIn instanceof CPlayerPacket) {
+                    final CPlayerPacket movingPacket = ((CPlayerPacket) packetIn);
+                    if (movingPacket instanceof CPlayerPacket.Rotation) {
                         ignoreMovementCapture = true;
                     } else if (packetPlayer.posX == movingPacket.x && packetPlayer.posY == movingPacket.y && packetPlayer.posZ == movingPacket.z) {
                         ignoreMovementCapture = true;
@@ -168,7 +168,7 @@ public final class PacketPhaseUtil {
                 } else {
                     ignoreMovementCapture = false;
                 }
-                if (ignoreMovementCapture || (packetIn instanceof CPacketClientSettings)) {
+                if (ignoreMovementCapture || (packetIn instanceof CClientSettingsPacket)) {
                     packetIn.processPacket(netHandler);
                 } else {
                     final ItemStackSnapshot cursor = ItemStackUtil.snapshotOf(packetPlayer.inventory.getItemStack());
@@ -192,9 +192,9 @@ public final class PacketPhaseUtil {
 
                     }
 
-                    if (packetIn instanceof CPacketClientStatus) {
+                    if (packetIn instanceof CClientStatusPacket) {
                         // update the reference of player
-                        packetPlayer = ((NetHandlerPlayServer) netHandler).player;
+                        packetPlayer = ((ServerPlayNetHandler) netHandler).player;
                     }
                     ((EntityPlayerMPBridge) packetPlayer).bridge$setPacketItem(ItemStack.EMPTY);
                 }

@@ -33,7 +33,7 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Sets;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.tileentity.TileEntity;
@@ -42,12 +42,12 @@ import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.Difficulty;
 import net.minecraft.world.World;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.biome.Biome;
-import net.minecraft.world.biome.BiomeProvider;
-import net.minecraft.world.chunk.Chunk.EnumCreateEntityType;
+import net.minecraft.world.biome.provider.BiomeProvider;
+import net.minecraft.world.chunk.Chunk.CreateEntityType;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -111,9 +111,9 @@ public abstract class ChunkMixin_API implements Chunk {
     @Shadow public boolean unloadQueued;
 
     // @formatter:off
-    @Shadow @Nullable public abstract TileEntity getTileEntity(BlockPos pos, EnumCreateEntityType p_177424_2_);
-    @Shadow public abstract IBlockState getBlockState(BlockPos pos);
-    @Shadow public abstract IBlockState getBlockState(int x, int y, int z);
+    @Shadow @Nullable public abstract TileEntity getTileEntity(BlockPos pos, CreateEntityType p_177424_2_);
+    @Shadow public abstract BlockState getBlockState(BlockPos pos);
+    @Shadow public abstract BlockState getBlockState(int x, int y, int z);
     @Shadow public abstract Biome getBiome(BlockPos pos, BiomeProvider chunkManager);
     @Shadow public abstract byte[] getBiomeArray();
     @Shadow public abstract void setBiomeArray(byte[] biomeArray);
@@ -158,7 +158,7 @@ public abstract class ChunkMixin_API implements Chunk {
 
     @Override
     public boolean loadChunk(boolean generate) {
-        WorldServer worldserver = (WorldServer) this.world;
+        ServerWorld worldserver = (ServerWorld) this.world;
         net.minecraft.world.chunk.Chunk chunk = null;
         if (worldserver.getChunkProvider().chunkExists(this.x, this.z) || generate) {
             chunk = worldserver.getChunkProvider().loadChunk(this.x, this.z);
@@ -180,7 +180,7 @@ public abstract class ChunkMixin_API implements Chunk {
 
     @Override
     public double getRegionalDifficultyFactor() {
-        final boolean flag = this.world.getDifficulty() == EnumDifficulty.HARD;
+        final boolean flag = this.world.getDifficulty() == Difficulty.HARD;
         float moon = this.world.getCurrentMoonPhaseFactor();
         float f2 = MathHelper.clamp((this.world.getWorldTime() - 72000.0F) / 1440000.0F, 0.0F, 1.0F) * 0.25F;
         float f3 = 0.0F;
@@ -222,8 +222,8 @@ public abstract class ChunkMixin_API implements Chunk {
         biomeArray[j << 4 | i] = (byte) (Biome.getIdForBiome((Biome) biome) & 255);
         setBiomeArray(biomeArray);
 
-        if (this.world instanceof WorldServer) {
-            final PlayerChunkMapEntry entry = ((WorldServer) this.world).getPlayerChunkMap().getEntry(this.x, this.z);
+        if (this.world instanceof ServerWorld) {
+            final PlayerChunkMapEntry entry = ((ServerWorld) this.world).getPlayerChunkMap().getEntry(this.x, this.z);
             if (entry != null) {
                 ((PlayerChunkMapEntryBridge) entry).bridge$markBiomesForUpdate();
             }
@@ -239,13 +239,13 @@ public abstract class ChunkMixin_API implements Chunk {
     @Override
     public boolean setBlock(int x, int y, int z, BlockState block) {
         checkBlockBounds(x, y, z);
-        return this.world.setBlockState(new BlockPos(x, y, z), (IBlockState) block, Constants.BlockChangeFlags.ALL);
+        return this.world.setBlockState(new BlockPos(x, y, z), (BlockState) block, Constants.BlockChangeFlags.ALL);
     }
 
     @Override
     public boolean setBlock(int x, int y, int z, BlockState block, BlockChangeFlag flag) {
         checkBlockBounds(x, y, z);
-        return this.world.setBlockState(new BlockPos(x, y, z), (IBlockState) block, ((SpongeBlockChangeFlag) flag).getRawFlag());
+        return this.world.setBlockState(new BlockPos(x, y, z), (BlockState) block, ((SpongeBlockChangeFlag) flag).getRawFlag());
     }
 
     @Override
@@ -425,7 +425,7 @@ public abstract class ChunkMixin_API implements Chunk {
     @Override
     public Optional<org.spongepowered.api.block.tileentity.TileEntity> getTileEntity(int x, int y, int z) {
         return Optional.ofNullable((org.spongepowered.api.block.tileentity.TileEntity) this.getTileEntity(
-                new BlockPos((this.x << 4) + (x & 15), y, (this.z << 4) + (z & 15)), EnumCreateEntityType.CHECK));
+                new BlockPos((this.x << 4) + (x & 15), y, (this.z << 4) + (z & 15)), CreateEntityType.CHECK));
     }
 
     @Override

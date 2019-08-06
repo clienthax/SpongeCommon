@@ -25,8 +25,8 @@
 package org.spongepowered.common.data.processor.data.item;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -47,7 +47,7 @@ import java.util.Optional;
 public class BlockItemDataProcessor extends AbstractItemSingleDataProcessor<BlockState, Value<BlockState>, BlockItemData, ImmutableBlockItemData> {
 
     public BlockItemDataProcessor() {
-        super(stack -> stack.getItem() instanceof ItemBlock, Keys.ITEM_BLOCKSTATE);
+        super(stack -> stack.getItem() instanceof BlockItem, Keys.ITEM_BLOCKSTATE);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class BlockItemDataProcessor extends AbstractItemSingleDataProcessor<Bloc
 
     @Override
     protected boolean set(ItemStack stack, BlockState value) {
-        final IBlockState blockState = (IBlockState) value;
+        final BlockState blockState = (BlockState) value;
         final Block baseBlock = blockState.getBlock();
         if (Block.getBlockFromItem(stack.getItem()) != baseBlock) {
             // Invalid state for this stack.
@@ -70,7 +70,7 @@ public class BlockItemDataProcessor extends AbstractItemSingleDataProcessor<Bloc
     @SuppressWarnings("deprecation")
     @Override
     protected Optional<BlockState> getVal(ItemStack stack) {
-        final Block block = ((ItemBlock) stack.getItem()).getBlock();
+        final Block block = ((BlockItem) stack.getItem()).getBlock();
         final int blockMeta = stack.getItem().getMetadata(stack.getItemDamage());
         return Optional.of((BlockState) block.getStateFromMeta(blockMeta));
     }

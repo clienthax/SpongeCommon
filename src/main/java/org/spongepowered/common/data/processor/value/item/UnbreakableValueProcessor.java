@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.processor.value.item;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -59,7 +59,7 @@ public class UnbreakableValueProcessor extends AbstractSpongeValueProcessor<Item
             container.setItemDamage(0);
         }
         if (!container.hasTagCompound()) {
-            container.setTagCompound(new NBTTagCompound());
+            container.setTagCompound(new CompoundNBT());
         }
         container.getTagCompound().setBoolean(Constants.Item.ITEM_UNBREAKABLE, value);
         return true;

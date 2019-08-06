@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.passive;
 
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.merchant.villager.VillagerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.CareerData;
@@ -51,14 +51,14 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityVillager.class)
+@Mixin(VillagerEntity.class)
 @Implements(@Interface(iface = Villager.class, prefix = "apiVillager$"))
 public abstract class EntityVillagerMixin_API extends EntityAgeableMixin_API implements Villager, CarriedInventory<Villager> {
 
     @Shadow public abstract void setProfession(int professionId);
-    @Shadow public abstract void setCustomer(EntityPlayer player);
+    @Shadow public abstract void setCustomer(PlayerEntity player);
     @Shadow public abstract boolean shadow$isTrading();
-    @Shadow @Nullable public abstract EntityPlayer shadow$getCustomer();
+    @Shadow @Nullable public abstract PlayerEntity shadow$getCustomer();
 
 
     @Intrinsic
@@ -73,7 +73,7 @@ public abstract class EntityVillagerMixin_API extends EntityAgeableMixin_API imp
 
     @Override
     public void setCustomer(@Nullable Humanoid humanoid) {
-        this.setCustomer((EntityPlayer) humanoid);
+        this.setCustomer((PlayerEntity) humanoid);
     }
 
     // Data delegated methods

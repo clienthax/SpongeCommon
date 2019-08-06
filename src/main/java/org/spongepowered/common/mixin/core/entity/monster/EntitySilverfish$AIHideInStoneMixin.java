@@ -24,26 +24,26 @@
  */
 package org.spongepowered.common.mixin.core.entity.monster;
 
-import net.minecraft.block.BlockSilverfish;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.ai.EntityAIWander;
-import net.minecraft.entity.monster.EntitySilverfish;
+import net.minecraft.block.SilverfishBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.ai.goal.RandomWalkingGoal;
+import net.minecraft.entity.monster.SilverfishEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 import org.spongepowered.common.bridge.entity.GrieferBridge;
 
-@Mixin(EntitySilverfish.AIHideInStone.class)
-public abstract class EntitySilverfish$AIHideInStoneMixin extends EntityAIWander {
+@Mixin(SilverfishEntity.AIHideInStone.class)
+public abstract class SilverfishEntity$AIHideInStoneMixin extends RandomWalkingGoal {
 
-    public EntitySilverfish$AIHideInStoneMixin(EntityCreature creatureIn, double speedIn) { // Ignored
+    public SilverfishEntity$AIHideInStoneMixin(CreatureEntity creatureIn, double speedIn) { // Ignored
         super(creatureIn, speedIn);
     }
 
     @Redirect(method = "shouldExecute",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/block/BlockSilverfish;canContainSilverfish(Lnet/minecraft/block/state/IBlockState;)Z"))
-    private boolean onCanGrief(final IBlockState blockState) {
-        return BlockSilverfish.canContainSilverfish(blockState) && ((GrieferBridge) this.entity).bridge$CanGrief();
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/block/SilverfishBlock;canContainSilverfish(Lnet/minecraft/block/state/BlockState;)Z"))
+    private boolean onCanGrief(final BlockState blockState) {
+        return SilverfishBlock.canContainSilverfish(blockState) && ((GrieferBridge) this.entity).bridge$CanGrief();
     }
 }

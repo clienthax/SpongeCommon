@@ -25,8 +25,8 @@
 package org.spongepowered.common.data.processor.data.entity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityItemFrame;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.ItemFrameEntity;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -53,11 +53,11 @@ public class RepresentedItemDataProcessor extends
 
     @Override
     protected boolean set(Entity container, ItemStackSnapshot value) {
-        if (container instanceof EntityItemFrame) {
-            ((EntityItemFrame) container).setDisplayedItem((ItemStack) value.createStack());
+        if (container instanceof ItemFrameEntity) {
+            ((ItemFrameEntity) container).setDisplayedItem((ItemStack) value.createStack());
             return true;
-        } else if (container instanceof EntityItem) {
-            ((EntityItem) container).setItem((ItemStack) value.createStack());
+        } else if (container instanceof ItemEntity) {
+            ((ItemEntity) container).setItem((ItemStack) value.createStack());
             return true;
         }
         return false;
@@ -80,13 +80,13 @@ public class RepresentedItemDataProcessor extends
 
     @Override
     protected boolean supports(Entity holder) {
-        return holder instanceof EntityItem || holder instanceof EntityItemFrame;
+        return holder instanceof ItemEntity || holder instanceof ItemFrameEntity;
     }
 
     @Override
     public DataTransactionResult removeFrom(ValueContainer<?> container) {
-        if (container instanceof EntityItemFrame) {
-            EntityItemFrame frame = (EntityItemFrame) container;
+        if (container instanceof ItemFrameEntity) {
+            ItemFrameEntity frame = (ItemFrameEntity) container;
             if (!frame.getDisplayedItem().isEmpty()) {
                 final ImmutableValue<ItemStackSnapshot> old = constructImmutableValue(getVal(frame).get());
                 frame.setDisplayedItem(ItemStack.EMPTY);

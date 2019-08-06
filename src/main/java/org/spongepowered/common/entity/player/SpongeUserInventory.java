@@ -24,24 +24,24 @@
  */
 package org.spongepowered.common.entity.player;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.StringTextComponent;
+import net.minecraft.util.text.TranslationTextComponent;
 
 import java.util.Arrays;
 import java.util.List;
 
 public class SpongeUserInventory implements IInventory {
 
-    // sourced from InventoryPlayer
+    // sourced from PlayerInventory
 
     /** An array of 36 item stacks indicating the main player inventory (including the visible bar). */
     final NonNullList<ItemStack> mainInventory = NonNullList.withSize(36, ItemStack.EMPTY);
@@ -61,7 +61,7 @@ public class SpongeUserInventory implements IInventory {
     }
 
     public ItemStack getCurrentItem() {
-        return InventoryPlayer.isHotbar(this.currentItem) ? this.mainInventory.get(this.currentItem) : ItemStack.EMPTY;
+        return PlayerInventory.isHotbar(this.currentItem) ? this.mainInventory.get(this.currentItem) : ItemStack.EMPTY;
     }
 
     /**
@@ -136,10 +136,10 @@ public class SpongeUserInventory implements IInventory {
      * Writes the inventory out as a list of compound tags. This is where the slot indices are used (+100 for armor, +80
      * for crafting).
      */
-    public NBTTagList writeToNBT(NBTTagList nbtTagListIn) {
+    public ListNBT writeToNBT(ListNBT nbtTagListIn) {
         for (int i = 0; i < this.mainInventory.size(); ++i) {
             if (!this.mainInventory.get(i).isEmpty()) {
-                NBTTagCompound nbttagcompound = new NBTTagCompound();
+                CompoundNBT nbttagcompound = new CompoundNBT();
                 nbttagcompound.setByte("Slot", (byte) i);
                 this.mainInventory.get(i).writeToNBT(nbttagcompound);
                 nbtTagListIn.appendTag(nbttagcompound);
@@ -148,7 +148,7 @@ public class SpongeUserInventory implements IInventory {
 
         for (int j = 0; j < this.armorInventory.size(); ++j) {
             if (!this.armorInventory.get(j).isEmpty()) {
-                NBTTagCompound nbttagcompound1 = new NBTTagCompound();
+                CompoundNBT nbttagcompound1 = new CompoundNBT();
                 nbttagcompound1.setByte("Slot", (byte) (j + 100));
                 this.armorInventory.get(j).writeToNBT(nbttagcompound1);
                 nbtTagListIn.appendTag(nbttagcompound1);
@@ -157,7 +157,7 @@ public class SpongeUserInventory implements IInventory {
 
         for (int k = 0; k < this.offHandInventory.size(); ++k) {
             if (!this.offHandInventory.get(k).isEmpty()) {
-                NBTTagCompound nbttagcompound2 = new NBTTagCompound();
+                CompoundNBT nbttagcompound2 = new CompoundNBT();
                 nbttagcompound2.setByte("Slot", (byte) (k + 150));
                 this.offHandInventory.get(k).writeToNBT(nbttagcompound2);
                 nbtTagListIn.appendTag(nbttagcompound2);
@@ -172,13 +172,13 @@ public class SpongeUserInventory implements IInventory {
     /**
      * Reads from the given tag list and fills the slots in the inventory with the correct items.
      */
-    public void readFromNBT(NBTTagList nbtTagListIn) {
+    public void readFromNBT(ListNBT nbtTagListIn) {
         this.mainInventory.clear();
         this.armorInventory.clear();
         this.offHandInventory.clear();
 
         for (int i = 0; i < nbtTagListIn.tagCount(); ++i) {
-            NBTTagCompound nbttagcompound = nbtTagListIn.getCompoundTagAt(i);
+            CompoundNBT nbttagcompound = nbtTagListIn.getCompoundTagAt(i);
             int j = nbttagcompound.getByte("Slot") & 255;
             ItemStack itemstack = new ItemStack(nbttagcompound);
 
@@ -265,7 +265,7 @@ public class SpongeUserInventory implements IInventory {
      */
     @Override
     public ITextComponent getDisplayName() {
-        return this.hasCustomName() ? new TextComponentString(this.getName()) : new TextComponentTranslation(this.getName());
+        return this.hasCustomName() ? new StringTextComponent(this.getName()) : new TranslationTextComponent(this.getName());
     }
 
     /**
@@ -290,16 +290,16 @@ public class SpongeUserInventory implements IInventory {
      * Don't rename this method to canInteractWith due to conflicts with Container
      */
     @Override
-    public boolean isUsableByPlayer(EntityPlayer player) {
+    public boolean isUsableByPlayer(PlayerEntity player) {
         return true;
     }
 
     @Override
-    public void openInventory(EntityPlayer player) {
+    public void openInventory(PlayerEntity player) {
     }
 
     @Override
-    public void closeInventory(EntityPlayer player) {
+    public void closeInventory(PlayerEntity player) {
     }
 
     /**

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.builder.block.tileentity;
 
-import net.minecraft.tileentity.TileEntitySkull;
+import net.minecraft.tileentity.SkullTileEntity;
 import org.spongepowered.api.block.tileentity.Skull;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -41,7 +41,7 @@ public class SpongeSkullBuilder extends AbstractTileBuilder<Skull> {
     protected Optional<Skull> buildContent(DataView container) throws InvalidDataException {
         return super.buildContent(container).map(skull1 -> {
             // TODO actually write the skull serialization code and deserialization code.
-            ((TileEntitySkull) skull1).validate();
+            ((SkullTileEntity) skull1).validate();
             return skull1;
         });
 

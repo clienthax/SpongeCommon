@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.builder.block.tileentity;
 
-import net.minecraft.tileentity.TileEntityEnderChest;
+import net.minecraft.tileentity.EnderChestTileEntity;
 import org.spongepowered.api.block.tileentity.EnderChest;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.persistence.InvalidDataException;
@@ -40,7 +40,7 @@ public class SpongeEnderChestBuilder extends AbstractTileBuilder<EnderChest> {
     @Override
     protected Optional<EnderChest> buildContent(DataView container) throws InvalidDataException {
         return super.buildContent(container).map(enderChest -> {
-            ((TileEntityEnderChest) enderChest).validate();
+            ((EnderChestTileEntity) enderChest).validate();
             return enderChest;
         });
     }

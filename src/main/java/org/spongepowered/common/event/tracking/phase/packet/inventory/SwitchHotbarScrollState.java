@@ -25,12 +25,12 @@
 package org.spongepowered.common.event.tracking.phase.packet.inventory;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Slot;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.CPacketHeldItemChange;
-import net.minecraft.network.play.server.SPacketHeldItemChange;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Slot;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.play.client.CHeldItemChangePacket;
+import net.minecraft.network.play.server.SHeldItemChangePacket;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
@@ -60,13 +60,13 @@ public final class SwitchHotbarScrollState extends BasicInventoryPacketState {
     }
 
     @Override
-    public void populateContext(EntityPlayerMP playerMP, Packet<?> packet, InventoryPacketContext context) {
+    public void populateContext(ServerPlayerEntity playerMP, IPacket<?> packet, InventoryPacketContext context) {
         super.populateContext(playerMP, packet, context);
         context.setHighlightedSlotId(playerMP.inventory.currentItem);
     }
 
     @Override
-    public ClickInventoryEvent createInventoryEvent(EntityPlayerMP playerMP, Container openContainer, Transaction<ItemStackSnapshot> transaction,
+    public ClickInventoryEvent createInventoryEvent(ServerPlayerEntity playerMP, Container openContainer, Transaction<ItemStackSnapshot> transaction,
             List<SlotTransaction> slotTransactions, List<Entity> capturedEntities, int usedButton, @Nullable org.spongepowered.api.item.inventory.Slot slot) {
         return SpongeEventFactory.createClickInventoryEventNumberPress(Sponge.getCauseStackManager().getCurrentCause(), transaction,
                 Optional.ofNullable(slot), openContainer, slotTransactions, usedButton);
@@ -75,12 +75,12 @@ public final class SwitchHotbarScrollState extends BasicInventoryPacketState {
     @Override
     public void unwind(InventoryPacketContext context) {
 
-        final EntityPlayerMP player = context.getPacketPlayer();
-        final CPacketHeldItemChange itemChange = context.getPacket();
+        final ServerPlayerEntity player = context.getPacketPlayer();
+        final CHeldItemChangePacket itemChange = context.getPacket();
         final int previousSlot = context.getHighlightedSlotId();
         final net.minecraft.inventory.Container inventoryContainer = player.inventoryContainer;
-        final InventoryPlayer inventory = player.inventory;
-        int preHotbarSize = inventory.mainInventory.size() - InventoryPlayer.getHotbarSize() + inventory.armorInventory.size() + 4 + 1; // Crafting Grid & Result
+        final PlayerInventory inventory = player.inventory;
+        int preHotbarSize = inventory.mainInventory.size() - PlayerInventory.getHotbarSize() + inventory.armorInventory.size() + 4 + 1; // Crafting Grid & Result
         final Slot sourceSlot = inventoryContainer.getSlot(previousSlot + preHotbarSize);
         final Slot targetSlot = inventoryContainer.getSlot(itemChange.getSlotId() + preHotbarSize);
 
@@ -99,7 +99,7 @@ public final class SwitchHotbarScrollState extends BasicInventoryPacketState {
             net.minecraft.inventory.Container openContainer = player.openContainer;
             SpongeImpl.postEvent(changeInventoryEventHeld);
             if (changeInventoryEventHeld.isCancelled() || PacketPhaseUtil.allTransactionsInvalid(changeInventoryEventHeld.getTransactions())) {
-                player.connection.sendPacket(new SPacketHeldItemChange(previousSlot));
+                player.connection.sendPacket(new SHeldItemChangePacket(previousSlot));
                 inventory.currentItem = previousSlot;
             } else {
                 PacketPhaseUtil.handleSlotRestore(player, openContainer, changeInventoryEventHeld.getTransactions(), false);

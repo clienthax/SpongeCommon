@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.tileentity;
 
-import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.tileentity.FurnaceTileEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -35,10 +35,10 @@ import org.spongepowered.common.data.value.SpongeValueFactory;
 
 import java.util.Optional;
 
-public class PassedBurnTimeValueProcessor extends AbstractSpongeValueProcessor<TileEntityFurnace, Integer, MutableBoundedValue<Integer>> {
+public class PassedBurnTimeValueProcessor extends AbstractSpongeValueProcessor<FurnaceTileEntity, Integer, MutableBoundedValue<Integer>> {
 
     public PassedBurnTimeValueProcessor() {
-        super(TileEntityFurnace.class, Keys.PASSED_BURN_TIME);
+        super(FurnaceTileEntity.class, Keys.PASSED_BURN_TIME);
     }
 
     @Override
@@ -51,7 +51,7 @@ public class PassedBurnTimeValueProcessor extends AbstractSpongeValueProcessor<T
     }
 
     @Override
-    protected boolean set(TileEntityFurnace container, Integer value) {
+    protected boolean set(FurnaceTileEntity container, Integer value) {
         if(value > container.getField(1)){ //value cannot be higher than the maximum
             return false;
         }
@@ -60,7 +60,7 @@ public class PassedBurnTimeValueProcessor extends AbstractSpongeValueProcessor<T
     }
 
     @Override
-    protected Optional<Integer> getVal(TileEntityFurnace container) {
+    protected Optional<Integer> getVal(FurnaceTileEntity container) {
         return Optional.of(container.isBurning() ? container.getField(1) - container.getField(0) : 0); //When the furnace is not burning, the value is 0
     }
 

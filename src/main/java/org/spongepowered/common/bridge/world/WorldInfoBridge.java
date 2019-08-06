@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.bridge.world;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.world.Difficulty;
 import org.spongepowered.api.world.DimensionType;
 import org.spongepowered.api.world.PortalAgentType;
 import org.spongepowered.common.config.SpongeConfig;
@@ -38,13 +38,13 @@ import javax.annotation.Nullable;
 
 public interface WorldInfoBridge {
 
-    NBTTagCompound bridge$getSpongeRootLevelNbt();
+    CompoundNBT bridge$getSpongeRootLevelNbt();
 
     boolean bridge$getSpawnsBonusChest();
 
-    void bridge$setSpongeRootLevelNBT(NBTTagCompound nbt);
+    void bridge$setSpongeRootLevelNBT(CompoundNBT nbt);
 
-    void bridge$readSpongeNbt(NBTTagCompound spongeNbt);
+    void bridge$readSpongeNbt(CompoundNBT spongeNbt);
 
     int bridge$getIndexForUniqueId(UUID uuid);
 
@@ -85,7 +85,7 @@ public interface WorldInfoBridge {
     /**
      * Sets the difficulty without marking it as custom
      */
-    void bridge$forceSetDifficulty(EnumDifficulty difficulty);
+    void bridge$forceSetDifficulty(Difficulty difficulty);
 
     void bridge$updatePlayersForDifficulty();
 

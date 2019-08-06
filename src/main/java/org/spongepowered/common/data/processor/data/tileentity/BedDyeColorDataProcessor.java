@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.data.processor.data.tileentity;
 
-import net.minecraft.item.EnumDyeColor;
-import net.minecraft.tileentity.TileEntityBed;
+import net.minecraft.item.DyeColor;
+import net.minecraft.tileentity.BedTileEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableDyeableData;
@@ -43,21 +43,21 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 
 import java.util.Optional;
 
-public class BedDyeColorDataProcessor extends AbstractTileEntitySingleDataProcessor<TileEntityBed, DyeColor, Value<DyeColor>, DyeableData,
+public class BedDyeColorDataProcessor extends AbstractTileEntitySingleDataProcessor<BedTileEntity, DyeColor, Value<DyeColor>, DyeableData,
         ImmutableDyeableData> {
 
     public BedDyeColorDataProcessor() {
-        super(TileEntityBed.class, Keys.DYE_COLOR);
+        super(BedTileEntity.class, Keys.DYE_COLOR);
     }
 
     @Override
-    protected boolean set(TileEntityBed dataHolder, DyeColor value) {
-        dataHolder.setColor((EnumDyeColor) (Object) value);
+    protected boolean set(BedTileEntity dataHolder, DyeColor value) {
+        dataHolder.setColor((DyeColor) (Object) value);
         return true;
     }
 
     @Override
-    protected Optional<DyeColor> getVal(TileEntityBed dataHolder) {
+    protected Optional<DyeColor> getVal(BedTileEntity dataHolder) {
         return Optional.of((DyeColor) (Object) dataHolder.getColor());
     }
 

@@ -24,9 +24,9 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity;
 
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.projectile.EntityShulkerBullet;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
+import net.minecraft.util.Direction;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.block.DirectionalData;
@@ -44,12 +44,12 @@ import java.util.Collection;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityShulkerBullet.class)
+@Mixin(ShulkerBulletEntity.class)
 public abstract class EntityShulkerBulletMixin_API extends EntityMixin_API implements ShulkerBullet {
 
-    @Shadow @Nullable private EnumFacing direction;
+    @Shadow @Nullable private Direction direction;
 
-    @Shadow private EntityLivingBase owner;
+    @Shadow private LivingEntity owner;
 
     @Nullable public ProjectileSource projectileSource;
 
@@ -78,8 +78,8 @@ public abstract class EntityShulkerBulletMixin_API extends EntityMixin_API imple
 
     @Override
     public void setShooter(ProjectileSource shooter) {
-        if (shooter instanceof EntityLivingBase) {
-            this.owner = (EntityLivingBase) shooter;
+        if (shooter instanceof LivingEntity) {
+            this.owner = (LivingEntity) shooter;
         } else {
             this.owner = null;
         }

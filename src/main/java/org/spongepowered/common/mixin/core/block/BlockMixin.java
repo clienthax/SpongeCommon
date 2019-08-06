@@ -29,17 +29,17 @@ import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockBeacon;
-import net.minecraft.block.BlockChest;
-import net.minecraft.block.BlockEndGateway;
-import net.minecraft.block.BlockEnderChest;
-import net.minecraft.block.BlockMobSpawner;
-import net.minecraft.block.BlockShulkerBox;
+import net.minecraft.block.BeaconBlock;
+import net.minecraft.block.ChestBlock;
+import net.minecraft.block.EndGatewayBlock;
+import net.minecraft.block.EnderChestBlock;
+import net.minecraft.block.SpawnerBlock;
+import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -114,9 +114,9 @@ public abstract class BlockMixin implements BlockBridge, TrackableBridge, Timing
     @Shadow @Final protected BlockStateContainer blockState;
 
     @Shadow public abstract String getTranslationKey();
-    @Shadow public abstract Material getMaterial(IBlockState state);
-    @Shadow public abstract IBlockState shadow$getDefaultState();
-    @Shadow public abstract void dropBlockAsItem(net.minecraft.world.World worldIn, BlockPos pos, IBlockState state, int fortune);
+    @Shadow public abstract Material getMaterial(BlockState state);
+    @Shadow public abstract BlockState shadow$getDefaultState();
+    @Shadow public abstract void dropBlockAsItem(net.minecraft.world.World worldIn, BlockPos pos, BlockState state, int fortune);
     @Shadow public abstract BlockStateContainer getBlockState();
     @Shadow protected abstract Block setTickRandomly(boolean shouldTick);
 
@@ -131,28 +131,28 @@ public abstract class BlockMixin implements BlockBridge, TrackableBridge, Timing
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         return Optional.empty();
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         return Optional.empty(); // By default, all blocks just have a single state unless otherwise dictated.
     }
 
     @Override
-    public List<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public List<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.of();
     }
 
     @Override
-    public ImmutableMap<Class<? extends Property<?, ?>>, Property<?, ?>> bridge$getProperties(final IBlockState blockState) {
+    public ImmutableMap<Class<? extends Property<?, ?>>, Property<?, ?>> bridge$getProperties(final BlockState blockState) {
         return populateSpongeProperties(ImmutableMap.builder(), blockState).build();
     }
 
     @SuppressWarnings("unchecked")
     private ImmutableMap.Builder<Class<? extends Property<?, ?>>, Property<?, ?>> populateSpongeProperties(
-        final ImmutableMap.Builder<Class<? extends Property<?, ?>>, Property<?, ?>> builder, final IBlockState blockState) {
+        final ImmutableMap.Builder<Class<? extends Property<?, ?>>, Property<?, ?>> builder, final BlockState blockState) {
         for (final Property<?, ?> property : SpongeImpl.getPropertyRegistry().getPropertiesFor((BlockState) blockState)) {
             builder.put((Class<? extends Property<?, ?>>) property.getClass(), property);
         }
@@ -160,7 +160,7 @@ public abstract class BlockMixin implements BlockBridge, TrackableBridge, Timing
     }
 
     @Inject(method = "dropBlockAsItem", at = @At("HEAD"), cancellable = true)
-    private void checkBlockDropForTransactions(final net.minecraft.world.World worldIn, final BlockPos pos, final IBlockState state, final int fortune,
+    private void checkBlockDropForTransactions(final net.minecraft.world.World worldIn, final BlockPos pos, final BlockState state, final int fortune,
         final CallbackInfo ci) {
         if (((WorldBridge) worldIn).bridge$isFake()) {
             return;
@@ -175,12 +175,12 @@ public abstract class BlockMixin implements BlockBridge, TrackableBridge, Timing
     // Please, for the love of all that is good, do NOT re-order the following two injections, if you do, you end up causing errors
     // from Mixin complaining about a leaked CallbackInfo. More can be read here: https://github.com/SpongePowered/Mixin/issues/337
     @Inject(method = "spawnAsEntity",
-        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/EntityItem;setDefaultPickupDelay()V", shift = At.Shift.AFTER),
+        at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/ItemEntity;setDefaultPickupDelay()V", shift = At.Shift.AFTER),
         locals = LocalCapture.CAPTURE_FAILSOFT,
         cancellable = true)
     private static void impl$attemptCaptureOrAllowSpawn(final net.minecraft.world.World worldIn, final BlockPos pos, final ItemStack stack,
         final CallbackInfo ci, final float unused, final double xOffset, final double yOffset, final double zOffset,
-        final EntityItem toSpawn) {
+        final ItemEntity toSpawn) {
         // Sponge Start - Tell the phase state to track this position, and then unset it.
         final PhaseContext<?> context = PhaseTracker.getInstance().getCurrentContext();
 
@@ -216,7 +216,7 @@ public abstract class BlockMixin implements BlockBridge, TrackableBridge, Timing
     }
 
     @Inject(method = "spawnAsEntity",
-        at = @At(value = "NEW", target = "net/minecraft/entity/item/EntityItem"),
+        at = @At(value = "NEW", target = "net/minecraft/entity/item/ItemEntity"),
         cancellable = true,
         locals = LocalCapture.CAPTURE_FAILSOFT,
         require = 0,
@@ -247,7 +247,7 @@ public abstract class BlockMixin implements BlockBridge, TrackableBridge, Timing
 
     // This method can be called directly by pistons, mods, etc. so the hook must go here
     @Inject(method = "dropBlockAsItemWithChance", at = @At("HEAD"), cancellable = true)
-    private void onDropBlockAsItemWithChanceHead(final net.minecraft.world.World worldIn, final BlockPos pos, final IBlockState state,
+    private void onDropBlockAsItemWithChanceHead(final net.minecraft.world.World worldIn, final BlockPos pos, final BlockState state,
         final float chance, final int fortune,
         final CallbackInfo ci) {
         if (!((WorldBridge) worldIn).bridge$isFake() && !SpongeImplHooks.isRestoringBlocks(worldIn)) {
@@ -277,7 +277,7 @@ public abstract class BlockMixin implements BlockBridge, TrackableBridge, Timing
     @Nullable private PhaseContext<?> data = null; // Soft reference for the methods between this
 
     @Inject(method = "dropBlockAsItemWithChance", at = @At(value = "RETURN"), cancellable = true)
-    private void onDropBlockAsItemWithChanceReturn(final net.minecraft.world.World worldIn, final BlockPos pos, final IBlockState state, final float chance, final int fortune,
+    private void onDropBlockAsItemWithChanceReturn(final net.minecraft.world.World worldIn, final BlockPos pos, final BlockState state, final float chance, final int fortune,
         final CallbackInfo ci) {
         if (!((WorldBridge) worldIn).bridge$isFake() && !SpongeImplHooks.isRestoringBlocks(worldIn)) {
             if (this.data == null) {
@@ -387,9 +387,9 @@ public abstract class BlockMixin implements BlockBridge, TrackableBridge, Timing
         }
 
         // Determine if this block needs to be handled during WorldServer#addBlockEvent
-        if ((Block) (Object) this instanceof BlockMobSpawner || (Block) (Object) this instanceof BlockEnderChest
-            || (Block) (Object) this instanceof BlockChest || (Block) (Object) this instanceof BlockShulkerBox
-            || (Block) (Object) this instanceof BlockEndGateway || (Block) (Object) this instanceof BlockBeacon) {
+        if ((Block) (Object) this instanceof SpawnerBlock || (Block) (Object) this instanceof EnderChestBlock
+            || (Block) (Object) this instanceof ChestBlock || (Block) (Object) this instanceof ShulkerBoxBlock
+            || (Block) (Object) this instanceof EndGatewayBlock || (Block) (Object) this instanceof BeaconBlock) {
             this.impl$shouldFireBlockEvents = false;
         }
         // Determine which blocks can avoid executing un-needed event logic
@@ -418,10 +418,10 @@ public abstract class BlockMixin implements BlockBridge, TrackableBridge, Timing
             // ignore
         }
 
-        // onEntityCollision (IBlockState)
+        // onEntityCollision (BlockState)
         try {
             final String mapping = SpongeImplHooks.isDeobfuscatedEnvironment() ? "onEntityCollision" : "func_180634_a";
-            final Class<?>[] argTypes = {net.minecraft.world.World.class, BlockPos.class, IBlockState.class, Entity.class };
+            final Class<?>[] argTypes = {net.minecraft.world.World.class, BlockPos.class, BlockState.class, Entity.class };
             final Class<?> clazz = this.getClass().getMethod(mapping, argTypes).getDeclaringClass();
             if (clazz.equals(Block.class)) {
                 this.impl$hasCollideWithStateLogic = false;
@@ -435,7 +435,7 @@ public abstract class BlockMixin implements BlockBridge, TrackableBridge, Timing
         // neighborChanged
         try {
             final String mapping = SpongeImplHooks.isDeobfuscatedEnvironment() ? "neighborChanged" : "func_189540_a";
-            final Class<?>[] argTypes = {IBlockState.class, net.minecraft.world.World.class, BlockPos.class, Block.class, BlockPos.class};
+            final Class<?>[] argTypes = {BlockState.class, net.minecraft.world.World.class, BlockPos.class, Block.class, BlockPos.class};
             final Class<?> clazz = this.getClass().getMethod(mapping, argTypes).getDeclaringClass();
             this.impl$hasNeighborOverride = !clazz.equals(Block.class);
         } catch (final Throwable e) {

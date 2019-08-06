@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.core.api.text.title;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.play.server.SPacketTitle;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.play.server.STitlePacket;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.asm.mixin.Final;
@@ -51,35 +51,35 @@ public abstract class TitleMixin implements TitleBridge {
     @Shadow @Final boolean clear;
     @Shadow @Final boolean reset;
 
-    private List<SPacketTitle> packets;
+    private List<STitlePacket> packets;
 
     @Override
-    public void bridge$send(EntityPlayerMP player) {
-        for (SPacketTitle packet : this.getPackets()) {
+    public void bridge$send(ServerPlayerEntity player) {
+        for (STitlePacket packet : this.getPackets()) {
             player.connection.sendPacket(packet);
         }
     }
 
-    private List<SPacketTitle> getPackets() {
+    private List<STitlePacket> getPackets() {
         if (this.packets == null) {
             this.packets = new ArrayList<>();
             if (this.clear) {
-                this.packets.add(new SPacketTitle(SPacketTitle.Type.RESET, null)); // SPacketTitle.Type.RESET is actually CLEAR
+                this.packets.add(new STitlePacket(STitlePacket.Type.RESET, null)); // STitlePacket.Type.RESET is actually CLEAR
             }
             if (this.reset) {
-                this.packets.add(new SPacketTitle(SPacketTitle.Type.RESET, null));
+                this.packets.add(new STitlePacket(STitlePacket.Type.RESET, null));
             }
             if (this.fadeIn.isPresent() || this.stay.isPresent() || this.fadeOut.isPresent()) {
-                this.packets.add(new SPacketTitle(this.fadeIn.orElse(20), this.stay.orElse(60), this.fadeOut.orElse(20)));
+                this.packets.add(new STitlePacket(this.fadeIn.orElse(20), this.stay.orElse(60), this.fadeOut.orElse(20)));
             }
             if (this.subtitle.isPresent()) {
-                this.packets.add(new SPacketTitle(SPacketTitle.Type.SUBTITLE, ((TextBridge) this.subtitle.get()).bridge$toComponent()));
+                this.packets.add(new STitlePacket(STitlePacket.Type.SUBTITLE, ((TextBridge) this.subtitle.get()).bridge$toComponent()));
             }
             if (this.actionBar.isPresent()) {
-                this.packets.add(new SPacketTitle(SPacketTitle.Type.ACTIONBAR, ((TextBridge) this.actionBar.get()).bridge$toComponent()));
+                this.packets.add(new STitlePacket(STitlePacket.Type.ACTIONBAR, ((TextBridge) this.actionBar.get()).bridge$toComponent()));
             }
             if (this.title.isPresent()) {
-                this.packets.add(new SPacketTitle(SPacketTitle.Type.TITLE, ((TextBridge) this.title.get()).bridge$toComponent()));
+                this.packets.add(new STitlePacket(STitlePacket.Type.TITLE, ((TextBridge) this.title.get()).bridge$toComponent()));
             }
         }
 

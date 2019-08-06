@@ -25,19 +25,19 @@
 package org.spongepowered.common.mixin.core.world.gen.feature;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.block.BlockHorizontal;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.HorizontalBlock;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.feature.WorldGenPumpkin;
+import net.minecraft.world.gen.feature.PumpkinFeature;
 import org.spongepowered.api.world.gen.populator.Pumpkin;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 
 import java.util.Random;
 
-@Mixin(WorldGenPumpkin.class)
+@Mixin(PumpkinFeature.class)
 public abstract class WorldGenPumpkinMixin extends WorldGeneratorMixin {
 
     /**
@@ -56,7 +56,7 @@ public abstract class WorldGenPumpkinMixin extends WorldGeneratorMixin {
             if (worldIn.isAirBlock(blockpos1) && worldIn.getBlockState(blockpos1.down()).getBlock() == Blocks.GRASS
                     && Blocks.PUMPKIN.canPlaceBlockAt(worldIn, blockpos1)) {
                 worldIn.setBlockState(blockpos1,
-                        Blocks.PUMPKIN.getDefaultState().withProperty(BlockHorizontal.FACING, EnumFacing.Plane.HORIZONTAL.random(rand)), 2);
+                        Blocks.PUMPKIN.getDefaultState().withProperty(HorizontalBlock.FACING, Direction.Plane.HORIZONTAL.random(rand)), 2);
             }
         }
 

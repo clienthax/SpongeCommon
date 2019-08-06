@@ -25,7 +25,7 @@
 package org.spongepowered.common.world.gen.populators;
 
 import com.flowpowered.math.vector.Vector3i;
-import net.minecraft.world.gen.NoiseGeneratorPerlin;
+import net.minecraft.world.gen.PerlinNoiseGenerator;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
@@ -36,7 +36,7 @@ import java.util.Random;
 
 public class SwampLilyPopulator implements GenerationPopulator {
 
-    private NoiseGeneratorPerlin noise = new NoiseGeneratorPerlin(new Random(2345L), 1);
+    private PerlinNoiseGenerator noise = new PerlinNoiseGenerator(new Random(2345L), 1);
 
     public SwampLilyPopulator() {
 

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.core.entity.item;
 
-import net.minecraft.entity.item.EntityItemFrame;
+import net.minecraft.entity.item.ItemFrameEntity;
 import net.minecraft.util.DamageSource;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.hanging.ItemFrame;
@@ -44,12 +44,12 @@ import java.util.ArrayList;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityItemFrame.class)
+@Mixin(ItemFrameEntity.class)
 public abstract class EntityItemFrameMixin extends EntityHangingMixin {
 
     @Shadow public abstract void setDisplayedItem(@Nullable net.minecraft.item.ItemStack p_82334_1_);
 
-    @Inject(method = "attackEntityFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/EntityItemFrame;dropItemOrSelf"
+    @Inject(method = "attackEntityFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/ItemFrameEntity;dropItemOrSelf"
       + "(Lnet/minecraft/entity/Entity;Z)V"), cancellable = true)
     private void onAttackEntityFrom(DamageSource source, float amount, CallbackInfoReturnable<Boolean> cir) {
         try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
@@ -75,7 +75,7 @@ public abstract class EntityItemFrameMixin extends EntityHangingMixin {
         method ="removeFrameFromMap",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/item/ItemStack;setItemFrame(Lnet/minecraft/entity/item/EntityItemFrame;)V",
+            target = "Lnet/minecraft/item/ItemStack;setItemFrame(Lnet/minecraft/entity/item/ItemFrameEntity;)V",
             shift = At.Shift.AFTER
         )
     )

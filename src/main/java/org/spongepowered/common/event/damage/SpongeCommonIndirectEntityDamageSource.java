@@ -25,7 +25,7 @@
 package org.spongepowered.common.event.damage;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.util.EntityDamageSourceIndirect;
+import net.minecraft.util.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.common.AbstractDamageSource;
 import org.spongepowered.common.mixin.core.util.EntityDamageSourceIndirectAccessor;
@@ -40,7 +40,7 @@ but it can certainly declare the methods as abstract.
 More notes are geared for abstraction of generating the builders, since those
 will require sending the builders into the ctors.
  */
-public abstract class SpongeCommonIndirectEntityDamageSource extends EntityDamageSourceIndirect implements IndirectEntityDamageSource {
+public abstract class SpongeCommonIndirectEntityDamageSource extends IndirectEntityDamageSource implements IndirectEntityDamageSource {
 
     public SpongeCommonIndirectEntityDamageSource() {
         super("SpongeEntityDamageSource", null, null);

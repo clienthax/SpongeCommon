@@ -25,10 +25,10 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockSlab;
+import net.minecraft.block.SlabBlock;
 import net.minecraft.block.BlockStoneSlab;
 import net.minecraft.block.BlockStoneSlabNew;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -52,7 +52,7 @@ public abstract class BlockStoneSlabMixin extends BlockMixin {
 
     @SuppressWarnings("RedundantTypeArguments") // some JDK's can fail to compile without the explicit type generics
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getSlabTypeFor(blockState), impl$getPortionTypeFor(blockState));
     }
 
@@ -62,7 +62,7 @@ public abstract class BlockStoneSlabMixin extends BlockMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableSlabData) {
             final SlabType type = ((ImmutableSlabData) manipulator).type().get();
             if (blockState.getBlock() instanceof BlockStoneSlab) {
@@ -79,7 +79,7 @@ public abstract class BlockStoneSlabMixin extends BlockMixin {
             return Optional.empty();
         } else if (manipulator instanceof ImmutablePortionData) {
             final PortionType portionType = ((ImmutablePortionData) manipulator).type().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockSlab.HALF, (BlockSlab.EnumBlockHalf) (Object) portionType));
+            return Optional.of((BlockState) blockState.withProperty(SlabBlock.HALF, (SlabBlock.EnumBlockHalf) (Object) portionType));
         }
         if (manipulator instanceof ImmutableSeamlessData) {
             final boolean seamless = ((ImmutableSeamlessData) manipulator).seamless().get();
@@ -94,7 +94,7 @@ public abstract class BlockStoneSlabMixin extends BlockMixin {
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.SLAB_TYPE)) {
             final SlabType type = (SlabType) value;
             if (blockState.getBlock() instanceof BlockStoneSlab) {
@@ -110,7 +110,7 @@ public abstract class BlockStoneSlabMixin extends BlockMixin {
             }
             return Optional.empty();
         } else if (key.equals(Keys.PORTION_TYPE)) {
-            return Optional.of((BlockState) blockState.withProperty(BlockSlab.HALF, (BlockSlab.EnumBlockHalf) value));
+            return Optional.of((BlockState) blockState.withProperty(SlabBlock.HALF, (SlabBlock.EnumBlockHalf) value));
         }
         if (key.equals(Keys.SEAMLESS)) {
             final boolean seamless = (Boolean) value;
@@ -125,7 +125,7 @@ public abstract class BlockStoneSlabMixin extends BlockMixin {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private ImmutableSlabData impl$getSlabTypeFor(final IBlockState blockState) {
+    private ImmutableSlabData impl$getSlabTypeFor(final BlockState blockState) {
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeSlabData.class,
                 blockState.getBlock() instanceof BlockStoneSlab
                         ? (SlabType) (Object) blockState.getValue(BlockStoneSlab.VARIANT)
@@ -134,7 +134,7 @@ public abstract class BlockStoneSlabMixin extends BlockMixin {
                                 : SlabTypes.COBBLESTONE);
     }
 
-    private ImmutablePortionData impl$getPortionTypeFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePortionData.class, blockState.getValue(BlockSlab.HALF));
+    private ImmutablePortionData impl$getPortionTypeFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePortionData.class, blockState.getValue(SlabBlock.HALF));
     }
 }

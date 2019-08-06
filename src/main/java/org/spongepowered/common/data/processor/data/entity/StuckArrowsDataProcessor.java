@@ -26,7 +26,7 @@ package org.spongepowered.common.data.processor.data.entity;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableStuckArrowsData;
@@ -43,10 +43,10 @@ import org.spongepowered.common.data.value.immutable.ImmutableSpongeBoundedValue
 import java.util.Optional;
 
 public class StuckArrowsDataProcessor extends
-        AbstractEntitySingleDataProcessor<EntityLivingBase, Integer, MutableBoundedValue<Integer>, StuckArrowsData, ImmutableStuckArrowsData> {
+        AbstractEntitySingleDataProcessor<LivingEntity, Integer, MutableBoundedValue<Integer>, StuckArrowsData, ImmutableStuckArrowsData> {
 
     public StuckArrowsDataProcessor() {
-        super(EntityLivingBase.class, Keys.STUCK_ARROWS);
+        super(LivingEntity.class, Keys.STUCK_ARROWS);
     }
 
     @Override
@@ -60,14 +60,14 @@ public class StuckArrowsDataProcessor extends
     }
 
     @Override
-    protected boolean set(EntityLivingBase entity, Integer arrows) {
+    protected boolean set(LivingEntity entity, Integer arrows) {
         checkArgument(arrows >= 0, "Stuck arrows must be greater than or equal to zero");
         entity.setArrowCountInEntity(arrows);
         return true;
     }
 
     @Override
-    protected Optional<Integer> getVal(EntityLivingBase entity) {
+    protected Optional<Integer> getVal(LivingEntity entity) {
         return Optional.of(entity.getArrowCountInEntity());
     }
 

@@ -25,7 +25,7 @@
 package org.spongepowered.common.mixin.core.potion;
 
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.registry.RegistryNamespacedDefaultedByKey;
+import net.minecraft.util.registry.DefaultedRegistry;
 import org.spongepowered.api.item.potion.PotionType;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -40,8 +40,8 @@ public abstract class PotionTypeMixin {
     @Redirect(method = "registerPotionType",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/util/registry/RegistryNamespacedDefaultedByKey;register(ILjava/lang/Object;Ljava/lang/Object;)V"))
-    private static void impl$registerForSponge(final RegistryNamespacedDefaultedByKey registry, final int id, final Object location,
+            target = "Lnet/minecraft/util/registry/DefaultedRegistry;register(ILjava/lang/Object;Ljava/lang/Object;)V"))
+    private static void impl$registerForSponge(final DefaultedRegistry registry, final int id, final Object location,
         final Object potion) {
         final ResourceLocation resource = (ResourceLocation) location;
         final net.minecraft.potion.PotionType mcPotion = (net.minecraft.potion.PotionType) potion;

@@ -37,24 +37,24 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.PropertyMap;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityCreature;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.CreatureEntity;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.IRangedAttackMob;
 import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.projectile.EntityTippedArrow;
-import net.minecraft.init.Enchantments;
-import net.minecraft.init.Items;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
+import net.minecraft.enchantment.Enchantments;
+import net.minecraft.item.Items;
+import net.minecraft.util.SoundEvents;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.SPacketDestroyEntities;
-import net.minecraft.network.play.server.SPacketPlayerListItem;
-import net.minecraft.network.play.server.SPacketSpawnPlayer;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.play.server.SDestroyEntitiesPacket;
+import net.minecraft.network.play.server.SPlayerListItemPacket;
+import net.minecraft.network.play.server.SSpawnPlayerPacket;
 import net.minecraft.scoreboard.Team;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.GameType;
@@ -86,7 +86,7 @@ import javax.annotation.Nullable;
  *
  * Hostile mobs don't attack the human, should this be default behaviour?
  */
-public class EntityHuman extends EntityCreature implements TeamMember, IRangedAttackMob {
+public class EntityHuman extends CreatureEntity implements TeamMember, IRangedAttackMob {
 
     // According to http://wiki.vg/Mojang_API#UUID_-.3E_Profile_.2B_Skin.2FCape
     // you can access this data once per minute, lets cache for 2 minutes
@@ -101,7 +101,7 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
             });
 
     // A queue of packets waiting to send to players tracking this human
-    private final Map<UUID, List<Packet<?>[]>> playerPacketMap = Maps.newHashMap();
+    private final Map<UUID, List<IPacket<?>[]>> playerPacketMap = Maps.newHashMap();
 
     private GameProfile fakeProfile;
     @Nullable private UUID skinUuid;
@@ -122,7 +122,7 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
 
     @Override
     protected void entityInit() {
-        // EntityLivingBase
+        // LivingEntity
         this.dataManager.register(HAND_STATES, Byte.valueOf((byte)0));
         this.dataManager.register(POTION_EFFECTS, Integer.valueOf(0));
         this.dataManager.register(HIDE_PARTICLES, Boolean.valueOf(false));
@@ -172,7 +172,7 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
     }
 
     @Override
-    public void readEntityFromNBT(final NBTTagCompound tagCompund) {
+    public void readEntityFromNBT(final CompoundNBT tagCompund) {
         super.readEntityFromNBT(tagCompund);
         final String skinUuidString = ((DataCompoundHolder) this).data$getSpongeCompound().getString("skinUuid");
         if (!skinUuidString.isEmpty()) {
@@ -181,9 +181,9 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
     }
 
     @Override
-    public void writeEntityToNBT(final NBTTagCompound tagCompound) {
+    public void writeEntityToNBT(final CompoundNBT tagCompound) {
         super.writeEntityToNBT(tagCompound);
-        final NBTTagCompound spongeData = ((DataCompoundHolder) this).data$getSpongeCompound();
+        final CompoundNBT spongeData = ((DataCompoundHolder) this).data$getSpongeCompound();
         if (this.skinUuid != null) {
             spongeData.setString("skinUuid", this.skinUuid.toString());
         } else {
@@ -294,12 +294,12 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
     @Override
     public boolean attackEntityAsMob(final Entity entityIn) {
         super.attackEntityAsMob(entityIn);
-        this.swingArm(EnumHand.MAIN_HAND);
+        this.swingArm(Hand.MAIN_HAND);
         float f = (float) this.getEntityAttribute(SharedMonsterAttributes.ATTACK_DAMAGE).getAttributeValue();
         int i = 0;
 
-        if (entityIn instanceof EntityLivingBase) {
-            f += EnchantmentHelper.getModifierForCreature(this.getHeldItem(EnumHand.MAIN_HAND), ((EntityLivingBase) entityIn).getCreatureAttribute());
+        if (entityIn instanceof LivingEntity) {
+            f += EnchantmentHelper.getModifierForCreature(this.getHeldItem(Hand.MAIN_HAND), ((LivingEntity) entityIn).getCreatureAttribute());
             i += EnchantmentHelper.getKnockbackModifier(this);
         }
 
@@ -341,7 +341,7 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
         return true;
     }
 
-    public void removeFromTabListDelayed(@Nullable final EntityPlayerMP player, final SPacketPlayerListItem removePacket) {
+    public void removeFromTabListDelayed(@Nullable final ServerPlayerEntity player, final SPlayerListItemPacket removePacket) {
         final int delay = SpongeImpl.getGlobalConfigAdapter().getConfig().getEntity().getHumanPlayerListRemoveDelay();
         final Runnable removeTask = () -> this.pushPackets(player, removePacket);
         if (delay == 0) {
@@ -394,9 +394,9 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
     }
 
     private void respawnOnClient() {
-        this.pushPackets(new SPacketDestroyEntities(this.getEntityId()), this.createPlayerListPacket(SPacketPlayerListItem.Action.ADD_PLAYER));
+        this.pushPackets(new SDestroyEntitiesPacket(this.getEntityId()), this.createPlayerListPacket(SPlayerListItemPacket.Action.ADD_PLAYER));
         this.pushPackets(this.createSpawnPacket());
-        removeFromTabListDelayed(null, this.createPlayerListPacket(SPacketPlayerListItem.Action.REMOVE_PLAYER));
+        removeFromTabListDelayed(null, this.createPlayerListPacket(SPlayerListItemPacket.Action.REMOVE_PLAYER));
     }
 
     /**
@@ -417,13 +417,13 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
      *
      * @param player The player that has stopped tracking this human
      */
-    public void onRemovedFrom(final EntityPlayerMP player) {
+    public void onRemovedFrom(final ServerPlayerEntity player) {
         this.playerPacketMap.remove(player.getUniqueID());
-        player.connection.sendPacket(this.createPlayerListPacket(SPacketPlayerListItem.Action.REMOVE_PLAYER));
+        player.connection.sendPacket(this.createPlayerListPacket(SPlayerListItemPacket.Action.REMOVE_PLAYER));
     }
 
     /**
-     * Creates a {@link SPacketSpawnPlayer} packet.
+     * Creates a {@link SSpawnPlayerPacket} packet.
      *
      * Copied directly from the constructor of the packet, because that can't be
      * used as we're not an EntityPlayer.
@@ -431,8 +431,8 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
      * @return A new spawn packet
      */
     @SuppressWarnings("ConstantConditions")
-    public SPacketSpawnPlayer createSpawnPacket() {
-        final SPacketSpawnPlayer packet = new SPacketSpawnPlayer();
+    public SSpawnPlayerPacket createSpawnPacket() {
+        final SSpawnPlayerPacket packet = new SSpawnPlayerPacket();
         final SPacketSpawnPlayerAccessor accessor = (SPacketSpawnPlayerAccessor) packet;
         accessor.accessor$setentityId(this.getEntityId());
         accessor.accessor$setuniqueId(this.fakeProfile.getId());
@@ -446,14 +446,14 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
     }
 
     /**
-     * Creates a {@link SPacketPlayerListItem} packet with the given action.
+     * Creates a {@link SPlayerListItemPacket} packet with the given action.
      *
      * @param action The action to apply on the tab list
      * @return A new tab list packet
      */
     @SuppressWarnings("ConstantConditions")
-    public SPacketPlayerListItem createPlayerListPacket(final SPacketPlayerListItem.Action action) {
-        final SPacketPlayerListItem packet = new SPacketPlayerListItem(action);
+    public SPlayerListItemPacket createPlayerListPacket(final SPlayerListItemPacket.Action action) {
+        final SPlayerListItemPacket packet = new SPlayerListItemPacket(action);
         ((SPacketPlayerListItemAccessor) packet).accessor$getPlayerDatas()
             .add(packet.new AddPlayerData(this.fakeProfile, 0, GameType.NOT_SET, this.getDisplayName()));
         return packet;
@@ -464,7 +464,7 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
      *
      * @param packets All packets to send in a single tick
      */
-    public void pushPackets(final Packet<?>... packets) {
+    public void pushPackets(final IPacket<?>... packets) {
         this.pushPackets(null, packets); // null = all players
     }
 
@@ -475,16 +475,16 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
      * @param player The player tracking this human
      * @param packets All packets to send in a single tick
      */
-    public void pushPackets(@Nullable final EntityPlayerMP player, final Packet<?>... packets) {
+    public void pushPackets(@Nullable final ServerPlayerEntity player, final IPacket<?>... packets) {
         if (player == null) {
-            List<Packet<?>[]> queue = this.playerPacketMap.get(null);
+            List<IPacket<?>[]> queue = this.playerPacketMap.get(null);
             if (queue == null) {
                 queue = new ArrayList<>();
                 this.playerPacketMap.put(null, queue);
             }
             queue.add(packets);
         } else {
-            List<Packet<?>[]> queue = this.playerPacketMap.get(player.getUniqueID());
+            List<IPacket<?>[]> queue = this.playerPacketMap.get(player.getUniqueID());
             if (queue == null) {
                 queue = new ArrayList<>();
                 this.playerPacketMap.put(player.getUniqueID(), queue);
@@ -499,16 +499,16 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
      * @param player The player to get packets for (or null for all players)
      * @return An array of packets to send in a single tick
      */
-    public Packet<?>[] popQueuedPackets(@Nullable final EntityPlayerMP player) {
-        final List<Packet<?>[]> queue = this.playerPacketMap.get(player == null ? null : player.getUniqueID());
+    public IPacket<?>[] popQueuedPackets(@Nullable final ServerPlayerEntity player) {
+        final List<IPacket<?>[]> queue = this.playerPacketMap.get(player == null ? null : player.getUniqueID());
         return queue == null || queue.isEmpty() ? null : queue.remove(0);
     }
 
     @Override
-    public void attackEntityWithRangedAttack(final EntityLivingBase target, final float distanceFactor) {
+    public void attackEntityWithRangedAttack(final LivingEntity target, final float distanceFactor) {
         // Borrowed from Skeleton
         // TODO Figure out how to API this out
-        final EntityTippedArrow entitytippedarrow = new EntityTippedArrow(this.world, this);
+        final ArrowEntity entitytippedarrow = new ArrowEntity(this.world, this);
         final double d0 = target.posX - this.posX;
         final double d1 = target.getEntityBoundingBox().minY + target.height / 3.0F - entitytippedarrow.posY;
         final double d2 = target.posZ - this.posZ;
@@ -527,7 +527,7 @@ public class EntityHuman extends EntityCreature implements TeamMember, IRangedAt
             entitytippedarrow.setKnockbackStrength(j);
         }
 
-        final ItemStack itemstack = this.getHeldItem(EnumHand.OFF_HAND);
+        final ItemStack itemstack = this.getHeldItem(Hand.OFF_HAND);
 
         if (itemstack.getItem() == Items.TIPPED_ARROW) {
             entitytippedarrow.setPotionEffect(itemstack);

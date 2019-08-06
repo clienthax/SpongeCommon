@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.datasync.entity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
+import net.minecraft.entity.MobEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.immutable.ImmutableValue;
@@ -38,7 +38,7 @@ import java.util.Optional;
 public class EntityLivingAIFlagsConverter extends DataParameterConverter<Byte> {
 
     public EntityLivingAIFlagsConverter() {
-        super(EntityLiving.AI_FLAGS);
+        super(MobEntity.AI_FLAGS);
     }
 
     @Override

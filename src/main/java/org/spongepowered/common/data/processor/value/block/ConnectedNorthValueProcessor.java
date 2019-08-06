@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.block;
 
-import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.tileentity.ChestTileEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -36,10 +36,10 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 import java.util.Optional;
 
 public class ConnectedNorthValueProcessor extends
-        AbstractSpongeValueProcessor<TileEntityChest, Boolean, Value<Boolean>> {
+        AbstractSpongeValueProcessor<ChestTileEntity, Boolean, Value<Boolean>> {
 
     public ConnectedNorthValueProcessor() {
-        super(TileEntityChest.class, Keys.CONNECTED_NORTH);
+        super(ChestTileEntity.class, Keys.CONNECTED_NORTH);
     }
 
     @Override
@@ -48,12 +48,12 @@ public class ConnectedNorthValueProcessor extends
     }
 
     @Override
-    protected boolean set(TileEntityChest container, Boolean value) {
+    protected boolean set(ChestTileEntity container, Boolean value) {
         return false;
     }
 
     @Override
-    protected Optional<Boolean> getVal(TileEntityChest container) {
+    protected Optional<Boolean> getVal(ChestTileEntity container) {
         container.checkForAdjacentChests();
         return Optional.of(container.adjacentChestZNeg != null);
     }

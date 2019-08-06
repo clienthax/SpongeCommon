@@ -33,11 +33,11 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -96,13 +96,13 @@ public class SpongeBlockSnapshot implements BlockSnapshot {
     private ImmutableList<ImmutableDataManipulator<?, ?>> blockData;
     private ImmutableMap<Key<?>, ImmutableValue<?>> blockKeyValueMap;
     private ImmutableSet<ImmutableValue<?>> blockValueSet;
-    @Nullable final NBTTagCompound compound;
+    @Nullable final CompoundNBT compound;
     @Nullable final UUID creatorUniqueId;
     @Nullable final UUID notifierUniqueId;
     // Internal use only
     private final BlockPos blockPos;
     private SpongeBlockChangeFlag changeFlag;
-    @Nullable private WeakReference<WorldServer> world;
+    @Nullable private WeakReference<ServerWorld> world;
     public BlockChange blockChange; // used for post event
 
     SpongeBlockSnapshot(final SpongeBlockSnapshotBuilder builder) {
@@ -174,7 +174,7 @@ public class SpongeBlockSnapshot implements BlockSnapshot {
             return false;
         }
 
-        final WorldServer world = (WorldServer) optionalWorld.get();
+        final ServerWorld world = (ServerWorld) optionalWorld.get();
         final WorldServerBridge mixinWorldServer = (WorldServerBridge) world;
         // We need to deterministically define the context as nullable if we don't need to enter.
         // this way we guarantee an exit.
@@ -184,8 +184,8 @@ public class SpongeBlockSnapshot implements BlockSnapshot {
             if (!((WorldAccessor) world).accessor$isValid(pos)) { // Invalid position. Inline this check
                 return false;
             }
-            final IBlockState current = world.getBlockState(pos);
-            final IBlockState replaced = (IBlockState) this.blockState;
+            final BlockState current = world.getBlockState(pos);
+            final BlockState replaced = (BlockState) this.blockState;
             if (!force && (current.getBlock() != replaced.getBlock() || current != replaced)) {
                 return false;
             }
@@ -265,9 +265,9 @@ public class SpongeBlockSnapshot implements BlockSnapshot {
         return Optional.empty();
     }
 
-    public Optional<WorldServer> getWorldServer() {
+    public Optional<ServerWorld> getWorldServer() {
         if (this.world == null) {
-            this.world = new WeakReference<>((WorldServer) SpongeImpl.getGame().getServer().getWorld(this.worldUniqueId).orElseThrow(() -> new IllegalStateException("WorldServer not found for UUID: " + this.worldUniqueId)));
+            this.world = new WeakReference<>((ServerWorld) SpongeImpl.getGame().getServer().getWorld(this.worldUniqueId).orElseThrow(() -> new IllegalStateException("ServerWorld not found for UUID: " + this.worldUniqueId)));
         }
         return Optional.ofNullable(this.world.get());
     }
@@ -508,8 +508,8 @@ public class SpongeBlockSnapshot implements BlockSnapshot {
         return this.values;
     }
 
-    public Optional<NBTTagCompound> getCompound() {
-        return this.compound == null ? Optional.<NBTTagCompound>empty() : Optional.of(this.compound.copy());
+    public Optional<CompoundNBT> getCompound() {
+        return this.compound == null ? Optional.<CompoundNBT>empty() : Optional.of(this.compound.copy());
     }
 
     public SpongeBlockSnapshotBuilder createBuilder() {

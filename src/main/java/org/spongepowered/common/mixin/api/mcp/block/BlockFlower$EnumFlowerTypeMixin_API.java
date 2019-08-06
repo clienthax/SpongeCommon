@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.block;
 
-import net.minecraft.block.BlockFlower;
+import net.minecraft.block.FlowerBlock;
 import org.spongepowered.api.data.type.PlantType;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.asm.mixin.Implements;
@@ -36,9 +36,9 @@ import org.spongepowered.common.text.translation.SpongeTranslation;
 
 import javax.annotation.Nullable;
 
-@Mixin(BlockFlower.EnumFlowerType.class)
+@Mixin(FlowerBlock.EnumFlowerType.class)
 @Implements(@Interface(iface = PlantType.class, prefix = "plant$"))
-public abstract class BlockFlower$EnumFlowerTypeMixin_API implements PlantType {
+public abstract class FlowerBlock$EnumFlowerTypeMixin_API implements PlantType {
 
     @Shadow public abstract String shadow$getName();
     @Shadow public abstract String shadow$getTranslationKey();
@@ -60,7 +60,7 @@ public abstract class BlockFlower$EnumFlowerTypeMixin_API implements PlantType {
     public Translation getTranslation() {
         // Maybe move this to a @Inject at the end of the constructor
         if (this.api$translation == null) {
-            if ((BlockFlower.EnumFlowerType) (Object) this == BlockFlower.EnumFlowerType.DANDELION) {
+            if ((FlowerBlock.EnumFlowerType) (Object) this == FlowerBlock.EnumFlowerType.DANDELION) {
                 this.api$translation = new SpongeTranslation("tile.flower1." + this.shadow$getTranslationKey() + ".name");
             } else {
                 this.api$translation = new SpongeTranslation("tile.flower2." + this.shadow$getTranslationKey() + ".name");

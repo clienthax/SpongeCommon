@@ -31,12 +31,12 @@ import com.flowpowered.math.vector.Vector3d;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.SPacketChunkData;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.SoundEvents;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.play.server.SChunkDataPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.PlayerChunkMap;
 import net.minecraft.server.management.PlayerChunkMapEntry;
@@ -46,12 +46,12 @@ import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.Explosion;
-import net.minecraft.world.MinecraftException;
+import net.minecraft.world.storage.SessionLockException;
 import net.minecraft.world.NextTickListEntry;
 import net.minecraft.world.Teleporter;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.gen.ChunkProviderServer;
+import net.minecraft.world.chunk.ServerChunkProvider;
 import org.apache.logging.log4j.Level;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -121,7 +121,7 @@ import java.util.UUID;
 
 import javax.annotation.Nullable;
 
-@Mixin(WorldServer.class)
+@Mixin(ServerWorld.class)
 public abstract class WorldServerMixin_API extends WorldMixin_API {
 
     @Shadow @Final private MinecraftServer server;
@@ -132,13 +132,13 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
 
     @Shadow @Nullable public abstract net.minecraft.entity.Entity getEntityFromUuid(UUID uuid);
     @Shadow public abstract PlayerChunkMap getPlayerChunkMap();
-    @Shadow public abstract ChunkProviderServer getChunkProvider();
+    @Shadow public abstract ServerChunkProvider getChunkProvider();
     @Shadow public abstract void updateBlockTick(BlockPos pos, Block blockIn, int delay, int priority);
     @Shadow protected abstract boolean isChunkLoaded(int x, int z, boolean allowEmpty);
 
     @Override
     public boolean isLoaded() {
-        return WorldManager.isKnownWorld((WorldServer) (Object) this);
+        return WorldManager.isKnownWorld((ServerWorld) (Object) this);
     }
 
     @Override
@@ -185,8 +185,8 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
 
         // TODO: Expose flush parameter in SpongeAPI?
         try {
-            WorldManager.saveWorld((WorldServer) (Object) this, true);
-        } catch (MinecraftException e) {
+            WorldManager.saveWorld((ServerWorld) (Object) this, true);
+        } catch (SessionLockException e) {
             throw new RuntimeException(e);
         }
         return true;
@@ -211,7 +211,7 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
     @SuppressWarnings("deprecation")
     @Override
     public Optional<org.spongepowered.api.world.Chunk> regenerateChunk(final int cx, final int cy, final int cz, final ChunkRegenerateFlag flag) {
-        final List<EntityPlayerMP> playerList = new ArrayList<>();
+        final List<ServerPlayerEntity> playerList = new ArrayList<>();
         final List<net.minecraft.entity.Entity> entityList = new ArrayList<>();
         org.spongepowered.api.world.Chunk spongeChunk;
         try (final PhaseContext<?> context = GenerationPhase.State.CHUNK_REGENERATING_LOAD_EXISTING.createPhaseContext()
@@ -236,8 +236,8 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
             // If we reached this point, an existing chunk was found so we need to regen
             for (final ClassInheritanceMultiMap<net.minecraft.entity.Entity> multiEntityList : chunk.getEntityLists()) {
                 for (final net.minecraft.entity.Entity entity : multiEntityList) {
-                    if (entity instanceof EntityPlayerMP) {
-                        playerList.add((EntityPlayerMP) entity);
+                    if (entity instanceof ServerPlayerEntity) {
+                        playerList.add((ServerPlayerEntity) entity);
                         entityList.add(entity);
                     } else if (keepEntities) {
                         entityList.add(entity);
@@ -249,17 +249,17 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
                 chunk.removeEntity(entity);
             }
 
-            final ChunkProviderServer chunkProviderServer = (ChunkProviderServer) chunk.getWorld().getChunkProvider();
+            final ServerChunkProvider chunkProviderServer = (ServerChunkProvider) chunk.getWorld().getChunkProvider();
             ((ChunkProviderServerBridge) chunkProviderServer).bridge$unloadChunkAndSave(chunk);
             // TODO - Move to accessor with Mixin 0.8
             final net.minecraft.world.chunk.Chunk newChunk = ((ChunkProviderServerBridge) chunkProviderServer).accessor$getChunkGenerator().generateChunk(cx, cz);
-            final PlayerChunkMapEntry playerChunk = ((WorldServer) chunk.getWorld()).getPlayerChunkMap().getEntry(cx, cz);
+            final PlayerChunkMapEntry playerChunk = ((ServerWorld) chunk.getWorld()).getPlayerChunkMap().getEntry(cx, cz);
             if (playerChunk != null) {
                 ((PlayerChunkMapEntryBridge) playerChunk).bridge$setChunk(newChunk);
             }
 
             if (newChunk != null) {
-                final WorldServer world = (WorldServer) newChunk.getWorld();
+                final ServerWorld world = (ServerWorld) newChunk.getWorld();
                 ((ChunkProviderServerBridge) world.getChunkProvider()).accessor$getLoadedChunks().put(ChunkPos.asLong(cx, cz), newChunk);
                 newChunk.onLoad();
                 ((ChunkBridge) newChunk).accessor$populate(((ChunkProviderServerBridge) world.getChunkProvider()).accessor$getChunkGenerator());
@@ -271,18 +271,18 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
                     return Optional.of((org.spongepowered.api.world.Chunk) newChunk);
                 }
 
-                final PlayerChunkMapEntry playerChunkMapEntry = ((WorldServer) newChunk.getWorld()).getPlayerChunkMap().getEntry(cx, cz);
+                final PlayerChunkMapEntry playerChunkMapEntry = ((ServerWorld) newChunk.getWorld()).getPlayerChunkMap().getEntry(cx, cz);
                 if (playerChunkMapEntry != null) {
-                    final List<EntityPlayerMP> chunkPlayers = ((PlayerChunkMapEntryBridge) playerChunkMapEntry).accessor$getPlayers();
+                    final List<ServerPlayerEntity> chunkPlayers = ((PlayerChunkMapEntryBridge) playerChunkMapEntry).accessor$getPlayers();
                     // We deliberately send two packets, to avoid sending a 'fullChunk' packet
                     // (a changedSectionFilter of 65535). fullChunk packets cause the client to
                     // completely overwrite its current chunk with a new chunk instance. This causes
                     // weird issues, such as making any entities in that chunk invisible (until they leave it
                     // for a new chunk)
                     // - Aaron1011
-                    for (final EntityPlayerMP playerMP: chunkPlayers) {
-                        playerMP.connection.sendPacket(new SPacketChunkData(newChunk, 65534));
-                        playerMP.connection.sendPacket(new SPacketChunkData(newChunk, 1));
+                    for (final ServerPlayerEntity playerMP: chunkPlayers) {
+                        playerMP.connection.sendPacket(new SChunkDataPacket(newChunk, 65534));
+                        playerMP.connection.sendPacket(new SChunkDataPacket(newChunk, 1));
                     }
                 }
             }
@@ -307,7 +307,7 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
             if (context != null) {
                 context.buildAndSwitch();
             }
-            return setBlockState(new BlockPos(x, y, z), (IBlockState) blockState, ((SpongeBlockChangeFlag) flag).getRawFlag());
+            return setBlockState(new BlockPos(x, y, z), (BlockState) blockState, ((SpongeBlockChangeFlag) flag).getRawFlag());
         }
     }
 
@@ -324,10 +324,10 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
         builder.worldId(this.getUniqueId())
             .position(new Vector3i(x, y, z));
         final Chunk chunk = this.getChunk(pos);
-        final IBlockState state = chunk.getBlockState(x, y, z);
+        final BlockState state = chunk.getBlockState(x, y, z);
         builder.blockState(state);
         try {
-            builder.extendedState((BlockState) state.getActualState((WorldServer) (Object) this, pos));
+            builder.extendedState((BlockState) state.getActualState((ServerWorld) (Object) this, pos));
         } catch (Throwable throwable) {
             // do nothing
         }
@@ -336,7 +336,7 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
             for (final DataManipulator<?, ?> manipulator : ((CustomDataHolderBridge) tile).bridge$getCustomManipulators()) {
                 builder.add(manipulator);
             }
-            final NBTTagCompound nbt = new NBTTagCompound();
+            final CompoundNBT nbt = new CompoundNBT();
             // Some mods like OpenComputers assert if attempting to save robot while moving
             try {
                 tile.writeToNBT(nbt);
@@ -446,7 +446,7 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
 
     @Override
     public WorldStorage getWorldStorage() {
-        return (WorldStorage) ((WorldServer) (Object) this).getChunkProvider();
+        return (WorldStorage) ((ServerWorld) (Object) this).getChunkProvider();
     }
 
     @Override
@@ -528,7 +528,7 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
         checkNotNull(position, "The position cannot be null");
         checkArgument(radius > 0, "The radius has to be greater then zero!");
 
-        final List<Packet<?>> packets = SpongeParticleHelper.toPackets((SpongeParticleEffect) particleEffect, position);
+        final List<IPacket<?>> packets = SpongeParticleHelper.toPackets((SpongeParticleEffect) particleEffect, position);
 
         if (!packets.isEmpty()) {
             final PlayerList playerList = this.server.getPlayerList();
@@ -537,7 +537,7 @@ public abstract class WorldServerMixin_API extends WorldMixin_API {
             final double y = position.getY();
             final double z = position.getZ();
 
-            for (final Packet<?> packet : packets) {
+            for (final IPacket<?> packet : packets) {
                 playerList.sendToAllNearExcept(null, x, y, z, radius, ((WorldServerBridge) this).bridge$getDimensionId(), packet);
             }
         }

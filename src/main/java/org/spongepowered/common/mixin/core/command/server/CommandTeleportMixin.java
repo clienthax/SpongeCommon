@@ -31,9 +31,9 @@ import net.minecraft.command.ICommandSender;
 import net.minecraft.command.WrongUsageException;
 import net.minecraft.command.server.CommandTeleport;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.play.server.SPacketPlayerPosLook;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.play.server.SPlayerPositionLookPacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -107,14 +107,14 @@ public abstract class CommandTeleportMixin extends CommandBase {
     @Overwrite
     private static void doTeleport(final Entity p_189862_0_, final CommandBase.CoordinateArg p_189862_1_, final CommandBase.CoordinateArg p_189862_2_, final CommandBase.CoordinateArg p_189862_3_, final CommandBase.CoordinateArg p_189862_4_, final CommandBase.CoordinateArg p_189862_5_)
     {
-        if (p_189862_0_ instanceof EntityPlayerMP)
+        if (p_189862_0_ instanceof ServerPlayerEntity)
         {
-            final Set<SPacketPlayerPosLook.EnumFlags> set = EnumSet.<SPacketPlayerPosLook.EnumFlags>noneOf(SPacketPlayerPosLook.EnumFlags.class);
+            final Set<SPlayerPositionLookPacket.EnumFlags> set = EnumSet.<SPlayerPositionLookPacket.EnumFlags>noneOf(SPlayerPositionLookPacket.EnumFlags.class);
             float f = (float)p_189862_4_.getAmount();
 
             if (p_189862_4_.isRelative())
             {
-                set.add(SPacketPlayerPosLook.EnumFlags.Y_ROT);
+                set.add(SPlayerPositionLookPacket.EnumFlags.Y_ROT);
             }
             else
             {
@@ -125,7 +125,7 @@ public abstract class CommandTeleportMixin extends CommandBase {
 
             if (p_189862_5_.isRelative())
             {
-                set.add(SPacketPlayerPosLook.EnumFlags.X_ROT);
+                set.add(SPlayerPositionLookPacket.EnumFlags.X_ROT);
             }
             else
             {
@@ -133,7 +133,7 @@ public abstract class CommandTeleportMixin extends CommandBase {
             }
 
             // Sponge start
-            final EntityPlayerMP player = (EntityPlayerMP) p_189862_0_;
+            final ServerPlayerEntity player = (ServerPlayerEntity) p_189862_0_;
             final double x = p_189862_1_.getAmount();
             final double y = p_189862_2_.getAmount();
             final double z = p_189862_3_.getAmount();
@@ -146,7 +146,7 @@ public abstract class CommandTeleportMixin extends CommandBase {
 
                 p_189862_0_.dismountRidingEntity();
                 final Vector3d position = event.getToTransform().getPosition();
-                ((EntityPlayerMP)p_189862_0_).connection.setPlayerLocation(position.getX(), position.getY(), position.getZ(), (float) event.getToTransform().getYaw(), (float) event.getToTransform().getPitch(), set);
+                ((ServerPlayerEntity)p_189862_0_).connection.setPlayerLocation(position.getX(), position.getY(), position.getZ(), (float) event.getToTransform().getYaw(), (float) event.getToTransform().getPitch(), set);
                 p_189862_0_.setRotationYawHead((float) event.getToTransform().getYaw());
             }
             // Sponge end
@@ -175,7 +175,7 @@ public abstract class CommandTeleportMixin extends CommandBase {
             // Sponge end
         }
 
-        if (!(p_189862_0_ instanceof EntityLivingBase) || !((EntityLivingBase)p_189862_0_).isElytraFlying())
+        if (!(p_189862_0_ instanceof LivingEntity) || !((LivingEntity)p_189862_0_).isElytraFlying())
         {
             p_189862_0_.motionY = 0.0D;
             p_189862_0_.onGround = true;

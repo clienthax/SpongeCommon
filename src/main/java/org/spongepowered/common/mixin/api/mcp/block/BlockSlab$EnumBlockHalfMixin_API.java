@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.block;
 
-import net.minecraft.block.BlockSlab;
+import net.minecraft.block.SlabBlock;
 import org.spongepowered.api.data.type.PortionType;
 import org.spongepowered.asm.mixin.Implements;
 import org.spongepowered.asm.mixin.Interface;
@@ -32,9 +32,9 @@ import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 
-@Mixin(BlockSlab.EnumBlockHalf.class)
+@Mixin(SlabBlock.EnumBlockHalf.class)
 @Implements(@Interface(iface = PortionType.class, prefix = "portion$"))
-public abstract class BlockSlab$EnumBlockHalfMixin_API {
+public abstract class SlabBlock$EnumBlockHalfMixin_API {
 
     @Shadow public abstract String shadow$getName();
 

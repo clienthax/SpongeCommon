@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.passive.EntityOcelot;
+import net.minecraft.entity.passive.OcelotEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableOcelotData;
@@ -45,10 +45,10 @@ import org.spongepowered.common.registry.type.entity.OcelotTypeRegistryModule;
 import java.util.Optional;
 
 public class OcelotDataProcessor extends
-        AbstractEntitySingleDataProcessor<EntityOcelot, OcelotType, Value<OcelotType>, OcelotData, ImmutableOcelotData> {
+        AbstractEntitySingleDataProcessor<OcelotEntity, OcelotType, Value<OcelotType>, OcelotData, ImmutableOcelotData> {
 
     public OcelotDataProcessor() {
-        super(EntityOcelot.class, Keys.OCELOT_TYPE);
+        super(OcelotEntity.class, Keys.OCELOT_TYPE);
     }
 
     @Override
@@ -57,7 +57,7 @@ public class OcelotDataProcessor extends
     }
 
     @Override
-    protected boolean set(EntityOcelot entity, OcelotType value) {
+    protected boolean set(OcelotEntity entity, OcelotType value) {
         if (value instanceof SpongeOcelotType) {
             entity.setTameSkin(((SpongeOcelotType) value).type);
             return true;
@@ -66,7 +66,7 @@ public class OcelotDataProcessor extends
     }
 
     @Override
-    protected Optional<OcelotType> getVal(EntityOcelot entity) {
+    protected Optional<OcelotType> getVal(OcelotEntity entity) {
         return Optional.ofNullable(OcelotTypeRegistryModule.OCELOT_IDMAP.get(entity.getTameSkin()));
     }
 

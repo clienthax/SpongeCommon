@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.ai;
 
-import net.minecraft.entity.ai.EntityAIAvoidEntity;
+import net.minecraft.entity.ai.goal.AvoidEntityGoal;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.ai.task.builtin.creature.AvoidEntityAITask;
 import org.spongepowered.api.entity.living.Creature;
@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import java.util.function.Predicate;
 
 @SuppressWarnings("rawtypes")
-@Mixin(EntityAIAvoidEntity.class)
+@Mixin(AvoidEntityGoal.class)
 public abstract class EntityAIAvoidEntityMixin_API extends EntityAIBaseMixin_API<Creature> implements AvoidEntityAITask {
 
     @Shadow @Final @Mutable private double farSpeed;

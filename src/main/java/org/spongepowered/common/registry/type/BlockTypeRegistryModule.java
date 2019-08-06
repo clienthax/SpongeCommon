@@ -33,8 +33,8 @@ import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
@@ -125,7 +125,7 @@ public class BlockTypeRegistryModule implements SpongeAdditionalCatalogRegistryM
 
     private void registerBlockTrait(String id, BlockType block) {
         Block nmsBlock = (Block) block;
-        for (IBlockState state : nmsBlock.getBlockState().getValidStates()) {
+        for (BlockState state : nmsBlock.getBlockState().getValidStates()) {
             BlockStateRegistryModule.getInstance().registerBlockState((BlockState) state);
         }
         for (Map.Entry<BlockTrait<?>, ?> mapEntry : block.getDefaultState().getTraitMap().entrySet()) {

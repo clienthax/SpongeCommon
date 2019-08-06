@@ -28,11 +28,11 @@ import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Sets;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.storage.IChunkLoader;
-import net.minecraft.world.gen.ChunkProviderServer;
-import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraft.world.chunk.storage.ChunkLoader;
+import net.minecraft.world.chunk.ServerChunkProvider;
+import net.minecraft.world.gen.ChunkGenerator;
 import org.spongepowered.common.world.gen.SpongeChunkGenerator;
 
 import java.util.Set;
@@ -41,19 +41,19 @@ import java.util.concurrent.CompletableFuture;
 import javax.annotation.Nullable;
 
 /**
- * Specific bridge for the {@link ChunkProviderServer}, with a direct
- * pairing to {@link WorldServer} as a hard requirement.
+ * Specific bridge for the {@link ServerChunkProvider}, with a direct
+ * pairing to {@link ServerWorld} as a hard requirement.
  */
 public interface ChunkProviderServerBridge {
 
     // TODO Mixin 0.8
     @Nullable
     @Deprecated
-    IChunkGenerator accessor$getChunkGenerator();
+    ChunkGenerator accessor$getChunkGenerator();
 
     // TODO Mixin 0.8
     @Deprecated
-    void accessor$setChunkGenerator(IChunkGenerator spongeGen);
+    void accessor$setChunkGenerator(ChunkGenerator spongeGen);
 
     // TODO Mixin 0.8
     @Deprecated

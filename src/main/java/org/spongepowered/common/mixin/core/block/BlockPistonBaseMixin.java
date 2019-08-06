@@ -25,9 +25,9 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockDirectional;
-import net.minecraft.block.BlockPistonBase;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.DirectionalBlock;
+import net.minecraft.block.PistonBlock;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -44,12 +44,12 @@ import org.spongepowered.common.data.util.DirectionResolver;
 
 import java.util.Optional;
 
-@Mixin(BlockPistonBase.class)
+@Mixin(PistonBlock.class)
 public abstract class BlockPistonBaseMixin extends BlockMixin {
 
     @SuppressWarnings("RedundantTypeArguments") // some java compilers will not calculate this generic correctly
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getIsExtendedFor(blockState), impl$getDirectionalData(blockState));
     }
 
@@ -59,35 +59,35 @@ public abstract class BlockPistonBaseMixin extends BlockMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableExtendedData) {
             return Optional.of((BlockState) blockState);
         }
         if (manipulator instanceof ImmutableDirectionalData) {
             final Direction dir = ((ImmutableDirectionalData) manipulator).direction().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockDirectional.FACING, DirectionResolver.getFor(dir)));
+            return Optional.of((BlockState) blockState.withProperty(DirectionalBlock.FACING, DirectionResolver.getFor(dir)));
         }
         return super.bridge$getStateWithData(blockState, manipulator);
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.EXTENDED)) {
             return Optional.of((BlockState) blockState);
         }
         if (key.equals(Keys.DIRECTION)) {
             final Direction dir = (Direction) value;
-            return Optional.of((BlockState) blockState.withProperty(BlockDirectional.FACING, DirectionResolver.getFor(dir)));
+            return Optional.of((BlockState) blockState.withProperty(DirectionalBlock.FACING, DirectionResolver.getFor(dir)));
         }
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
-    private ImmutableExtendedData impl$getIsExtendedFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeExtendedData.class, blockState.getValue(BlockPistonBase.EXTENDED));
+    private ImmutableExtendedData impl$getIsExtendedFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeExtendedData.class, blockState.getValue(PistonBlock.EXTENDED));
     }
 
-    private ImmutableDirectionalData impl$getDirectionalData(final IBlockState blockState) {
+    private ImmutableDirectionalData impl$getDirectionalData(final BlockState blockState) {
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeDirectionalData.class,
-                DirectionResolver.getFor(blockState.getValue(BlockDirectional.FACING)));
+                DirectionResolver.getFor(blockState.getValue(DirectionalBlock.FACING)));
     }
 }

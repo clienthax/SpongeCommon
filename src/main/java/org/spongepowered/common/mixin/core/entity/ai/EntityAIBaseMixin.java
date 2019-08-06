@@ -25,7 +25,7 @@
 package org.spongepowered.common.mixin.core.entity.ai;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import org.spongepowered.api.entity.ai.Goal;
 import org.spongepowered.api.entity.ai.task.AITaskType;
 import org.spongepowered.asm.mixin.Mixin;
@@ -39,7 +39,7 @@ import java.util.Optional;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityAIBase.class)
+@Mixin(Goal.class)
 public abstract class EntityAIBaseMixin implements EntityAIBasesBridge {
 
     private AITaskType impl$type;

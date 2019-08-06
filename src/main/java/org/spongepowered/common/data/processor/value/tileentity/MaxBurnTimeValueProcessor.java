@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.tileentity;
 
-import net.minecraft.tileentity.TileEntityFurnace;
+import net.minecraft.tileentity.FurnaceTileEntity;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -37,10 +37,10 @@ import org.spongepowered.common.data.value.SpongeValueFactory;
 
 import java.util.Optional;
 
-public class MaxBurnTimeValueProcessor extends AbstractSpongeValueProcessor<TileEntityFurnace, Integer, MutableBoundedValue<Integer>> {
+public class MaxBurnTimeValueProcessor extends AbstractSpongeValueProcessor<FurnaceTileEntity, Integer, MutableBoundedValue<Integer>> {
 
     public MaxBurnTimeValueProcessor() {
-        super(TileEntityFurnace.class, Keys.MAX_BURN_TIME);
+        super(FurnaceTileEntity.class, Keys.MAX_BURN_TIME);
     }
 
     @Override
@@ -53,19 +53,19 @@ public class MaxBurnTimeValueProcessor extends AbstractSpongeValueProcessor<Tile
     }
 
     @Override
-    protected boolean set(TileEntityFurnace container, Integer value) {
+    protected boolean set(FurnaceTileEntity container, Integer value) {
         if (!container.isBurning() && value > 0 || container.isBurning() && value == 0) {
             final World world = (World) container.getWorld();
             world.setBlockType(container.getPos().getX(), container.getPos().getY(),
                     container.getPos().getZ(), value > 0 ? BlockTypes.LIT_FURNACE : BlockTypes.FURNACE);
-            container = (TileEntityFurnace) container.getWorld().getTileEntity(container.getPos());
+            container = (FurnaceTileEntity) container.getWorld().getTileEntity(container.getPos());
         }
         container.setField(1, value);
         return true;
     }
 
     @Override
-    protected Optional<Integer> getVal(TileEntityFurnace container) {
+    protected Optional<Integer> getVal(FurnaceTileEntity container) {
         return Optional.of(container.getField(1));
     }
 

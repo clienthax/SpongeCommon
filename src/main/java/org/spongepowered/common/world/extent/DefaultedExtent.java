@@ -26,8 +26,8 @@ package org.spongepowered.common.world.extent;
 
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.collect.Maps;
-import net.minecraft.nbt.NBTTagDouble;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.DoubleNBT;
+import net.minecraft.nbt.ListNBT;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.tileentity.TileEntity;
 import org.spongepowered.api.block.tileentity.TileEntityArchetype;
@@ -200,15 +200,15 @@ public interface DefaultedExtent extends Extent {
         for (Entity hit : intersectingEntities) {
             net.minecraft.entity.Entity nms = (net.minecraft.entity.Entity) hit;
             SpongeEntityArchetype archetype = (SpongeEntityArchetype) hit.createArchetype();
-            NBTTagList tagList = archetype.getData().getTagList(Constants.Entity.ENTITY_POSITION, Constants.NBT.TAG_DOUBLE);
+            ListNBT tagList = archetype.getData().getTagList(Constants.Entity.ENTITY_POSITION, Constants.NBT.TAG_DOUBLE);
             if (tagList.isEmpty()) {
-                tagList.appendTag(new NBTTagDouble(nms.posX - ox));
-                tagList.appendTag(new NBTTagDouble(nms.posY - oy));
-                tagList.appendTag(new NBTTagDouble(nms.posZ - oz));
+                tagList.appendTag(new DoubleNBT(nms.posX - ox));
+                tagList.appendTag(new DoubleNBT(nms.posY - oy));
+                tagList.appendTag(new DoubleNBT(nms.posZ - oz));
             } else {
-                tagList.set(0, new NBTTagDouble(nms.posX - ox));
-                tagList.set(1, new NBTTagDouble(nms.posY - oy));
-                tagList.set(2, new NBTTagDouble(nms.posZ - oz));
+                tagList.set(0, new DoubleNBT(nms.posX - ox));
+                tagList.set(1, new DoubleNBT(nms.posY - oy));
+                tagList.set(2, new DoubleNBT(nms.posZ - oz));
             }
             entities.add(archetype);
         }

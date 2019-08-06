@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.entity;
 
-import net.minecraft.entity.item.EntityFallingBlock;
+import net.minecraft.entity.item.FallingBlockEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -36,10 +36,10 @@ import org.spongepowered.common.util.Constants;
 
 import java.util.Optional;
 
-public class FallTimeValueProcessor extends AbstractSpongeValueProcessor<EntityFallingBlock, Integer, Value<Integer>> {
+public class FallTimeValueProcessor extends AbstractSpongeValueProcessor<FallingBlockEntity, Integer, Value<Integer>> {
 
     public FallTimeValueProcessor() {
-        super(EntityFallingBlock.class, Keys.FALL_TIME);
+        super(FallingBlockEntity.class, Keys.FALL_TIME);
     }
 
     @Override
@@ -48,13 +48,13 @@ public class FallTimeValueProcessor extends AbstractSpongeValueProcessor<EntityF
     }
 
     @Override
-    protected boolean set(EntityFallingBlock container, Integer value) {
+    protected boolean set(FallingBlockEntity container, Integer value) {
         container.fallTime = value;
         return true;
     }
 
     @Override
-    protected Optional<Integer> getVal(EntityFallingBlock container) {
+    protected Optional<Integer> getVal(FallingBlockEntity container) {
         return Optional.of(container.fallTime);
     }
 

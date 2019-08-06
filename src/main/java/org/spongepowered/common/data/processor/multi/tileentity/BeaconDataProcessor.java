@@ -25,8 +25,8 @@
 package org.spongepowered.common.data.processor.multi.tileentity;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.potion.Potion;
-import net.minecraft.tileentity.TileEntityBeacon;
+import net.minecraft.potion.Effect;
+import net.minecraft.tileentity.BeaconTileEntity;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -43,22 +43,22 @@ import org.spongepowered.common.bridge.tileentity.TileEntityBeaconBridge;
 import java.util.Map;
 import java.util.Optional;
 
-public class BeaconDataProcessor extends AbstractTileEntityDataProcessor<TileEntityBeacon, BeaconData, ImmutableBeaconData> {
+public class BeaconDataProcessor extends AbstractTileEntityDataProcessor<BeaconTileEntity, BeaconData, ImmutableBeaconData> {
 
     public BeaconDataProcessor() {
-        super(TileEntityBeacon.class);
+        super(BeaconTileEntity.class);
     }
 
     @Override
-    protected boolean doesDataExist(TileEntityBeacon dataHolder) {
+    protected boolean doesDataExist(BeaconTileEntity dataHolder) {
         return true;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected boolean set(TileEntityBeacon dataHolder, Map<Key<?>, Object> keyValues) {
-        Potion primary = ((Optional<Potion>) keyValues.get(Keys.BEACON_PRIMARY_EFFECT)).orElse(null);
-        Potion secondary = ((Optional<Potion>) keyValues.get(Keys.BEACON_SECONDARY_EFFECT)).orElse(null);
+    protected boolean set(BeaconTileEntity dataHolder, Map<Key<?>, Object> keyValues) {
+        Effect primary = ((Optional<Effect>) keyValues.get(Keys.BEACON_PRIMARY_EFFECT)).orElse(null);
+        Effect secondary = ((Optional<Effect>) keyValues.get(Keys.BEACON_SECONDARY_EFFECT)).orElse(null);
 
         ((TileEntityBeaconBridge) dataHolder).bridge$forceSetPrimaryEffect(primary);
         ((TileEntityBeaconBridge) dataHolder).bridge$forceSetSecondaryEffect(secondary);
@@ -68,15 +68,15 @@ public class BeaconDataProcessor extends AbstractTileEntityDataProcessor<TileEnt
     }
 
     @Override
-    protected Map<Key<?>, ?> getValues(TileEntityBeacon dataHolder) {
+    protected Map<Key<?>, ?> getValues(BeaconTileEntity dataHolder) {
         ImmutableMap.Builder<Key<?>, Object> builder = ImmutableMap.builder();
         int primaryID = dataHolder.getField(1);
         int secondaryID = dataHolder.getField(2);
         if (primaryID > 0) {
-            builder.put(Keys.BEACON_PRIMARY_EFFECT, Optional.ofNullable(Potion.getPotionById(primaryID)));
+            builder.put(Keys.BEACON_PRIMARY_EFFECT, Optional.ofNullable(Effect.getPotionById(primaryID)));
         }
         if (secondaryID > 0 && dataHolder.getField(0) == 4) {
-            builder.put(Keys.BEACON_SECONDARY_EFFECT, Optional.ofNullable(Potion.getPotionById(secondaryID)));
+            builder.put(Keys.BEACON_SECONDARY_EFFECT, Optional.ofNullable(Effect.getPotionById(secondaryID)));
         }
         return builder.build();
     }

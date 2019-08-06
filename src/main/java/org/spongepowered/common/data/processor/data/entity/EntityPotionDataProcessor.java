@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.processor.data.entity;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.ImmutablePotionEffectData;
@@ -45,15 +45,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-public class EntityPotionDataProcessor extends AbstractSingleDataSingleTargetProcessor<EntityLivingBase, List<PotionEffect>, ListValue<PotionEffect>,
+public class EntityPotionDataProcessor extends AbstractSingleDataSingleTargetProcessor<LivingEntity, List<PotionEffect>, ListValue<PotionEffect>,
         PotionEffectData, ImmutablePotionEffectData> {
 
     public EntityPotionDataProcessor() {
-        super(Keys.POTION_EFFECTS, EntityLivingBase.class);
+        super(Keys.POTION_EFFECTS, LivingEntity.class);
     }
 
     @Override
-    protected boolean set(EntityLivingBase dataHolder, List<PotionEffect> value) {
+    protected boolean set(LivingEntity dataHolder, List<PotionEffect> value) {
         dataHolder.clearActivePotions();
         for (PotionEffect effect : value) {
             net.minecraft.potion.PotionEffect mcEffect = PotionUtil.copyToNative(effect);
@@ -63,7 +63,7 @@ public class EntityPotionDataProcessor extends AbstractSingleDataSingleTargetPro
     }
 
     @Override
-    protected Optional<List<PotionEffect>> getVal(EntityLivingBase dataHolder) {
+    protected Optional<List<PotionEffect>> getVal(LivingEntity dataHolder) {
         Collection<net.minecraft.potion.PotionEffect> effects = dataHolder.getActivePotionEffects();
         if (effects.isEmpty()) {
             return Optional.empty();
@@ -92,12 +92,12 @@ public class EntityPotionDataProcessor extends AbstractSingleDataSingleTargetPro
 
     @Override
     public DataTransactionResult removeFrom(ValueContainer<?> container) {
-        if (!(container instanceof EntityLivingBase)) {
+        if (!(container instanceof LivingEntity)) {
             return DataTransactionResult.failNoData();
         }
-        Optional<List<PotionEffect>> effects = getVal((EntityLivingBase) container);
+        Optional<List<PotionEffect>> effects = getVal((LivingEntity) container);
         if (effects.isPresent()) {
-            ((EntityLivingBase) container).clearActivePotions();
+            ((LivingEntity) container).clearActivePotions();
             return DataTransactionResult.successRemove(constructImmutableValue(effects.get()));
         }
         return DataTransactionResult.successNoData();

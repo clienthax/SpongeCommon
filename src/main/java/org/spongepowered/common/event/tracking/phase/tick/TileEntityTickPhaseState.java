@@ -27,9 +27,9 @@ package org.spongepowered.common.event.tracking.phase.tick;
 import com.google.common.collect.ListMultimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEventData;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.ExperienceOrbEntity;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockState;
@@ -113,7 +113,7 @@ class TileEntityTickPhaseState extends LocationBasedTickPhaseState<TileEntityTic
             context.getCapturedItemsSupplier()
                     .acceptAndClearIfNotEmpty(entities -> {
                         final ArrayList<Entity> capturedEntities = new ArrayList<>();
-                        for (EntityItem entity : entities) {
+                        for (ItemEntity entity : entities) {
                             capturedEntities.add((Entity) entity);
                         }
                         SpongeCommonEventFactory.callSpawnEntity(capturedEntities, context);
@@ -178,7 +178,7 @@ class TileEntityTickPhaseState extends LocationBasedTickPhaseState<TileEntityTic
             return EntityUtil.processEntitySpawn(entity, EntityUtil.ENTITY_CREATOR_FUNCTION.apply(context));
         }
         // Separate experience from other entities
-        if (entity instanceof EntityXPOrb) {
+        if (entity instanceof ExperienceOrbEntity) {
             try (CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
                 frame.pushCause(tickingTile.getLocatableBlock());
                 frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.EXPERIENCE);
@@ -211,7 +211,7 @@ class TileEntityTickPhaseState extends LocationBasedTickPhaseState<TileEntityTic
             return postEvent.getTransactions().stream().anyMatch(transaction -> {
                 final BlockState state = transaction.getOriginal().getState();
                 final BlockType type = state.getType();
-                final boolean hasTile = SpongeImplHooks.hasBlockTileEntity((Block) type, (IBlockState) state);
+                final boolean hasTile = SpongeImplHooks.hasBlockTileEntity((Block) type, (BlockState) state);
                 final BlockPos pos = context.getSource(net.minecraft.tileentity.TileEntity.class).get().getPos();
                 final BlockPos blockPos = ((SpongeBlockSnapshot) transaction.getOriginal()).getBlockPos();
                 if (pos.equals(blockPos) && !transaction.isValid()) {
@@ -221,7 +221,7 @@ class TileEntityTickPhaseState extends LocationBasedTickPhaseState<TileEntityTic
                     return transaction.getIntermediary().stream().anyMatch(inter -> {
                         final BlockState iterState = inter.getState();
                         final BlockType interType = state.getType();
-                        return SpongeImplHooks.hasBlockTileEntity((Block) interType, (IBlockState) iterState);
+                        return SpongeImplHooks.hasBlockTileEntity((Block) interType, (BlockState) iterState);
                     });
                 }
                 return hasTile;

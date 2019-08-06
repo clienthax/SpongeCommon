@@ -25,7 +25,7 @@
 package org.spongepowered.common.mixin.api.mcp.block.properties;
 
 import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyHelper;
+import net.minecraft.block.properties.AbstractProperty;
 import org.spongepowered.api.block.trait.BlockTrait;
 import org.spongepowered.api.util.Functional;
 import org.spongepowered.asm.mixin.Implements;
@@ -42,7 +42,7 @@ import java.util.function.Predicate;
 /**
  * This default implements the {@link BlockTrait} methods directly
  * into {@link IProperty} such that regardless of whether a mod extends
- * {@link PropertyHelper} or only implements {@link IProperty}, we can
+ * {@link AbstractProperty} or only implements {@link IProperty}, we can
  * still cast back and forth between the implementation interface and
  * API interface. Of course, this is Java 8 only functionality, but
  * still, as with all other Mixin classes, this mixin class cannot be

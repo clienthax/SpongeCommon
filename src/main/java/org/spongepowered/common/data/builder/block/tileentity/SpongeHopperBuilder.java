@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.builder.block.tileentity;
 
-import net.minecraft.tileentity.TileEntityHopper;
+import net.minecraft.tileentity.HopperTileEntity;
 import org.spongepowered.api.block.tileentity.carrier.Hopper;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Keys;
@@ -44,14 +44,14 @@ public class SpongeHopperBuilder extends SpongeLockableBuilder<Hopper> {
     protected Optional<Hopper> buildContent(final DataView container) throws InvalidDataException {
         return super.buildContent(container).flatMap(hopper -> {
             if (container.contains(Constants.TileEntity.CUSTOM_NAME)) {
-                ((TileEntityHopper) hopper).setCustomName(container.getString(Constants.TileEntity.CUSTOM_NAME).get());
+                ((HopperTileEntity) hopper).setCustomName(container.getString(Constants.TileEntity.CUSTOM_NAME).get());
             }
             if (!container.contains(Keys.COOLDOWN.getQuery())) {
-                ((TileEntityHopper) hopper).invalidate();
+                ((HopperTileEntity) hopper).invalidate();
                 return Optional.empty();
             }
             ((TileEntityHopperAccessor) hopper).accessor$setTransferCooldown(container.getInt(Keys.COOLDOWN.getQuery()).get());
-            ((TileEntityHopper) hopper).validate();
+            ((HopperTileEntity) hopper).validate();
             return Optional.of(hopper);
         });
     }

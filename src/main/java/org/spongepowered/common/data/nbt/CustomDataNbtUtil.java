@@ -25,8 +25,8 @@
 package org.spongepowered.common.data.nbt;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -51,31 +51,31 @@ import javax.annotation.Nullable;
 
 public class CustomDataNbtUtil {
 
-    public static DataTransactionResult apply(final NBTTagCompound compound, final DataManipulator<?, ?> manipulator) {
+    public static DataTransactionResult apply(final CompoundNBT compound, final DataManipulator<?, ?> manipulator) {
         if (!compound.hasKey(Constants.Forge.FORGE_DATA, Constants.NBT.TAG_COMPOUND)) {
-            compound.setTag(Constants.Forge.FORGE_DATA, new NBTTagCompound());
+            compound.setTag(Constants.Forge.FORGE_DATA, new CompoundNBT());
         }
-        final NBTTagCompound forgeCompound = compound.getCompoundTag(Constants.Forge.FORGE_DATA);
+        final CompoundNBT forgeCompound = compound.getCompoundTag(Constants.Forge.FORGE_DATA);
         if (!forgeCompound.hasKey(Constants.Sponge.SPONGE_DATA, Constants.NBT.TAG_COMPOUND)) {
-            forgeCompound.setTag(Constants.Sponge.SPONGE_DATA, new NBTTagCompound());
+            forgeCompound.setTag(Constants.Sponge.SPONGE_DATA, new CompoundNBT());
         }
-        final NBTTagCompound spongeTag = forgeCompound.getCompoundTag(Constants.Sponge.SPONGE_DATA);
+        final CompoundNBT spongeTag = forgeCompound.getCompoundTag(Constants.Sponge.SPONGE_DATA);
 
         final boolean isReplacing;
         // Validate that the custom manipulator isn't already existing in the compound
-        final NBTTagList list;
+        final ListNBT list;
         if (spongeTag.hasKey(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_LIST)) {
             list = spongeTag.getTagList(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_COMPOUND);
             for (int i = 0; i < list.tagCount(); i++) {
-                final NBTTagCompound dataCompound = list.getCompoundTagAt(i);
+                final CompoundNBT dataCompound = list.getCompoundTagAt(i);
                 final String clazzName = dataCompound.getString(Constants.Sponge.CUSTOM_DATA_CLASS);
                 if (manipulator.getClass().getName().equals(clazzName)) {
-                    final NBTTagCompound current = dataCompound.getCompoundTag(Constants.Sponge.CUSTOM_DATA);
+                    final CompoundNBT current = dataCompound.getCompoundTag(Constants.Sponge.CUSTOM_DATA);
                     final DataContainer currentView = NbtTranslator.getInstance().translate(current);
                     final DataManipulator<?, ?> existing = deserialize(clazzName, currentView);
                     isReplacing = existing != null;
                     final DataContainer container = manipulator.toContainer();
-                    final NBTTagCompound newCompound = NbtTranslator.getInstance().translateData(container);
+                    final CompoundNBT newCompound = NbtTranslator.getInstance().translateData(container);
                     dataCompound.setTag(Constants.Sponge.CUSTOM_DATA_CLASS, newCompound);
                     if (isReplacing) {
                         return DataTransactionResult.successReplaceResult(manipulator.getValues(), existing.getValues());
@@ -84,14 +84,14 @@ public class CustomDataNbtUtil {
                 }
             }
         } else {
-            list = new NBTTagList();
+            list = new ListNBT();
             spongeTag.setTag(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, list);
         }
         // We are now adding to the list, not replacing
-        final NBTTagCompound newCompound = new NBTTagCompound();
+        final CompoundNBT newCompound = new CompoundNBT();
         newCompound.setString(Constants.Sponge.CUSTOM_DATA_CLASS, manipulator.getClass().getName());
         final DataContainer dataContainer = manipulator.toContainer();
-        final NBTTagCompound dataCompound = NbtTranslator.getInstance().translateData(dataContainer);
+        final CompoundNBT dataCompound = NbtTranslator.getInstance().translateData(dataContainer);
         newCompound.setTag(Constants.Sponge.CUSTOM_DATA, dataCompound);
         list.appendTag(newCompound);
         return DataTransactionResult.builder().result(DataTransactionResult.Type.SUCCESS).success(manipulator.getValues()).build();
@@ -139,28 +139,28 @@ public class CustomDataNbtUtil {
         return DataTransactionResult.builder().result(DataTransactionResult.Type.SUCCESS).success(manipulator.getValues()).build();
     }
 
-    public static DataTransactionResult remove(final NBTTagCompound data, final Class<? extends DataManipulator<?, ?>> containerClass) {
+    public static DataTransactionResult remove(final CompoundNBT data, final Class<? extends DataManipulator<?, ?>> containerClass) {
         if (!data.hasKey(Constants.Forge.FORGE_DATA, Constants.NBT.TAG_COMPOUND)) {
             return DataTransactionResult.successNoData();
         }
-        final NBTTagCompound forgeTag = data.getCompoundTag(Constants.Forge.FORGE_DATA);
+        final CompoundNBT forgeTag = data.getCompoundTag(Constants.Forge.FORGE_DATA);
         if (!forgeTag.hasKey(Constants.Sponge.SPONGE_DATA, Constants.NBT.TAG_COMPOUND)) {
             return DataTransactionResult.successNoData();
         }
-        final NBTTagCompound spongeData = forgeTag.getCompoundTag(Constants.Sponge.SPONGE_DATA);
+        final CompoundNBT spongeData = forgeTag.getCompoundTag(Constants.Sponge.SPONGE_DATA);
         if (!spongeData.hasKey(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_LIST)) {
             return DataTransactionResult.successNoData();
         }
-        final NBTTagList dataList = spongeData.getTagList(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_COMPOUND);
+        final ListNBT dataList = spongeData.getTagList(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_COMPOUND);
         if (dataList.tagCount() == 0) {
             return DataTransactionResult.successNoData();
         }
         final boolean isRemoving;
         for (int i = 0; i < dataList.tagCount(); i++) {
-            final NBTTagCompound dataCompound = dataList.getCompoundTagAt(i);
+            final CompoundNBT dataCompound = dataList.getCompoundTagAt(i);
             final String dataClass = dataCompound.getString(Constants.Sponge.CUSTOM_DATA_CLASS);
             if (containerClass.getName().equals(dataClass)) {
-                final NBTTagCompound current = dataCompound.getCompoundTag(Constants.Sponge.CUSTOM_DATA);
+                final CompoundNBT current = dataCompound.getCompoundTag(Constants.Sponge.CUSTOM_DATA);
                 final DataContainer currentView = NbtTranslator.getInstance().translate(current);
                 final DataManipulator<?, ?> existing = deserialize(dataClass, currentView);
                 isRemoving = existing != null;
@@ -193,10 +193,10 @@ public class CustomDataNbtUtil {
     }
 
     @SuppressWarnings("unchecked")
-    public static void readCustomData(final NBTTagCompound compound, final DataHolder dataHolder) {
+    public static void readCustomData(final CompoundNBT compound, final DataHolder dataHolder) {
         if (dataHolder instanceof CustomDataHolderBridge) {
             if (compound.hasKey(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_LIST)) {
-                final NBTTagList list = compound.getTagList(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_COMPOUND);
+                final ListNBT list = compound.getTagList(Constants.Sponge.CUSTOM_MANIPULATOR_TAG_LIST, Constants.NBT.TAG_COMPOUND);
                 final ImmutableList.Builder<DataView> builder = ImmutableList.builder();
                 translateTagListToView(builder, list);
                 try {
@@ -213,7 +213,7 @@ public class CustomDataNbtUtil {
                 }
             }
             if (compound.hasKey(Constants.Sponge.FAILED_CUSTOM_DATA, Constants.NBT.TAG_LIST)) {
-                final NBTTagList list = compound.getTagList(Constants.Sponge.FAILED_CUSTOM_DATA, Constants.NBT.TAG_COMPOUND);
+                final ListNBT list = compound.getTagList(Constants.Sponge.FAILED_CUSTOM_DATA, Constants.NBT.TAG_COMPOUND);
                 final ImmutableList.Builder<DataView> builder = ImmutableList.builder();
                 translateTagListToView(builder, list);
                 // We want to attempt to refresh the failed data if it does succeed in getting read.
@@ -240,22 +240,22 @@ public class CustomDataNbtUtil {
         }
     }
 
-    private static void translateTagListToView(final ImmutableList.Builder<? super DataView> builder, final NBTTagList list) {
+    private static void translateTagListToView(final ImmutableList.Builder<? super DataView> builder, final ListNBT list) {
         if (!list.isEmpty()) {
             for (int i = 0; i < list.tagCount(); i++) {
-                final NBTTagCompound internal = list.getCompoundTagAt(i);
+                final CompoundNBT internal = list.getCompoundTagAt(i);
                 builder.add(NbtTranslator.getInstance().translateFrom(internal));
             }
 
         }
     }
 
-    public static void writeCustomData(final NBTTagCompound compound, final DataHolder dataHolder) {
+    public static void writeCustomData(final CompoundNBT compound, final DataHolder dataHolder) {
         if (dataHolder instanceof CustomDataHolderBridge) {
             final Collection<DataManipulator<?, ?>> manipulators = ((CustomDataHolderBridge) dataHolder).bridge$getCustomManipulators();
             if (!manipulators.isEmpty()) {
                 final List<DataView> manipulatorViews = DataUtil.getSerializedManipulatorList(manipulators);
-                final NBTTagList manipulatorTagList = new NBTTagList();
+                final ListNBT manipulatorTagList = new ListNBT();
                 for (final DataView dataView : manipulatorViews) {
                     manipulatorTagList.appendTag(NbtTranslator.getInstance().translateData(dataView));
                 }
@@ -263,7 +263,7 @@ public class CustomDataNbtUtil {
             }
             final List<DataView> failedData = ((CustomDataHolderBridge) dataHolder).bridge$getFailedData();
             if (!failedData.isEmpty()) {
-                final NBTTagList failedList = new NBTTagList();
+                final ListNBT failedList = new ListNBT();
                 for (final DataView failedDatum : failedData) {
                     failedList.appendTag(NbtTranslator.getInstance().translateData(failedDatum));
                 }

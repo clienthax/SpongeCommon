@@ -25,9 +25,9 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockTrapDoor;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.block.TrapDoorBlock;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -48,11 +48,11 @@ import org.spongepowered.common.data.util.DirectionResolver;
 
 import java.util.Optional;
 
-@Mixin(BlockTrapDoor.class)
+@Mixin(TrapDoorBlock.class)
 public abstract class BlockTrapDoorMixin extends BlockMixin {
 
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>builder()
             .add(impl$getPortionTypeFor(blockState))
             .add(impl$getIsOpenFor(blockState))
@@ -68,58 +68,58 @@ public abstract class BlockTrapDoorMixin extends BlockMixin {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutablePortionData) {
             final PortionType portionType = ((ImmutablePortionData) manipulator).type().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockTrapDoor.HALF, impl$convertType((BlockSlab.EnumBlockHalf) (Object) portionType)));
+            return Optional.of((BlockState) blockState.withProperty(TrapDoorBlock.HALF, impl$convertType((SlabBlock.EnumBlockHalf) (Object) portionType)));
         }
         if (manipulator instanceof ImmutableOpenData) {
             final boolean isOpen = ((ImmutableOpenData) manipulator).open().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockTrapDoor.OPEN, isOpen));
+            return Optional.of((BlockState) blockState.withProperty(TrapDoorBlock.OPEN, isOpen));
         }
         if (manipulator instanceof ImmutableDirectionalData) {
             final Direction dir = DirectionChecker.checkDirectionToHorizontal(((ImmutableDirectionalData) manipulator).direction().get());
-            return Optional.of((BlockState) blockState.withProperty(BlockTrapDoor.FACING, DirectionResolver.getFor(dir)));
+            return Optional.of((BlockState) blockState.withProperty(TrapDoorBlock.FACING, DirectionResolver.getFor(dir)));
         }
         return super.bridge$getStateWithData(blockState, manipulator);
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.PORTION_TYPE)) {
-            return Optional.of((BlockState) blockState.withProperty(BlockTrapDoor.HALF, impl$convertType((BlockSlab.EnumBlockHalf) value)));
+            return Optional.of((BlockState) blockState.withProperty(TrapDoorBlock.HALF, impl$convertType((SlabBlock.EnumBlockHalf) value)));
         }
         if (key.equals(Keys.OPEN)) {
             final boolean isOpen = (Boolean) value;
-            return Optional.of((BlockState) blockState.withProperty(BlockTrapDoor.OPEN, isOpen));
+            return Optional.of((BlockState) blockState.withProperty(TrapDoorBlock.OPEN, isOpen));
         }
         if (key.equals(Keys.DIRECTION)) {
             final Direction dir = DirectionChecker.checkDirectionToHorizontal((Direction) value);
-            return Optional.of((BlockState) blockState.withProperty(BlockTrapDoor.FACING, DirectionResolver.getFor(dir)));
+            return Optional.of((BlockState) blockState.withProperty(TrapDoorBlock.FACING, DirectionResolver.getFor(dir)));
         }
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
-    private ImmutablePortionData impl$getPortionTypeFor(final IBlockState blockState) {
+    private ImmutablePortionData impl$getPortionTypeFor(final BlockState blockState) {
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePortionData.class,
-                impl$convertType(blockState.getValue(BlockTrapDoor.HALF)));
+                impl$convertType(blockState.getValue(TrapDoorBlock.HALF)));
     }
 
-    private ImmutableOpenData impl$getIsOpenFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeOpenData.class, blockState.getValue(BlockTrapDoor.OPEN));
+    private ImmutableOpenData impl$getIsOpenFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeOpenData.class, blockState.getValue(TrapDoorBlock.OPEN));
     }
 
-    private ImmutableDirectionalData impl$getDirectionalData(final IBlockState blockState) {
+    private ImmutableDirectionalData impl$getDirectionalData(final BlockState blockState) {
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeDirectionalData.class,
-                DirectionResolver.getFor(blockState.getValue(BlockTrapDoor.FACING)));
+                DirectionResolver.getFor(blockState.getValue(TrapDoorBlock.FACING)));
     }
 
     @SuppressWarnings("ConstantConditions")
-    private PortionType impl$convertType(final BlockTrapDoor.DoorHalf type) {
-        return (PortionType) (Object) BlockSlab.EnumBlockHalf.valueOf(type.getName().toUpperCase());
+    private PortionType impl$convertType(final TrapDoorBlock.DoorHalf type) {
+        return (PortionType) (Object) SlabBlock.EnumBlockHalf.valueOf(type.getName().toUpperCase());
     }
 
-    private BlockTrapDoor.DoorHalf impl$convertType(final BlockSlab.EnumBlockHalf type) {
-        return BlockTrapDoor.DoorHalf.valueOf(type.getName().toUpperCase());
+    private TrapDoorBlock.DoorHalf impl$convertType(final SlabBlock.EnumBlockHalf type) {
+        return TrapDoorBlock.DoorHalf.valueOf(type.getName().toUpperCase());
     }
 }

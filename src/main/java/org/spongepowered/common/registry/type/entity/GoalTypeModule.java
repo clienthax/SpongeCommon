@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
-import net.minecraft.entity.ai.EntityAITasks;
+import net.minecraft.entity.ai.goal.GoalSelector;
 import org.spongepowered.api.entity.ai.Goal;
 import org.spongepowered.api.entity.ai.GoalType;
 import org.spongepowered.api.entity.ai.GoalTypes;
@@ -84,7 +84,7 @@ public class GoalTypeModule implements AlternateCatalogRegistryModule<GoalType> 
 
     private GoalType createGoalType(String combinedId, String name) {
         @SuppressWarnings("unchecked")
-        final SpongeGoalType newType = new SpongeGoalType(combinedId, name, (Class<Goal<?>>) (Class<?>) EntityAITasks.class);
+        final SpongeGoalType newType = new SpongeGoalType(combinedId, name, (Class<Goal<?>>) (Class<?>) GoalSelector.class);
         this.goalTypes.put(combinedId, newType);
         return newType;
     }

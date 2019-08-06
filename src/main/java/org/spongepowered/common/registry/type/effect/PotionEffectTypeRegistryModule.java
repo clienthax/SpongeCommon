@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.potion.Potion;
+import net.minecraft.potion.Effect;
 import org.spongepowered.api.effect.potion.PotionEffectType;
 import org.spongepowered.api.effect.potion.PotionEffectTypes;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
@@ -98,23 +98,23 @@ public final class PotionEffectTypeRegistryModule implements SpongeAdditionalCat
 
     @Override
     public void registerDefaults() {
-        for (Potion potion : Potion.REGISTRY) {
+        for (Effect potion : Effect.REGISTRY) {
             if (potion != null) {
                 PotionEffectType potionEffectType = (PotionEffectType) potion;
                 this.potionList.add(potionEffectType);
-                this.potionEffectTypeMap.put(Potion.REGISTRY.getNameForObject(potion).toString(), potionEffectType);
+                this.potionEffectTypeMap.put(Effect.REGISTRY.getNameForObject(potion).toString(), potionEffectType);
             }
         }
     }
 
     @AdditionalRegistration
     public void additionalRegistration() { // I'm guessing that this should work very well.
-        for (Potion potion : Potion.REGISTRY) {
+        for (Effect potion : Effect.REGISTRY) {
             if (potion != null) {
                 PotionEffectType potionEffectType = (PotionEffectType) potion;
                 if (!this.potionList.contains(potionEffectType)) {
                     this.potionList.add(potionEffectType);
-                    this.potionEffectTypeMap.put(Potion.REGISTRY.getNameForObject(potion).toString(), potionEffectType);
+                    this.potionEffectTypeMap.put(Effect.REGISTRY.getNameForObject(potion).toString(), potionEffectType);
                 }
             }
         }

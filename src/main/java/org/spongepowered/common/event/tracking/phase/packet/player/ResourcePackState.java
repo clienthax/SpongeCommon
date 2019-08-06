@@ -24,9 +24,9 @@
  */
 package org.spongepowered.common.event.tracking.phase.packet.player;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.play.client.CPacketResourcePackStatus;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.play.ServerPlayNetHandler;
+import net.minecraft.network.play.client.CResourcePackStatusPacket;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.SpongeEventFactory;
@@ -42,9 +42,9 @@ public final class ResourcePackState extends BasicPacketState {
 
     @Override
     public void unwind(BasicPacketContext phaseContext) {
-        final EntityPlayerMP player = phaseContext.getPacketPlayer();
+        final ServerPlayerEntity player = phaseContext.getPacketPlayer();
 
-        final NetHandlerPlayServer connection = player.connection;
+        final ServerPlayNetHandler connection = player.connection;
         final NetHandlerPlayServerBridge mixinHandler = (NetHandlerPlayServerBridge) connection;
         final CPacketResourcePackStatusAccessor resource = phaseContext.getPacket();
         final ResourcePackStatusEvent.ResourcePackStatus status;

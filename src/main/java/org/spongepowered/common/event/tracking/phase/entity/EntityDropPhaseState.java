@@ -24,9 +24,9 @@
  */
 package org.spongepowered.common.event.tracking.phase.entity;
 
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.world.WorldServer;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.ServerWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.CauseStackManager;
@@ -78,8 +78,8 @@ public class EntityDropPhaseState extends EntityPhaseState<BasicEntityContext> {
             context.getSource(Entity.class)
                 .orElseThrow(TrackingUtil.throwWithContext("Dying entity not found!", context));
 
-        final boolean isPlayer = dyingEntity instanceof EntityPlayer;
-        final EntityPlayer entityPlayer = isPlayer ? (EntityPlayer) dyingEntity : null;
+        final boolean isPlayer = dyingEntity instanceof PlayerEntity;
+        final PlayerEntity entityPlayer = isPlayer ? (PlayerEntity) dyingEntity : null;
         context.getCapturedEntitySupplier()
             .acceptAndClearIfNotEmpty(entities -> this.standardSpawnCapturedEntities(context, entities));
 
@@ -93,7 +93,7 @@ public class EntityDropPhaseState extends EntityPhaseState<BasicEntityContext> {
         }
         context.getPerEntityItemEntityDropSupplier().acceptAndRemoveIfPresent(dyingEntity.getUniqueId(), items -> {
             final ArrayList<Entity> entities = new ArrayList<>();
-            for (EntityItem item : items) {
+            for (ItemEntity item : items) {
                 entities.add((Entity) item);
             }
 
@@ -113,7 +113,7 @@ public class EntityDropPhaseState extends EntityPhaseState<BasicEntityContext> {
         processPerItemDrop(context, dyingEntity, isPlayer, entityPlayer);
     }
 
-    static void processPerItemDrop(EntityContext<?> context, Entity dyingEntity, boolean isPlayer, EntityPlayer entityPlayer) {
+    static void processPerItemDrop(EntityContext<?> context, Entity dyingEntity, boolean isPlayer, PlayerEntity entityPlayer) {
         context.getPerEntityItemDropSupplier().acceptAndRemoveIfPresent(dyingEntity.getUniqueId(), itemStacks -> {
             final List<ItemDropData> items = new ArrayList<>();
             items.addAll(itemStacks);
@@ -121,7 +121,7 @@ public class EntityDropPhaseState extends EntityPhaseState<BasicEntityContext> {
             if (!items.isEmpty()) {
                 final net.minecraft.entity.Entity minecraftEntity = (net.minecraft.entity.Entity) dyingEntity;
                 final List<Entity> itemEntities = items.stream()
-                    .map(data -> data.create((WorldServer) minecraftEntity.world))
+                    .map(data -> data.create((ServerWorld) minecraftEntity.world))
                     .map(entity -> (Entity) entity)
                     .collect(Collectors.toList());
 

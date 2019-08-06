@@ -25,7 +25,7 @@
 package org.spongepowered.common.event.tracking.phase.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.CauseStackManager;
@@ -74,7 +74,7 @@ public class GrowablePhaseState implements IPhaseState<GrowablePhaseContext> {
 
     @Override
     public BlockChange associateBlockChangeWithSnapshot(GrowablePhaseContext phaseContext,
-        IBlockState newState, Block newBlock, IBlockState currentState, SpongeBlockSnapshot snapshot, Block originalBlock) {
+        BlockState newState, Block newBlock, BlockState currentState, SpongeBlockSnapshot snapshot, Block originalBlock) {
         return BlockChange.GROW;
     }
 

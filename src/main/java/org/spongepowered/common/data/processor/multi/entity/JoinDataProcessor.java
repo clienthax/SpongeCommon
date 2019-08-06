@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.processor.multi.entity;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -52,7 +52,7 @@ public class JoinDataProcessor extends AbstractMultiDataSingleTargetProcessor<Id
 
     @Override
     protected boolean supports(Identifiable dataHolder) {
-        return dataHolder instanceof EntityPlayer || dataHolder instanceof SpongeUser;
+        return dataHolder instanceof PlayerEntity || dataHolder instanceof SpongeUser;
     }
 
     @Override

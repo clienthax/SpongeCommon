@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.extra;
 
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;

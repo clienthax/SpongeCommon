@@ -25,14 +25,14 @@
 package org.spongepowered.common.world.teleport;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.block.BlockAnvil;
-import net.minecraft.block.BlockCauldron;
-import net.minecraft.block.BlockChorusPlant;
-import net.minecraft.block.BlockFence;
-import net.minecraft.block.BlockSlab;
-import net.minecraft.block.BlockSnow;
+import net.minecraft.block.AnvilBlock;
+import net.minecraft.block.CauldronBlock;
+import net.minecraft.block.ChorusPlantBlock;
+import net.minecraft.block.FenceBlock;
+import net.minecraft.block.SlabBlock;
+import net.minecraft.block.SnowBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.world.teleport.TeleportHelperFilter;
 
@@ -55,12 +55,12 @@ public class DefaultTeleportHelperFilter implements TeleportHelperFilter {
 
     @Override
     public boolean isSafeFloorMaterial(BlockState blockState) {
-        return !NOT_SAFE_FLOOR.contains(((IBlockState) blockState).getMaterial());
+        return !NOT_SAFE_FLOOR.contains(((BlockState) blockState).getMaterial());
     }
 
     @Override
     public boolean isSafeBodyMaterial(BlockState blockState) {
-        IBlockState state = (IBlockState) blockState;
+        BlockState state = (BlockState) blockState;
         Material material = state.getMaterial();
 
         // Deny blocks that suffocate
@@ -75,12 +75,12 @@ public class DefaultTeleportHelperFilter implements TeleportHelperFilter {
         // Sadly there is no easy way to check for this using vanilla right now as Blocks like Cauldron are technically marked as passable.
 
         // Deny non-passable non "full" blocks
-        return !(state.getBlock() instanceof BlockSlab ||
-                 state.getBlock() instanceof BlockCauldron ||
-                 state.getBlock() instanceof BlockAnvil ||
-                 state.getBlock() instanceof BlockFence ||
-                 state.getBlock() instanceof BlockChorusPlant ||
-                 state.getBlock() instanceof BlockSnow ||
+        return !(state.getBlock() instanceof SlabBlock ||
+                 state.getBlock() instanceof CauldronBlock ||
+                 state.getBlock() instanceof AnvilBlock ||
+                 state.getBlock() instanceof FenceBlock ||
+                 state.getBlock() instanceof ChorusPlantBlock ||
+                 state.getBlock() instanceof SnowBlock ||
                  material == Material.GLASS ||
                  material == Material.LEAVES);
     }

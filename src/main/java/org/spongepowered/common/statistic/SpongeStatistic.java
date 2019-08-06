@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.statistic;
 
-import net.minecraft.stats.StatBase;
+import net.minecraft.stats.Stat;
 import net.minecraft.stats.StatCrafting;
 import org.spongepowered.api.statistic.Statistic;
 import org.spongepowered.common.bridge.stats.StatBaseBridge;
@@ -34,7 +34,7 @@ import java.text.NumberFormat;
 
 /**
  * Specifically a default implemented bridge for Sponge added statistics
- * base classes that extend {@link StatBase} and {@link StatCrafting} but
+ * base classes that extend {@link Stat} and {@link StatCrafting} but
  * cannot specifically reference the implementation provided by
  * {@link StatBaseBridge} and therefor, {@link StatBaseMixin}. It is the
  * premise that the bridge methods are implemented appropriately, and

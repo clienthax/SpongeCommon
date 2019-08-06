@@ -32,7 +32,7 @@ import com.flowpowered.math.vector.Vector3i;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.chunk.storage.ExtendedBlockStorage;
-import net.minecraft.world.gen.IChunkGenerator;
+import net.minecraft.world.gen.ChunkGenerator;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.world.extent.ImmutableBiomeVolume;
 import org.spongepowered.api.world.extent.MutableBlockVolume;
@@ -44,18 +44,18 @@ import org.spongepowered.common.relocate.co.aikar.timings.SpongeTimingsFactory;
 import javax.annotation.Nullable;
 
 /**
- * Generator populator that wraps a Minecraft {@link IChunkGenerator}.
+ * Generator populator that wraps a Minecraft {@link ChunkGenerator}.
  */
 public final class SpongeGenerationPopulator implements GenerationPopulator, TimingBridge {
 
-    private final IChunkGenerator chunkGenerator;
+    private final ChunkGenerator chunkGenerator;
     private final World world;
     @Nullable private Timing timing;
     @Nullable private Chunk cachedChunk = null;
 
     /**
      * Gets the {@link GenerationPopulator} from the given
-     * {@link IChunkGenerator}. If the chunk generator wraps a
+     * {@link ChunkGenerator}. If the chunk generator wraps a
      * {@link GenerationPopulator}, that populator is returned, otherwise the
      * chunk generator is wrapped.
      *
@@ -63,7 +63,7 @@ public final class SpongeGenerationPopulator implements GenerationPopulator, Tim
      * @param chunkGenerator The chunk generator.
      * @return The generator populator.
      */
-    public static GenerationPopulator of(final World world, final IChunkGenerator chunkGenerator) {
+    public static GenerationPopulator of(final World world, final ChunkGenerator chunkGenerator) {
         if (WorldGenConstants.isValid(chunkGenerator, GenerationPopulator.class)) {
             return (GenerationPopulator) chunkGenerator;
         }
@@ -73,7 +73,7 @@ public final class SpongeGenerationPopulator implements GenerationPopulator, Tim
         return new SpongeGenerationPopulator(world, chunkGenerator);
     }
 
-    private SpongeGenerationPopulator(final World world, final IChunkGenerator chunkGenerator) {
+    private SpongeGenerationPopulator(final World world, final ChunkGenerator chunkGenerator) {
         this.world = checkNotNull(world, "world");
         this.chunkGenerator = checkNotNull(chunkGenerator, "chunkGenerator");
     }
@@ -147,7 +147,7 @@ public final class SpongeGenerationPopulator implements GenerationPopulator, Tim
         return this.cachedChunk;
     }
 
-    public IChunkGenerator getChunkGenerator() {
+    public ChunkGenerator getChunkGenerator() {
         return this.chunkGenerator;
     }
 
@@ -156,14 +156,14 @@ public final class SpongeGenerationPopulator implements GenerationPopulator, Tim
     }
 
     /**
-     * Gets the {@link IChunkGenerator}, if the target world matches the world this chunk generator is bound to.
+     * Gets the {@link ChunkGenerator}, if the target world matches the world this chunk generator is bound to.
      *
      * @param targetWorld The target world.
      * @return The chunk generator.
      * @throws IllegalArgumentException If the target world is not the world
      *         this chunk provider is bound to.`
      */
-    public IChunkGenerator getHandle(final World targetWorld) {
+    public ChunkGenerator getHandle(final World targetWorld) {
         if (!this.world.equals(targetWorld)) {
             throw new IllegalArgumentException("Cannot reassign internal generator from world "
                     + getWorldName(this.world) + " to world " + getWorldName(targetWorld));

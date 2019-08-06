@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.event.tracking.phase.packet.inventory;
 
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
@@ -53,7 +53,7 @@ public final class MiddleInventoryClickState extends BasicInventoryPacketState {
     }
 
     @Override
-    public ClickInventoryEvent createInventoryEvent(final EntityPlayerMP playerMP, final Container openContainer, final Transaction<ItemStackSnapshot> transaction,
+    public ClickInventoryEvent createInventoryEvent(final ServerPlayerEntity playerMP, final Container openContainer, final Transaction<ItemStackSnapshot> transaction,
             final List<SlotTransaction> slotTransactions, final List<Entity> capturedEntities, final int usedButton, @Nullable final Slot slot) {
         return SpongeEventFactory.createClickInventoryEventMiddle(Sponge.getCauseStackManager().getCurrentCause(), transaction,
                 Optional.ofNullable(slot), openContainer, slotTransactions);

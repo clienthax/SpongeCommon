@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.tileentity;
 
-import net.minecraft.tileentity.TileEntitySkull;
+import net.minecraft.tileentity.SkullTileEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.ImmutableRepresentedPlayerData;
@@ -43,21 +43,21 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 import java.util.Optional;
 
 public class SkullRepresentedPlayerDataProcessor extends
-        AbstractTileEntitySingleDataProcessor<TileEntitySkull, GameProfile, Value<GameProfile>, RepresentedPlayerData, ImmutableRepresentedPlayerData> {
+        AbstractTileEntitySingleDataProcessor<SkullTileEntity, GameProfile, Value<GameProfile>, RepresentedPlayerData, ImmutableRepresentedPlayerData> {
 
     public SkullRepresentedPlayerDataProcessor() {
-        super(TileEntitySkull.class, Keys.REPRESENTED_PLAYER);
+        super(SkullTileEntity.class, Keys.REPRESENTED_PLAYER);
     }
 
     @Override
-    public boolean supports(TileEntitySkull skull) {
+    public boolean supports(SkullTileEntity skull) {
         return SkullUtils.getSkullType(skull.getSkullType()).equals(SkullTypes.PLAYER);
     }
 
     @Override
     public DataTransactionResult removeFrom(ValueContainer<?> container) {
         if (supports(container)) {
-            TileEntitySkull skull = (TileEntitySkull) container;
+            SkullTileEntity skull = (SkullTileEntity) container;
             Optional<GameProfile> old = getVal(skull);
             if (!old.isPresent()) {
                 return DataTransactionResult.successNoData();
@@ -71,12 +71,12 @@ public class SkullRepresentedPlayerDataProcessor extends
     }
 
     @Override
-    protected boolean set(TileEntitySkull skull, GameProfile profile) {
+    protected boolean set(SkullTileEntity skull, GameProfile profile) {
         return SkullUtils.setProfile(skull, profile);
     }
 
     @Override
-    protected Optional<GameProfile> getVal(TileEntitySkull entity) {
+    protected Optional<GameProfile> getVal(SkullTileEntity entity) {
         return Optional.ofNullable((GameProfile) entity.getPlayerProfile());
     }
 

@@ -24,10 +24,10 @@
  */
 package org.spongepowered.common.event.tracking.phase.packet.player;
 
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.CPacketUseEntity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.play.client.CUseEntityPacket;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.Entity;
@@ -65,16 +65,16 @@ public final class InteractAtEntityPacketState extends BasicPacketState {
     }
 
     @Override
-    public boolean isPacketIgnored(Packet<?> packetIn, EntityPlayerMP packetPlayer) {
-        final CPacketUseEntity useEntityPacket = (CPacketUseEntity) packetIn;
+    public boolean isPacketIgnored(IPacket<?> packetIn, ServerPlayerEntity packetPlayer) {
+        final CUseEntityPacket useEntityPacket = (CUseEntityPacket) packetIn;
         // There are cases where a player is interacting with an entity that doesn't exist on the server.
         @Nullable net.minecraft.entity.Entity entity = useEntityPacket.getEntityFromWorld(packetPlayer.world);
         return entity == null;
     }
 
     @Override
-    public void populateContext(EntityPlayerMP playerMP, Packet<?> packet, BasicPacketContext context) {
-        final CPacketUseEntity useEntityPacket = (CPacketUseEntity) packet;
+    public void populateContext(ServerPlayerEntity playerMP, IPacket<?> packet, BasicPacketContext context) {
+        final CUseEntityPacket useEntityPacket = (CUseEntityPacket) packet;
         final ItemStack stack = ItemStackUtil.cloneDefensive(playerMP.getHeldItem(useEntityPacket.getHand()));
         if (stack != null) {
             context.itemUsed(stack);
@@ -90,9 +90,9 @@ public final class InteractAtEntityPacketState extends BasicPacketState {
 
     @Override
     public void unwind(BasicPacketContext context) {
-        final EntityPlayerMP player = context.getPacketPlayer();
+        final ServerPlayerEntity player = context.getPacketPlayer();
 
-        final CPacketUseEntity useEntityPacket = context.getPacket();
+        final CUseEntityPacket useEntityPacket = context.getPacket();
         final net.minecraft.entity.Entity entity = useEntityPacket.getEntityFromWorld(player.world);
         if (entity == null) {
             // Something happened?
@@ -130,7 +130,7 @@ public final class InteractAtEntityPacketState extends BasicPacketState {
                 printer.trace(System.err);
             });
             context.getPerEntityItemEntityDropSupplier().acceptAndClearIfNotEmpty(map -> {
-                for (Map.Entry<UUID, Collection<EntityItem>> entry : map.asMap().entrySet()) {
+                for (Map.Entry<UUID, Collection<ItemEntity>> entry : map.asMap().entrySet()) {
                     final UUID entityUuid = entry.getKey();
                     final net.minecraft.entity.Entity entityFromUuid = player.getServerWorld().getEntityFromUuid(entityUuid);
                     if (entityFromUuid != null) {
@@ -153,7 +153,7 @@ public final class InteractAtEntityPacketState extends BasicPacketState {
                 }
             });
             context.getCapturedItemStackSupplier().acceptAndClearIfNotEmpty(drops -> {
-                final List<EntityItem> items =
+                final List<ItemEntity> items =
                     drops.stream().map(drop -> drop.create(player.getServerWorld())).collect(Collectors.toList());
                 final List<Entity> entities = items
                     .stream()

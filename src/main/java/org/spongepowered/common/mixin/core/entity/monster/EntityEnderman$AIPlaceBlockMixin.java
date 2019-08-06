@@ -25,9 +25,9 @@
 package org.spongepowered.common.mixin.core.entity.monster;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.monster.EntityEnderman;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.monster.EndermanEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.api.Sponge;
@@ -50,10 +50,10 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-@Mixin(EntityEnderman.AIPlaceBlock.class)
-public abstract class EntityEnderman$AIPlaceBlockMixin extends EntityAIBase {
+@Mixin(EndermanEntity.AIPlaceBlock.class)
+public abstract class EndermanEntity$AIPlaceBlockMixin extends Goal {
 
-    @Shadow @Final private EntityEnderman enderman;
+    @Shadow @Final private EndermanEntity enderman;
 
     /**
      * @author gabizou - April 13th, 2018
@@ -70,12 +70,12 @@ public abstract class EntityEnderman$AIPlaceBlockMixin extends EntityAIBase {
         method = "shouldExecute",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/entity/monster/EntityEnderman;getHeldBlockState()Lnet/minecraft/block/state/IBlockState;"
+            target = "Lnet/minecraft/entity/monster/EndermanEntity;getHeldBlockState()Lnet/minecraft/block/state/BlockState;"
         )
     )
     @Nullable
-    private IBlockState onCanGrief(final EntityEnderman entityEnderman) {
-        final IBlockState heldBlockState = entityEnderman.getHeldBlockState();
+    private BlockState onCanGrief(final EndermanEntity entityEnderman) {
+        final BlockState heldBlockState = entityEnderman.getHeldBlockState();
         return ((GrieferBridge) this.enderman).bridge$CanGrief() ? heldBlockState : null;
     }
 
@@ -92,9 +92,9 @@ public abstract class EntityEnderman$AIPlaceBlockMixin extends EntityAIBase {
      * @param state The new state
      * @return True if the state is a full cube, and the event didnt get cancelled
      */
-    @Redirect(method = "canPlaceBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/state/IBlockState;isFullCube()Z"))
-    private boolean onUpdateCancel(final IBlockState blockState, final World world, final BlockPos pos, final Block toPlace,
-        final IBlockState old, final IBlockState state) {
+    @Redirect(method = "canPlaceBlock", at = @At(value = "INVOKE", target = "Lnet/minecraft/block/state/BlockState;isFullCube()Z"))
+    private boolean onUpdateCancel(final BlockState blockState, final World world, final BlockPos pos, final Block toPlace,
+        final BlockState old, final BlockState state) {
         if (state.isFullCube()) {
             if (ShouldFire.CHANGE_BLOCK_EVENT_PRE) {
                 final Location<org.spongepowered.api.world.World> location =

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.core.entity.item;
 
-import net.minecraft.entity.item.EntityArmorStand;
+import net.minecraft.entity.item.ArmorStandEntity;
 import net.minecraft.util.DamageSource;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
@@ -46,7 +46,7 @@ import org.spongepowered.common.mixin.core.entity.EntityLivingBaseMixin;
 
 import java.util.ArrayList;
 
-@Mixin(EntityArmorStand.class)
+@Mixin(ArmorStandEntity.class)
 public abstract class EntityArmorStandMixin extends EntityLivingBaseMixin {
 
     @Shadow protected abstract void damageArmorStand(float damage);
@@ -72,7 +72,7 @@ public abstract class EntityArmorStandMixin extends EntityLivingBaseMixin {
 
     @Inject(method = "attackEntityFrom",
             slice = @Slice(from = @At(value = "FIELD", target = "Lnet/minecraft/util/DamageSource;OUT_OF_WORLD:Lnet/minecraft/util/DamageSource;")),
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/EntityArmorStand;setDead()V", ordinal = 0),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/ArmorStandEntity;setDead()V", ordinal = 0),
             cancellable = true)
     private void fireDamageEventOutOfWorld(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
         fireDestroyDamageEvent(source, cir);
@@ -80,14 +80,14 @@ public abstract class EntityArmorStandMixin extends EntityLivingBaseMixin {
 
     @Inject(method = "attackEntityFrom",
             slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/util/DamageSource;isExplosion()Z")),
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/EntityArmorStand;dropContents()V"),
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/ArmorStandEntity;dropContents()V"),
             cancellable = true)
     private void fireDamageEventExplosion(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
         fireDestroyDamageEvent(source, cir);
     }
 
-    @Redirect(method = "attackEntityFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/EntityArmorStand;damageArmorStand(F)V"))
-    private void fireDamageEventDamage(final EntityArmorStand self, final float effectiveAmount, final DamageSource source, final float originalAmount) {
+    @Redirect(method = "attackEntityFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/ArmorStandEntity;damageArmorStand(F)V"))
+    private void fireDamageEventDamage(final ArmorStandEntity self, final float effectiveAmount, final DamageSource source, final float originalAmount) {
         try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             DamageEventHandler.generateCauseFor(source, frame);
             final DamageEntityEvent event = SpongeEventFactory.createDamageEntityEvent(frame.getCurrentCause(), new ArrayList<>(),
@@ -99,14 +99,14 @@ public abstract class EntityArmorStandMixin extends EntityLivingBaseMixin {
     }
 
     @Inject(method = "attackEntityFrom", slice = @Slice(from = @At(value = "INVOKE", target = "Lnet/minecraft/util/DamageSource;isCreativePlayer()Z")),
-            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/EntityArmorStand;playBrokenSound()V"), cancellable = true)
+            at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/ArmorStandEntity;playBrokenSound()V"), cancellable = true)
     private void fireDamageEventCreativePunch(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
         fireDestroyDamageEvent(source, cir);
     }
 
     @Inject(method = "attackEntityFrom",
             slice = @Slice(
-                    from = @At(value = "FIELD", target = "Lnet/minecraft/entity/item/EntityArmorStand;punchCooldown:J", opcode = Opcodes.GETFIELD)),
+                    from = @At(value = "FIELD", target = "Lnet/minecraft/entity/item/ArmorStandEntity;punchCooldown:J", opcode = Opcodes.GETFIELD)),
             at = @At(value = "INVOKE", target = "Lnet/minecraft/world/World;setEntityState(Lnet/minecraft/entity/Entity;B)V"),
             cancellable = true)
     private void fireDamageEventFirstPunch(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
@@ -122,7 +122,7 @@ public abstract class EntityArmorStandMixin extends EntityLivingBaseMixin {
         }
     }
 
-    @Inject(method = "attackEntityFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/EntityArmorStand;dropBlock()V"),
+    @Inject(method = "attackEntityFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/ArmorStandEntity;dropBlock()V"),
             cancellable = true)
     private void fireDamageEventSecondPunch(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
         fireDestroyDamageEvent(source, cir);
@@ -130,10 +130,10 @@ public abstract class EntityArmorStandMixin extends EntityLivingBaseMixin {
 
     /**
      * @author JBYoshi
-     * @reason EntityArmorStand "simplifies" this method to simply call {@link
+     * @reason ArmorStandEntity "simplifies" this method to simply call {@link
      * #setDead()}. However, this ignores our custom event. Instead, delegate
      * to the superclass and use {@link
-     * EntityArmorStand#attackEntityFrom(DamageSource, float)}.
+     * ArmorStandEntity#attackEntityFrom(DamageSource, float)}.
      */
     @Overwrite
     @Override

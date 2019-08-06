@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.registry.type.scoreboard;
 
-import net.minecraft.scoreboard.IScoreCriteria;
+import net.minecraft.scoreboard.ScoreCriteria;
 import org.spongepowered.api.registry.util.RegisterCatalog;
 import org.spongepowered.api.scoreboard.critieria.Criteria;
 import org.spongepowered.api.scoreboard.critieria.Criterion;
@@ -39,12 +39,12 @@ public final class CriteriaRegistryModule extends AbstractPrefixAlternateCatalog
 
     @Override
     public void registerDefaults() {
-        register((Criterion) IScoreCriteria.DUMMY);
-        register((Criterion) IScoreCriteria.TRIGGER);
-        register((Criterion) IScoreCriteria.HEALTH);
-        register((Criterion) IScoreCriteria.PLAYER_KILL_COUNT);
-        register((Criterion) IScoreCriteria.TOTAL_KILL_COUNT);
-        register((Criterion) IScoreCriteria.DEATH_COUNT);
+        register((Criterion) ScoreCriteria.DUMMY);
+        register((Criterion) ScoreCriteria.TRIGGER);
+        register((Criterion) ScoreCriteria.HEALTH);
+        register((Criterion) ScoreCriteria.PLAYER_KILL_COUNT);
+        register((Criterion) ScoreCriteria.TOTAL_KILL_COUNT);
+        register((Criterion) ScoreCriteria.DEATH_COUNT);
     }
 
 }

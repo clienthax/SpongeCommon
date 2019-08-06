@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.passive;
 
-import net.minecraft.entity.passive.EntityPig;
+import net.minecraft.entity.passive.PigEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.PigSaddleData;
@@ -37,7 +37,7 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 
 import java.util.Collection;
 
-@Mixin(EntityPig.class)
+@Mixin(PigEntity.class)
 public abstract class EntityPigMixin_API extends EntityAnimalMixin_API implements Pig {
 
     @Shadow public abstract boolean getSaddled();

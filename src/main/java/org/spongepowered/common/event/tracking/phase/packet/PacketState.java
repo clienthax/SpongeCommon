@@ -25,10 +25,10 @@
 package org.spongepowered.common.event.tracking.phase.packet;
 
 import net.minecraft.block.Block;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.Packet;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.IPacket;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.chunk.Chunk;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
@@ -68,12 +68,12 @@ public abstract class PacketState<P extends PacketContext<P>> implements IPhaseS
     }
 
 
-    protected static void processSpawnedEntities(EntityPlayerMP player, SpawnEntityEvent event) {
+    protected static void processSpawnedEntities(ServerPlayerEntity player, SpawnEntityEvent event) {
         List<Entity> entities = event.getEntities();
         processEntities(player, entities);
     }
 
-    protected static void processEntities(EntityPlayerMP player, Collection<Entity> entities) {
+    protected static void processEntities(ServerPlayerEntity player, Collection<Entity> entities) {
         for (Entity entity : entities) {
             EntityUtil.processEntitySpawn(entity, () -> Optional.of((Player) player));
         }
@@ -102,18 +102,18 @@ public abstract class PacketState<P extends PacketContext<P>> implements IPhaseS
     }
 
     @Override
-    public void associateNeighborStateNotifier(P unwindingContext, BlockPos sourcePos, Block block, BlockPos notifyPos, WorldServer minecraftWorld,
+    public void associateNeighborStateNotifier(P unwindingContext, BlockPos sourcePos, Block block, BlockPos notifyPos, ServerWorld minecraftWorld,
         PlayerTracker.Type notifier) {
         final Player player = unwindingContext.getSpongePlayer();
         Chunk chunk = minecraftWorld.getChunk(notifyPos);
         ((ChunkBridge) chunk).bridge$setBlockNotifier(notifyPos, player.getUniqueId());
     }
 
-    public void populateContext(EntityPlayerMP playerMP, Packet<?> packet, P context) {
+    public void populateContext(ServerPlayerEntity playerMP, IPacket<?> packet, P context) {
 
     }
 
-    public boolean isPacketIgnored(Packet<?> packetIn, EntityPlayerMP packetPlayer) {
+    public boolean isPacketIgnored(IPacket<?> packetIn, ServerPlayerEntity packetPlayer) {
         return false;
     }
 
@@ -196,7 +196,7 @@ public abstract class PacketState<P extends PacketContext<P>> implements IPhaseS
         return SpawnTypes.PLACEMENT;
     }
 
-    private final String desc = TrackingUtil.phaseStateToString("Packet", this);
+    private final String desc = TrackingUtil.phaseStateToString("IPacket", this);
 
     @Override
     public String toString() {

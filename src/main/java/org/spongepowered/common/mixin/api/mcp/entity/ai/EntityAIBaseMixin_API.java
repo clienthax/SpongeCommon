@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.ai;
 
-import net.minecraft.entity.ai.EntityAIBase;
+import net.minecraft.entity.ai.goal.Goal;
 import org.spongepowered.api.entity.ai.Goal;
 import org.spongepowered.api.entity.ai.task.AITask;
 import org.spongepowered.api.entity.ai.task.AITaskType;
@@ -37,7 +37,7 @@ import org.spongepowered.common.bridge.entity.ai.EntityAIBasesBridge;
 
 import java.util.Optional;
 
-@Mixin(EntityAIBase.class)
+@Mixin(Goal.class)
 @Implements(value = @Interface(iface = AITask.class, prefix = "task$"))
 public abstract class EntityAIBaseMixin_API<O extends Agent> implements AITask<O> {
 
@@ -56,12 +56,12 @@ public abstract class EntityAIBaseMixin_API<O extends Agent> implements AITask<O
 
     @Override
     public boolean canRunConcurrentWith(AITask<O> other) {
-        return (this.mutexBits & ((EntityAIBase) other).getMutexBits()) == 0;
+        return (this.mutexBits & ((Goal) other).getMutexBits()) == 0;
     }
 
     @Override
     public boolean canBeInterrupted() {
-        return ((EntityAIBase) (Object) this).isInterruptible();
+        return ((Goal) (Object) this).isInterruptible();
     }
 
 

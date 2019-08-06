@@ -28,7 +28,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Maps;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.HandSide;
 import org.spongepowered.api.data.type.HandPreference;
 import org.spongepowered.api.data.type.HandPreferences;
 import org.spongepowered.api.registry.CatalogRegistryModule;
@@ -49,8 +49,8 @@ public class HandPreferenceRegistryModule implements CatalogRegistryModule<HandP
 
     @Override
     public void registerDefaults() {
-        this.handSideMap.put("left", (HandPreference) (Object) EnumHandSide.LEFT);
-        this.handSideMap.put("right", (HandPreference) (Object) EnumHandSide.RIGHT);
+        this.handSideMap.put("left", (HandPreference) (Object) HandSide.LEFT);
+        this.handSideMap.put("right", (HandPreference) (Object) HandSide.RIGHT);
     }
 
     @Override

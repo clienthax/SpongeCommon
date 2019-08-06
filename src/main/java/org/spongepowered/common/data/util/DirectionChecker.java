@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.util;
 
-import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Direction;
 import org.spongepowered.api.util.Axis;
 import org.spongepowered.api.util.Direction;
 
@@ -82,21 +82,21 @@ public class DirectionChecker {
         return dir;
     }
 
-    public static EnumFacing.Axis convertAxisToMinecraft(Axis axis) {
+    public static Direction.Axis convertAxisToMinecraft(Axis axis) {
         switch (axis) {
             case X:
-                return EnumFacing.Axis.X;
+                return Direction.Axis.X;
             case Y:
-                return EnumFacing.Axis.Y;
+                return Direction.Axis.Y;
             case Z:
-                return EnumFacing.Axis.Z;
+                return Direction.Axis.Z;
             default:
-                return EnumFacing.Axis.X;
+                return Direction.Axis.X;
 
         }
     }
 
-    public static Axis convertAxisToSponge(EnumFacing.Axis axis) {
+    public static Axis convertAxisToSponge(Direction.Axis axis) {
         switch (axis) {
             case X:
                 return Axis.X;

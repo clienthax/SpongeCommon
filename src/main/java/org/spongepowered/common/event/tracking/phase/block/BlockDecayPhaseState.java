@@ -25,10 +25,10 @@
 package org.spongepowered.common.event.tracking.phase.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Blocks;
-import net.minecraft.world.WorldServer;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.world.ServerWorld;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.CauseStackManager.StackFrame;
@@ -99,8 +99,8 @@ final class BlockDecayPhaseState extends BlockPhaseState {
             });
         context.getCapturedItemStackSupplier()
             .acceptAndClearIfNotEmpty(drops -> {
-                final List<EntityItem> items = drops.stream()
-                    .map(drop -> drop.create((WorldServer) mixinWorld))
+                final List<ItemEntity> items = drops.stream()
+                    .map(drop -> drop.create((ServerWorld) mixinWorld))
                     .collect(Collectors.toList());
                 final List<Entity> entities = (List<Entity>) (List<?>) items;
                 if (!entities.isEmpty()) {
@@ -120,9 +120,9 @@ final class BlockDecayPhaseState extends BlockPhaseState {
     }
 
     @Override
-    public BlockChange associateBlockChangeWithSnapshot(GeneralizedContext phaseContext, IBlockState newState,
+    public BlockChange associateBlockChangeWithSnapshot(GeneralizedContext phaseContext, BlockState newState,
         Block newBlock,
-        IBlockState currentState, SpongeBlockSnapshot snapshot, Block originalBlock) {
+        BlockState currentState, SpongeBlockSnapshot snapshot, Block originalBlock) {
         if (newBlock == Blocks.AIR) {
             return BlockChange.DECAY;
         } else {

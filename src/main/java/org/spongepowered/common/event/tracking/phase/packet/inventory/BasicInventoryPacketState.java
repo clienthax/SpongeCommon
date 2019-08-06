@@ -24,9 +24,9 @@
  */
 package org.spongepowered.common.event.tracking.phase.packet.inventory;
 
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.client.CPacketClickWindow;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.play.client.CClickWindowPacket;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.Transaction;
 import org.spongepowered.api.entity.Entity;
@@ -106,7 +106,7 @@ public class BasicInventoryPacketState extends PacketState<InventoryPacketContex
     }
 
     @Nullable
-    public ClickInventoryEvent createInventoryEvent(EntityPlayerMP playerMP, Container openContainer, Transaction<ItemStackSnapshot> transaction,
+    public ClickInventoryEvent createInventoryEvent(ServerPlayerEntity playerMP, Container openContainer, Transaction<ItemStackSnapshot> transaction,
             List<SlotTransaction> slotTransactions, List<Entity> capturedEntities, int usedButton, @Nullable Slot slot) {
         return null;
     }
@@ -125,7 +125,7 @@ public class BasicInventoryPacketState extends PacketState<InventoryPacketContex
     }
 
     @Override
-    public void populateContext(EntityPlayerMP playerMP, Packet<?> packet, InventoryPacketContext context) {
+    public void populateContext(ServerPlayerEntity playerMP, IPacket<?> packet, InventoryPacketContext context) {
         ((TrackedInventoryBridge) playerMP.openContainer).bridge$setCaptureInventory(true);
         context.addEntityDropCaptures();
     }
@@ -146,7 +146,7 @@ public class BasicInventoryPacketState extends PacketState<InventoryPacketContex
 
     @Override
     public void unwind(InventoryPacketContext context) {
-        final EntityPlayerMP player = context.getPacketPlayer();
+        final ServerPlayerEntity player = context.getPacketPlayer();
 
         // The server will disable the player's crafting after receiving a client packet
         // that did not pass validation (server click item != packet click item)
@@ -163,7 +163,7 @@ public class BasicInventoryPacketState extends PacketState<InventoryPacketContex
             return;
         }
 
-        final CPacketClickWindow packetIn = context.getPacket();
+        final CClickWindowPacket packetIn = context.getPacket();
         final Transaction<ItemStackSnapshot> cursorTransaction = this.getCursorTransaction(context, player);
 
         final net.minecraft.inventory.Container openContainer = player.openContainer;
@@ -278,7 +278,7 @@ public class BasicInventoryPacketState extends PacketState<InventoryPacketContex
         }
     }
 
-    public Transaction<ItemStackSnapshot> getCursorTransaction(InventoryPacketContext context, EntityPlayerMP player) {
+    public Transaction<ItemStackSnapshot> getCursorTransaction(InventoryPacketContext context, ServerPlayerEntity player) {
         final ItemStackSnapshot lastCursor = context.getCursor();
         final ItemStackSnapshot newCursor = ItemStackUtil.snapshotOf(player.inventory.getItemStack());
         return new Transaction<>(lastCursor, newCursor);

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableHealthScalingData;
@@ -40,10 +40,10 @@ import org.spongepowered.common.util.Constants;
 
 import java.util.Optional;
 
-public class HealthScalingProcessor extends AbstractEntitySingleDataProcessor<EntityPlayerMP, Double, MutableBoundedValue<Double>, HealthScalingData, ImmutableHealthScalingData> {
+public class HealthScalingProcessor extends AbstractEntitySingleDataProcessor<ServerPlayerEntity, Double, MutableBoundedValue<Double>, HealthScalingData, ImmutableHealthScalingData> {
 
     public HealthScalingProcessor() {
-        super(EntityPlayerMP.class, Keys.HEALTH_SCALE);
+        super(ServerPlayerEntity.class, Keys.HEALTH_SCALE);
     }
 
     @Override
@@ -52,7 +52,7 @@ public class HealthScalingProcessor extends AbstractEntitySingleDataProcessor<En
     }
 
     @Override
-    protected boolean set(EntityPlayerMP dataHolder, Double value) {
+    protected boolean set(ServerPlayerEntity dataHolder, Double value) {
         if (value < 1D) {
             return false;
         }
@@ -65,7 +65,7 @@ public class HealthScalingProcessor extends AbstractEntitySingleDataProcessor<En
     }
 
     @Override
-    protected Optional<Double> getVal(EntityPlayerMP dataHolder) {
+    protected Optional<Double> getVal(ServerPlayerEntity dataHolder) {
         final EntityPlayerMPBridge mixinPlayer = (EntityPlayerMPBridge) dataHolder;
         return Optional.ofNullable(mixinPlayer.bridge$isHealthScaled() ? mixinPlayer.bridge$getHealthScale() : null);
     }

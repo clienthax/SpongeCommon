@@ -25,9 +25,9 @@
 package org.spongepowered.common.entity.projectile;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityShulker;
-import net.minecraft.entity.projectile.EntityShulkerBullet;
-import net.minecraft.init.SoundEvents;
+import net.minecraft.entity.monster.ShulkerEntity;
+import net.minecraft.entity.projectile.ShulkerBulletEntity;
+import net.minecraft.util.SoundEvents;
 import org.spongepowered.api.entity.ShulkerBullet;
 import org.spongepowered.api.entity.living.golem.Shulker;
 import org.spongepowered.api.entity.projectile.Projectile;
@@ -40,8 +40,8 @@ public class ShulkerSourceLogic implements ProjectileSourceLogic<Shulker> {
     @Override
     public <P extends Projectile> Optional<P> launch(ProjectileLogic<P> logic, Shulker source, Class<P> projectileClass, Object... args) {
         if (projectileClass == ShulkerBullet.class && args.length == 1 && args[0] instanceof Entity) {
-            EntityShulker shulker = (EntityShulker) source;
-            EntityShulkerBullet bullet = new EntityShulkerBullet(shulker.world, shulker, (Entity) args[0], shulker.getAttachmentFacing().getAxis());
+            ShulkerEntity shulker = (ShulkerEntity) source;
+            ShulkerBulletEntity bullet = new ShulkerBulletEntity(shulker.world, shulker, (Entity) args[0], shulker.getAttachmentFacing().getAxis());
             shulker.world.spawnEntity(bullet);
             shulker.playSound(SoundEvents.ENTITY_SHULKER_SHOOT,
                     2.0F, (shulker.world.rand.nextFloat() - shulker.world.rand.nextFloat()) * 0.2F + 1.0F);

@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.api.mcp.entity.ai;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.entity.ai.EntityAIBase;
-import net.minecraft.entity.ai.EntityAITasks;
+import net.minecraft.entity.ai.goal.Goal;
+import net.minecraft.entity.ai.goal.GoalSelector;
 import org.spongepowered.api.entity.ai.Goal;
 import org.spongepowered.api.entity.ai.GoalType;
 import org.spongepowered.api.entity.ai.task.AITask;
@@ -41,14 +41,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-@Mixin(EntityAITasks.class)
+@Mixin(GoalSelector.class)
 public abstract class EntityAITasksMixin_API<O extends Agent> implements Goal<O> {
 
-    @Shadow @Final private Set<EntityAITasks.EntityAITaskEntry> taskEntries;
-    @Shadow @Final private Set<EntityAITasks.EntityAITaskEntry> executingTaskEntries;
+    @Shadow @Final private Set<GoalSelector.EntityAITaskEntry> taskEntries;
+    @Shadow @Final private Set<GoalSelector.EntityAITaskEntry> executingTaskEntries;
 
-    @Shadow public abstract void shadow$addTask(int priority, EntityAIBase task);
-    @Shadow public abstract void shadow$removeTask(EntityAIBase task);
+    @Shadow public abstract void shadow$addTask(int priority, Goal task);
+    @Shadow public abstract void shadow$removeTask(Goal task);
 
     @SuppressWarnings("unchecked")
     @Override
@@ -63,23 +63,23 @@ public abstract class EntityAITasksMixin_API<O extends Agent> implements Goal<O>
 
     @Override
     public Goal<O> addTask(final int priority, final AITask<? extends O> task) {
-        shadow$addTask(priority, (EntityAIBase) task);
+        shadow$addTask(priority, (Goal) task);
         return this;
     }
 
     @Override
     public Goal<O> removeTask(final AITask<? extends O> task) {
-        shadow$removeTask((EntityAIBase) task);
+        shadow$removeTask((Goal) task);
         return  this;
     }
 
     @Override
     public Goal<O> removeTasks(final AITaskType type) {
-        final Iterator<EntityAITasks.EntityAITaskEntry> iterator = this.taskEntries.iterator();
+        final Iterator<GoalSelector.EntityAITaskEntry> iterator = this.taskEntries.iterator();
 
         while (iterator.hasNext()) {
-            final EntityAITasks.EntityAITaskEntry entityaitaskentry = iterator.next();
-            final EntityAIBase otherAiBase = entityaitaskentry.action;
+            final GoalSelector.EntityAITaskEntry entityaitaskentry = iterator.next();
+            final Goal otherAiBase = entityaitaskentry.action;
             final AITask<?> otherTask = (AITask<?>) otherAiBase;
 
             if (otherTask.getType().equals(type)) {
@@ -99,7 +99,7 @@ public abstract class EntityAITasksMixin_API<O extends Agent> implements Goal<O>
     public List<? super AITask<? extends O>> getTasksByType(final AITaskType type) {
         final ImmutableList.Builder<AITask<?>> tasks = ImmutableList.builder();
 
-        for (final EntityAITasks.EntityAITaskEntry entry : this.taskEntries) {
+        for (final GoalSelector.EntityAITaskEntry entry : this.taskEntries) {
             final AITask<?> task = (AITask<?>) entry.action;
 
             if (task.getType().equals(type)) {
@@ -114,7 +114,7 @@ public abstract class EntityAITasksMixin_API<O extends Agent> implements Goal<O>
     public List<? super AITask<? extends O>> getTasks() {
         final ImmutableList.Builder<AITask<?>> tasks = ImmutableList.builder();
         for (final Object o : this.taskEntries) {
-            final EntityAITasks.EntityAITaskEntry entry = (EntityAITasks.EntityAITaskEntry) o;
+            final GoalSelector.EntityAITaskEntry entry = (GoalSelector.EntityAITaskEntry) o;
 
             tasks.add((AITask<?>) entry.action);
         }

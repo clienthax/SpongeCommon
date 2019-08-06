@@ -28,33 +28,33 @@ import com.flowpowered.math.vector.Vector3d;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.advancements.PlayerAdvancements;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.Packet;
-import net.minecraft.network.play.server.SPacketChangeGameState;
-import net.minecraft.network.play.server.SPacketEntityEffect;
-import net.minecraft.network.play.server.SPacketEntityStatus;
-import net.minecraft.network.play.server.SPacketHeldItemChange;
-import net.minecraft.network.play.server.SPacketPlayerListItem;
-import net.minecraft.network.play.server.SPacketRespawn;
-import net.minecraft.network.play.server.SPacketServerDifficulty;
-import net.minecraft.network.play.server.SPacketSetExperience;
-import net.minecraft.network.play.server.SPacketSpawnPosition;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.network.play.ServerPlayNetHandler;
+import net.minecraft.network.IPacket;
+import net.minecraft.network.play.server.SChangeGameStatePacket;
+import net.minecraft.network.play.server.SPlayEntityEffectPacket;
+import net.minecraft.network.play.server.SEntityStatusPacket;
+import net.minecraft.network.play.server.SHeldItemChangePacket;
+import net.minecraft.network.play.server.SPlayerListItemPacket;
+import net.minecraft.network.play.server.SRespawnPacket;
+import net.minecraft.network.play.server.SServerDifficultyPacket;
+import net.minecraft.network.play.server.SSetExperiencePacket;
+import net.minecraft.network.play.server.SSpawnPositionPacket;
+import net.minecraft.potion.EffectInstance;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.management.DemoPlayerInteractionManager;
 import net.minecraft.server.management.PlayerInteractionManager;
 import net.minecraft.server.management.PlayerList;
-import net.minecraft.server.management.UserListBans;
-import net.minecraft.server.management.UserListIPBans;
-import net.minecraft.server.management.UserListWhitelist;
+import net.minecraft.server.management.BanList;
+import net.minecraft.server.management.IPBanList;
+import net.minecraft.server.management.WhiteList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.world.WorldProvider;
+import net.minecraft.world.dimension.Dimension;
 import net.minecraft.world.WorldProviderHell;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.border.WorldBorder;
 import net.minecraft.world.storage.IPlayerFileData;
 import net.minecraft.world.storage.WorldInfo;
@@ -123,21 +123,21 @@ public abstract class PlayerListMixin implements PlayerListBridge {
 
     @Shadow @Final private static Logger LOGGER;
     @Shadow @Final private MinecraftServer server;
-    @Shadow @Final private Map<UUID, EntityPlayerMP> uuidToPlayerMap;
-    @Shadow @Final private List<EntityPlayerMP> playerEntityList;
+    @Shadow @Final private Map<UUID, ServerPlayerEntity> uuidToPlayerMap;
+    @Shadow @Final private List<ServerPlayerEntity> playerEntityList;
     @Shadow @Final private Map<UUID, PlayerAdvancements> advancements;
     @Shadow private IPlayerFileData playerDataManager;
-    @Shadow public abstract NBTTagCompound readPlayerDataFromFile(EntityPlayerMP playerIn);
+    @Shadow public abstract CompoundNBT readPlayerDataFromFile(ServerPlayerEntity playerIn);
     @Shadow public abstract MinecraftServer getServerInstance();
     @Shadow public abstract int getMaxPlayers();
-    @Shadow public abstract void sendPacketToAllPlayers(Packet<?> packetIn);
-    @Shadow public abstract void preparePlayer(EntityPlayerMP playerIn, @Nullable WorldServer worldIn);
-    @Shadow public abstract void playerLoggedIn(EntityPlayerMP playerIn);
-    @Shadow public abstract void updateTimeAndWeatherForPlayer(EntityPlayerMP playerIn, WorldServer worldIn);
-    @Shadow public abstract void updatePermissionLevel(EntityPlayerMP p_187243_1_);
-    @Shadow public abstract void syncPlayerInventory(EntityPlayerMP playerIn);
+    @Shadow public abstract void sendPacketToAllPlayers(IPacket<?> packetIn);
+    @Shadow public abstract void preparePlayer(ServerPlayerEntity playerIn, @Nullable ServerWorld worldIn);
+    @Shadow public abstract void playerLoggedIn(ServerPlayerEntity playerIn);
+    @Shadow public abstract void updateTimeAndWeatherForPlayer(ServerPlayerEntity playerIn, ServerWorld worldIn);
+    @Shadow public abstract void updatePermissionLevel(ServerPlayerEntity p_187243_1_);
+    @Shadow public abstract void syncPlayerInventory(ServerPlayerEntity playerIn);
     @Nullable @Shadow public abstract String allowUserToConnect(SocketAddress address, GameProfile profile);
-    @Shadow private void setPlayerGameTypeBasedOnOther(final EntityPlayerMP playerIn, @Nullable final EntityPlayerMP other, final net.minecraft.world.World worldIn) {
+    @Shadow private void setPlayerGameTypeBasedOnOther(final ServerPlayerEntity playerIn, @Nullable final ServerPlayerEntity other, final net.minecraft.world.World worldIn) {
         // Shadowed
     }
 
@@ -146,8 +146,8 @@ public abstract class PlayerListMixin implements PlayerListBridge {
      * @reason Redirect ban list constructor and use our custom implementation
      *     instead. Redirects all methods to the {@link BanService}.
      */
-    @Redirect(method = "<init>", at = @At(value = "NEW", args = "class=net/minecraft/server/management/UserListBans"))
-    private UserListBans createBanList(final File file) {
+    @Redirect(method = "<init>", at = @At(value = "NEW", args = "class=net/minecraft/server/management/BanList"))
+    private BanList createBanList(final File file) {
         return new SpongeUserListBans(file);
     }
 
@@ -156,8 +156,8 @@ public abstract class PlayerListMixin implements PlayerListBridge {
      * @reason Redirect IP ban list constructor and use our custom implementation
      *     instead. Redirects all methods to the {@link BanService}.
      */
-    @Redirect(method = "<init>", at = @At(value = "NEW", args = "class=net/minecraft/server/management/UserListIPBans"))
-    private UserListIPBans createIPBanList(final File file) {
+    @Redirect(method = "<init>", at = @At(value = "NEW", args = "class=net/minecraft/server/management/IPBanList"))
+    private IPBanList createIPBanList(final File file) {
         return new SpongeIPBanList(file);
     }
 
@@ -166,8 +166,8 @@ public abstract class PlayerListMixin implements PlayerListBridge {
      * @reason Redirect whitelist constructor and use our custom implementation
      *     instead. Redirects all methods to the {@link WhitelistService}.
      */
-    @Redirect(method = "<init>", at = @At(value = "NEW", args = "class=net/minecraft/server/management/UserListWhitelist"))
-    private UserListWhitelist createWhitelist(final File file) {
+    @Redirect(method = "<init>", at = @At(value = "NEW", args = "class=net/minecraft/server/management/WhiteList"))
+    private WhiteList createWhitelist(final File file) {
         return new SpongeUserListWhitelist(file);
     }
 
@@ -187,7 +187,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
      */
     @SuppressWarnings("ConstantConditions")
     @Overwrite
-    public EntityPlayerMP recreatePlayerEntity(final EntityPlayerMP playerIn, int targetDimension, final boolean conqueredEnd) {
+    public ServerPlayerEntity recreatePlayerEntity(final ServerPlayerEntity playerIn, int targetDimension, final boolean conqueredEnd) {
         // ### PHASE 1 ### Get the location to spawn
 
         // Vanilla will always use overworld, set to the world the player was in
@@ -206,7 +206,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
 
         final Player player = (Player) playerIn;
         final Transform<World> fromTransform = player.getTransform();
-        WorldServer worldServer = this.server.getWorld(targetDimension);
+        ServerWorld worldServer = this.server.getWorld(targetDimension);
         final Location<World> toLocation;
         final Location<World> temp = ((World) playerIn.world).getSpawnLocation();
         boolean tempIsBedSpawn = false;
@@ -218,7 +218,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
             // Cannot respawn in requested world, use the fallback dimension for
             // that world. (Usually overworld unless a mod says otherwise).
             if (!toDimension.allowsPlayerRespawns()) {
-                toDimensionId = SpongeImplHooks.getRespawnDimension((WorldProvider) toDimension, playerIn);
+                toDimensionId = SpongeImplHooks.getRespawnDimension((Dimension) toDimension, playerIn);
                 worldServer = worldServer.getMinecraftServer().getWorld(toDimensionId);
             }
 
@@ -226,12 +226,12 @@ public abstract class PlayerListMixin implements PlayerListBridge {
             final BlockPos bedPos = SpongeImplHooks.getBedLocation(playerIn, toDimensionId);
             if (bedPos != null) { // Player has a bed
                 final boolean forceBedSpawn = SpongeImplHooks.isSpawnForced(playerIn, toDimensionId);
-                final BlockPos bedSpawnLoc = EntityPlayer.getBedSpawnLocation(worldServer, bedPos, forceBedSpawn);
+                final BlockPos bedSpawnLoc = PlayerEntity.getBedSpawnLocation(worldServer, bedPos, forceBedSpawn);
                 if (bedSpawnLoc != null) { // The bed exists and is not obstructed
                     tempIsBedSpawn = true;
                     targetSpawnVec = new Vector3d(bedSpawnLoc.getX() + 0.5D, bedSpawnLoc.getY() + 0.1D, bedSpawnLoc.getZ() + 0.5D);
                 } else { // Bed invalid
-                    playerIn.connection.sendPacket(new SPacketChangeGameState(0, 0.0F));
+                    playerIn.connection.sendPacket(new SChangeGameStatePacket(0, 0.0F));
                 }
             }
             toLocation = new Location<>((World) worldServer, targetSpawnVec);
@@ -256,7 +256,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
         // Keep players out of blocks
         final Vector3d tempPos = player.getLocation().getPosition();
         playerIn.setPosition(location.getX(), location.getY(), location.getZ());
-        while (!((WorldServer) location.getExtent()).getCollisionBoxes(playerIn, playerIn.getEntityBoundingBox()).isEmpty() && location.getPosition().getY() < 256.0D) {
+        while (!((ServerWorld) location.getExtent()).getCollisionBoxes(playerIn, playerIn.getEntityBoundingBox()).isEmpty() && location.getPosition().getY() < 256.0D) {
             playerIn.setPosition(playerIn.posX, playerIn.posY + 1.0D, playerIn.posZ);
             location = location.add(0, 1, 0);
         }
@@ -280,7 +280,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
             playerinteractionmanager = new PlayerInteractionManager(this.server.getWorld(targetDimension));
         }
 
-        final EntityPlayerMP newPlayer = new EntityPlayerMP(SpongeImpl.getServer(), worldServer, playerIn.getGameProfile(), playerinteractionmanager);
+        final ServerPlayerEntity newPlayer = new ServerPlayerEntity(SpongeImpl.getServer(), worldServer, playerIn.getGameProfile(), playerinteractionmanager);
         newPlayer.connection = playerIn.connection;
         newPlayer.copyFrom(playerIn, conqueredEnd);
         // set player dimension for RespawnPlayerEvent
@@ -321,11 +321,11 @@ public abstract class PlayerListMixin implements PlayerListBridge {
         toTransform = event.getToTransform();
         location = toTransform.getLocation();
 
-        if (!(location.getExtent() instanceof WorldServer)) {
+        if (!(location.getExtent() instanceof ServerWorld)) {
             SpongeImpl.getLogger().warn("LocationBridge set in PlayerRespawnEvent was invalid, using original location instead");
             location = event.getFromTransform().getLocation();
         }
-        worldServer = (WorldServer) location.getExtent();
+        worldServer = (ServerWorld) location.getExtent();
 
         final WorldServerBridge mixinWorldServer = (WorldServerBridge) worldServer;
         // Set the dimension again in case a plugin changed the target world during RespawnPlayerEvent
@@ -347,19 +347,19 @@ public abstract class PlayerListMixin implements PlayerListBridge {
             // Force vanilla client to refresh its chunk cache if same dimension type
             if (fromTransform.getExtent().getUniqueId() != ((World) worldServer).getUniqueId() && fromTransform.getExtent().getDimension().getType() ==
               toTransform.getExtent().getDimension().getType()) {
-                newPlayer.connection.sendPacket(new SPacketRespawn((dimensionId >= 0 ? -1 : 0), worldServer.getDifficulty(), worldServer
+                newPlayer.connection.sendPacket(new SRespawnPacket((dimensionId >= 0 ? -1 : 0), worldServer.getDifficulty(), worldServer
                         .getWorldInfo().getTerrainType(), newPlayer.interactionManager.getGameType()));
             }
         }
-        newPlayer.connection.sendPacket(new SPacketRespawn(dimensionId, worldServer.getDifficulty(), worldServer
+        newPlayer.connection.sendPacket(new SRespawnPacket(dimensionId, worldServer.getDifficulty(), worldServer
                 .getWorldInfo().getTerrainType(), newPlayer.interactionManager.getGameType()));
-        newPlayer.connection.sendPacket(new SPacketServerDifficulty(worldServer.getDifficulty(), worldServer.getWorldInfo().isDifficultyLocked()));
+        newPlayer.connection.sendPacket(new SServerDifficultyPacket(worldServer.getDifficulty(), worldServer.getWorldInfo().isDifficultyLocked()));
         newPlayer.connection.setPlayerLocation(location.getX(), location.getY(), location.getZ(),
                 (float) toTransform.getYaw(), (float) toTransform.getPitch());
 
         final BlockPos spawnLocation = worldServer.getSpawnPoint();
-        newPlayer.connection.sendPacket(new SPacketSpawnPosition(spawnLocation));
-        newPlayer.connection.sendPacket(new SPacketSetExperience(newPlayer.experience, newPlayer.experienceTotal,
+        newPlayer.connection.sendPacket(new SSpawnPositionPacket(spawnLocation));
+        newPlayer.connection.sendPacket(new SSetExperiencePacket(newPlayer.experience, newPlayer.experienceTotal,
                 newPlayer.experienceLevel));
         this.updateTimeAndWeatherForPlayer(newPlayer, worldServer);
         this.updatePermissionLevel(newPlayer);
@@ -367,7 +367,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
         final org.spongepowered.api.entity.Entity spongeEntity = (org.spongepowered.api.entity.Entity) newPlayer;
         ((org.spongepowered.api.world.World) worldServer).spawnEntity(spongeEntity);
         this.playerEntityList.add(newPlayer);
-        newPlayer.connection.sendPacket(new SPacketPlayerListItem(SPacketPlayerListItem.Action.UPDATE_GAME_MODE, newPlayer));
+        newPlayer.connection.sendPacket(new SPlayerListItemPacket(SPlayerListItemPacket.Action.UPDATE_GAME_MODE, newPlayer));
         for (DataManipulator<?, ?> container : ((Player) playerIn).getContainers()) {
             ((Player) newPlayer).offer(container);
         }
@@ -375,14 +375,14 @@ public abstract class PlayerListMixin implements PlayerListBridge {
         newPlayer.addSelfToInternalCraftingInventory();
 
         // Update reducedDebugInfo game rule
-        newPlayer.connection.sendPacket(new SPacketEntityStatus(newPlayer,
+        newPlayer.connection.sendPacket(new SEntityStatusPacket(newPlayer,
                 worldServer.getGameRules().getBoolean(DefaultGameRules.REDUCED_DEBUG_INFO) ? (byte) 22 : 23));
 
-        for (final PotionEffect potioneffect : newPlayer.getActivePotionEffects()) {
-            newPlayer.connection.sendPacket(new SPacketEntityEffect(newPlayer.getEntityId(), potioneffect));
+        for (final EffectInstance potioneffect : newPlayer.getActivePotionEffects()) {
+            newPlayer.connection.sendPacket(new SPlayEntityEffectPacket(newPlayer.getEntityId(), potioneffect));
         }
         ((EntityPlayerMPBridge) newPlayer).bridge$refreshScaledHealth();
-        newPlayer.connection.sendPacket(new SPacketHeldItemChange(playerIn.inventory.currentItem));
+        newPlayer.connection.sendPacket(new SHeldItemChangePacket(playerIn.inventory.currentItem));
         SpongeCommonEventFactory.callPostPlayerRespawnEvent(newPlayer, conqueredEnd);
 
         return newPlayer;
@@ -393,7 +393,7 @@ public abstract class PlayerListMixin implements PlayerListBridge {
      * @reason Re-route to the common hook
      */
     @Overwrite
-    public void transferEntityToWorld(final Entity entityIn, final int lastDimension, final WorldServer oldWorldIn, final WorldServer toWorldIn) {
+    public void transferEntityToWorld(final Entity entityIn, final int lastDimension, final ServerWorld oldWorldIn, final ServerWorld toWorldIn) {
         EntityUtil.transferEntityToWorld(entityIn, null, toWorldIn, (ForgeITeleporterBridge) toWorldIn.getDefaultTeleporter(), false);
     }
 
@@ -402,15 +402,15 @@ public abstract class PlayerListMixin implements PlayerListBridge {
      * @reason Re-route to the common hook
      */
     @Overwrite
-    public void changePlayerDimension(final EntityPlayerMP player, final int dimension) {
-        final WorldServer toWorld = this.server.getWorld(dimension);
+    public void changePlayerDimension(final ServerPlayerEntity player, final int dimension) {
+        final ServerWorld toWorld = this.server.getWorld(dimension);
 
         EntityUtil.transferPlayerToWorld(player, null, toWorld, (ForgeITeleporterBridge) toWorld.getDefaultTeleporter());
     }
 
     @SuppressWarnings("ConstantConditions")
     @Inject(method = "setPlayerManager", at = @At("HEAD"), cancellable = true)
-    private void onSetPlayerManager(final WorldServer[] worlds, final CallbackInfo callbackInfo) {
+    private void onSetPlayerManager(final ServerWorld[] worlds, final CallbackInfo callbackInfo) {
         if (this.playerDataManager == null) {
             this.playerDataManager = worlds[0].getSaveHandler().getPlayerNBTManager();
             // This is already added in our world constructor
@@ -419,15 +419,15 @@ public abstract class PlayerListMixin implements PlayerListBridge {
         callbackInfo.cancel();
     }
 
-    @Redirect(method = "updateTimeAndWeatherForPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldServer;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
-    private WorldBorder onUpdateTimeGetWorldBorder(final WorldServer worldServer, final EntityPlayerMP entityPlayerMP, final WorldServer worldServerIn) {
+    @Redirect(method = "updateTimeAndWeatherForPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/ServerWorld;getWorldBorder()Lnet/minecraft/world/border/WorldBorder;"))
+    private WorldBorder onUpdateTimeGetWorldBorder(final ServerWorld worldServer, final ServerPlayerEntity entityPlayerMP, final ServerWorld worldServerIn) {
         return worldServerIn.getWorldBorder();
     }
 
-    @Redirect(method = "updateTimeAndWeatherForPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/NetHandlerPlayServer;sendPacket"
-            + "(Lnet/minecraft/network/Packet;)V", ordinal = 0))
+    @Redirect(method = "updateTimeAndWeatherForPlayer", at = @At(value = "INVOKE", target = "Lnet/minecraft/network/ServerPlayNetHandler;sendPacket"
+            + "(Lnet/minecraft/network/IPacket;)V", ordinal = 0))
     private void onWorldBorderInitializePacket(
-        final NetHandlerPlayServer invoker, final Packet<?> packet, final EntityPlayerMP playerMP, final WorldServer worldServer) {
+        final ServerPlayNetHandler invoker, final IPacket<?> packet, final ServerPlayerEntity playerMP, final ServerWorld worldServer) {
         if (worldServer.provider instanceof WorldProviderHell) {
             ((SPacketWorldBorderBridge) packet).bridge$changeCoordinatesForNether();
         }
@@ -435,14 +435,14 @@ public abstract class PlayerListMixin implements PlayerListBridge {
         invoker.sendPacket(packet);
     }
 
-    @Inject(method = "playerLoggedOut(Lnet/minecraft/entity/player/EntityPlayerMP;)V", at = @At("HEAD"))
-    private void onPlayerLogOut(final EntityPlayerMP player, final CallbackInfo ci) {
+    @Inject(method = "playerLoggedOut(Lnet/minecraft/entity/player/ServerPlayerEntity;)V", at = @At("HEAD"))
+    private void onPlayerLogOut(final ServerPlayerEntity player, final CallbackInfo ci) {
         // Remove player reference from scoreboard
         ((ServerScoreboardBridge) ((Player) player).getScoreboard()).bridge$removePlayer(player, false);
     }
 
-    @Redirect(method = "playerLoggedOut(Lnet/minecraft/entity/player/EntityPlayerMP;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/WorldServer;removeEntity(Lnet/minecraft/entity/Entity;)V"))
-    private void onPlayerRemoveFromWorldFromDisconnect(final WorldServer world, final Entity player, final EntityPlayerMP playerMP) {
+    @Redirect(method = "playerLoggedOut(Lnet/minecraft/entity/player/ServerPlayerEntity;)V", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/ServerWorld;removeEntity(Lnet/minecraft/entity/Entity;)V"))
+    private void onPlayerRemoveFromWorldFromDisconnect(final ServerWorld world, final Entity player, final ServerPlayerEntity playerMP) {
         try (final GeneralizedContext context = PlayerPhase.State.PLAYER_LOGOUT.createPhaseContext().source(playerMP).addCaptures()) {
             context.buildAndSwitch();
             world.removeEntity(player);
@@ -456,23 +456,23 @@ public abstract class PlayerListMixin implements PlayerListBridge {
         }
     }
 
-    @Inject(method = "playerLoggedIn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/management/PlayerList;sendPacketToAllPlayers(Lnet/minecraft/network/Packet;)V", shift = At.Shift.BEFORE), cancellable = true)
-    private void impl$sendAddPlayerListItemPacketAndPreparePlayer(final EntityPlayerMP player, final CallbackInfo ci) {
+    @Inject(method = "playerLoggedIn", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/management/PlayerList;sendPacketToAllPlayers(Lnet/minecraft/network/IPacket;)V", shift = At.Shift.BEFORE), cancellable = true)
+    private void impl$sendAddPlayerListItemPacketAndPreparePlayer(final ServerPlayerEntity player, final CallbackInfo ci) {
         // Create a packet to be used for players without context data
-        final SPacketPlayerListItem noSpecificViewerPacket = new SPacketPlayerListItem(SPacketPlayerListItem.Action.ADD_PLAYER, player);
+        final SPlayerListItemPacket noSpecificViewerPacket = new SPlayerListItemPacket(SPlayerListItemPacket.Action.ADD_PLAYER, player);
 
-        for (final EntityPlayerMP viewer : this.playerEntityList) {
+        for (final ServerPlayerEntity viewer : this.playerEntityList) {
             if (((Player) viewer).canSee((Player) player)) {
                 viewer.connection.sendPacket(noSpecificViewerPacket);
             }
 
             if (player == viewer || ((Player) player).canSee((Player) viewer)) {
-                player.connection.sendPacket(new SPacketPlayerListItem(SPacketPlayerListItem.Action.ADD_PLAYER, viewer));
+                player.connection.sendPacket(new SPlayerListItemPacket(SPlayerListItemPacket.Action.ADD_PLAYER, viewer));
             }
         }
 
         // Spawn player into level
-        final WorldServer level = this.server.getWorld(player.dimension);
+        final ServerWorld level = this.server.getWorld(player.dimension);
         // TODO direct this appropriately
         level.spawnEntity(player);
         this.preparePlayer(player, null);
@@ -481,8 +481,8 @@ public abstract class PlayerListMixin implements PlayerListBridge {
         ci.cancel();
     }
 
-    @Inject(method = "writePlayerData", at = @At(target = "Lnet/minecraft/world/storage/IPlayerFileData;writePlayerData(Lnet/minecraft/entity/player/EntityPlayer;)V", value = "INVOKE"))
-    private void impl$saveSpongePlayerDataAfterSavingPlayerData(final EntityPlayerMP playerMP, final CallbackInfo callbackInfo) {
+    @Inject(method = "writePlayerData", at = @At(target = "Lnet/minecraft/world/storage/IPlayerFileData;writePlayerData(Lnet/minecraft/entity/player/PlayerEntity;)V", value = "INVOKE"))
+    private void impl$saveSpongePlayerDataAfterSavingPlayerData(final ServerPlayerEntity playerMP, final CallbackInfo callbackInfo) {
         SpongePlayerDataHandler.savePlayer(playerMP.getUniqueID());
     }
 
@@ -497,8 +497,8 @@ public abstract class PlayerListMixin implements PlayerListBridge {
     }
 
     @Redirect(method = "updatePermissionLevel", at = @At(value = "INVOKE",
-            target = "Lnet/minecraft/world/WorldServer;getWorldInfo()Lnet/minecraft/world/storage/WorldInfo;"))
-    private WorldInfo onGetWorldInfo(final WorldServer overworld, final EntityPlayerMP player) {
+            target = "Lnet/minecraft/world/ServerWorld;getWorldInfo()Lnet/minecraft/world/storage/WorldInfo;"))
+    private WorldInfo onGetWorldInfo(final ServerWorld overworld, final ServerPlayerEntity player) {
         // TODO: This applies only to singleplayer, on the server canSendCommands is called with the game profile
         // We can't get the world from the game profile
 

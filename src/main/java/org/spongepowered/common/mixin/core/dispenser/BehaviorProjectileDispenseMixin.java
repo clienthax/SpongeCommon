@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.core.dispenser;
 
-import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
-import net.minecraft.dispenser.BehaviorProjectileDispense;
+import net.minecraft.dispenser.DefaultDispenseItemBehavior;
+import net.minecraft.dispenser.ProjectileDispenseBehavior;
 import net.minecraft.dispenser.IBlockSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
@@ -37,8 +37,8 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(BehaviorProjectileDispense.class)
-public class BehaviorProjectileDispenseMixin extends BehaviorDefaultDispenseItem {
+@Mixin(ProjectileDispenseBehavior.class)
+public class BehaviorProjectileDispenseMixin extends DefaultDispenseItemBehavior {
 
     @Redirect(method = "dispenseStack", at = @At(value = "INVOKE",
             target = "Lnet/minecraft/world/World;spawnEntity(Lnet/minecraft/entity/Entity;)Z"))

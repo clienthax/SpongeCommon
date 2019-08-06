@@ -29,8 +29,8 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.tileentity.TileEntityEnderChest;
+import net.minecraft.tileentity.ChestTileEntity;
+import net.minecraft.tileentity.EnderChestTileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.ResourceLocation;
 import org.spongepowered.api.block.tileentity.TileEntityType;
@@ -145,7 +145,7 @@ public final class TileEntityTypeRegistryModule
             if (ITickable.class.isAssignableFrom(clazz)) {
                 String mapping = SpongeImplHooks.isDeobfuscatedEnvironment() ? "update" : "func_73660_a";
                 Class<?> declaringClazz = clazz.getMethod(mapping).getDeclaringClass();
-                if (declaringClazz.equals(TileEntityChest.class) || declaringClazz.equals(TileEntityEnderChest.class)) {
+                if (declaringClazz.equals(ChestTileEntity.class) || declaringClazz.equals(EnderChestTileEntity.class)) {
                     canTick = false;
                 }
             }

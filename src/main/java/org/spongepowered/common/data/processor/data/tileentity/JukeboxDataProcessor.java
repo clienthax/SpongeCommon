@@ -24,10 +24,10 @@
  */
 package org.spongepowered.common.data.processor.data.tileentity;
 
-import net.minecraft.block.BlockJukebox;
+import net.minecraft.block.JukeboxBlock;
 import net.minecraft.block.BlockJukebox.TileEntityJukebox;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.item.ItemRecord;
+import net.minecraft.block.BlockState;
+import net.minecraft.item.MusicDiscItem;
 import org.spongepowered.api.block.tileentity.Jukebox;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -46,49 +46,49 @@ import org.spongepowered.common.registry.type.ItemTypeRegistryModule;
 import java.util.Optional;
 
 public class JukeboxDataProcessor extends
-        AbstractTileEntitySingleDataProcessor<BlockJukebox.TileEntityJukebox, ItemStackSnapshot, Value<ItemStackSnapshot>, RepresentedItemData, ImmutableRepresentedItemData> {
+        AbstractTileEntitySingleDataProcessor<JukeboxBlock.TileEntityJukebox, ItemStackSnapshot, Value<ItemStackSnapshot>, RepresentedItemData, ImmutableRepresentedItemData> {
 
     public JukeboxDataProcessor() {
-        super(BlockJukebox.TileEntityJukebox.class, Keys.REPRESENTED_ITEM);
+        super(JukeboxBlock.TileEntityJukebox.class, Keys.REPRESENTED_ITEM);
     }
 
     @Override
-    protected boolean set(BlockJukebox.TileEntityJukebox jukebox, ItemStackSnapshot stackSnapshot) {
-        IBlockState block = jukebox.getWorld().getBlockState(jukebox.getPos());
+    protected boolean set(JukeboxBlock.TileEntityJukebox jukebox, ItemStackSnapshot stackSnapshot) {
+        BlockState block = jukebox.getWorld().getBlockState(jukebox.getPos());
         if (stackSnapshot == ItemStackSnapshot.NONE) {
             if (jukebox.getRecord() == null) {
                 return true;
             }
             return remove(jukebox);
         }
-        if (!(stackSnapshot.getType() instanceof ItemRecord)) {
+        if (!(stackSnapshot.getType() instanceof MusicDiscItem)) {
             return false;
         }
         ((Jukebox) jukebox).insertRecord(stackSnapshot.createStack());
         block = jukebox.getWorld().getBlockState(jukebox.getPos());
-        return block.getBlock() instanceof BlockJukebox && block.getValue(BlockJukebox.HAS_RECORD);
+        return block.getBlock() instanceof JukeboxBlock && block.getValue(JukeboxBlock.HAS_RECORD);
     }
 
     @Override
-    protected Optional<ItemStackSnapshot> getVal(BlockJukebox.TileEntityJukebox jukebox) {
+    protected Optional<ItemStackSnapshot> getVal(JukeboxBlock.TileEntityJukebox jukebox) {
         if (jukebox.getRecord() == null) {
             return Optional.empty();
         }
         return Optional.of(((org.spongepowered.api.item.inventory.ItemStack) jukebox.getRecord()).createSnapshot());
     }
 
-    private boolean remove(BlockJukebox.TileEntityJukebox jukebox) {
+    private boolean remove(JukeboxBlock.TileEntityJukebox jukebox) {
         ((Jukebox) jukebox).ejectRecord();
-        IBlockState block = jukebox.getWorld().getBlockState(jukebox.getPos());
-        return block.getBlock() instanceof BlockJukebox && !block.getValue(BlockJukebox.HAS_RECORD);
+        BlockState block = jukebox.getWorld().getBlockState(jukebox.getPos());
+        return block.getBlock() instanceof JukeboxBlock && !block.getValue(JukeboxBlock.HAS_RECORD);
     }
 
     @Override
     public DataTransactionResult removeFrom(ValueContainer<?> container) {
-        if (!(container instanceof BlockJukebox.TileEntityJukebox)) {
+        if (!(container instanceof JukeboxBlock.TileEntityJukebox)) {
             return DataTransactionResult.failNoData();
         }
-        BlockJukebox.TileEntityJukebox jukebox = (TileEntityJukebox) container;
+        JukeboxBlock.TileEntityJukebox jukebox = (TileEntityJukebox) container;
         Optional<ItemStackSnapshot> old = getVal(jukebox);
         if (!old.isPresent()) {
             return DataTransactionResult.successNoData();

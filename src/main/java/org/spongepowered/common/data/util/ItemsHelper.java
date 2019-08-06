@@ -29,7 +29,7 @@ import static org.spongepowered.api.data.DataTransactionResult.successNoData;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemBlock;
+import net.minecraft.item.BlockItem;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.item.BlockItemData;
@@ -51,7 +51,7 @@ public final class ItemsHelper {
     }
 
     public static Optional<Integer> getDamageValue(final ItemType type, final Set<DataManipulator<?, ?>> DataManipulatorSet) {
-        if (type instanceof ItemBlock) {
+        if (type instanceof BlockItem) {
             // If it's a block, well, we definitely should have some block state information we can use
             for (DataManipulator<?, ?> data : DataManipulatorSet) {
                 if (data instanceof BlockItemData) {

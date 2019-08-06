@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.monster;
 
-import net.minecraft.entity.monster.EntityEndermite;
+import net.minecraft.entity.monster.EndermiteEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.ExpirableData;
@@ -38,7 +38,7 @@ import org.spongepowered.common.util.Constants;
 
 import java.util.Collection;
 
-@Mixin(EntityEndermite.class)
+@Mixin(EndermiteEntity.class)
 public abstract class EntityEndermiteMixin_API extends EntityMobMixin_API implements Endermite {
 
     @Shadow private int lifetime;

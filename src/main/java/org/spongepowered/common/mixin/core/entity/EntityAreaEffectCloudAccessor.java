@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.mixin.core.entity;
 
-import net.minecraft.entity.EntityAreaEffectCloud;
-import net.minecraft.potion.PotionEffect;
+import net.minecraft.entity.AreaEffectCloudEntity;
+import net.minecraft.potion.EffectInstance;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
@@ -34,7 +34,7 @@ import java.util.List;
 /**
  * Specialized {@link Accessor} mixin
  */
-@Mixin(EntityAreaEffectCloud.class)
+@Mixin(AreaEffectCloudEntity.class)
 public interface EntityAreaEffectCloudAccessor {
 
     @Accessor
@@ -44,10 +44,10 @@ public interface EntityAreaEffectCloudAccessor {
     int getDurationOnUse();
 
     @Accessor("effects")
-    List<PotionEffect> getPotionEffects();
+    List<EffectInstance> getPotionEffects();
 
     @Accessor("effects")
-    void setPotionEffects(List<PotionEffect> potionEffects);
+    void setPotionEffects(List<EffectInstance> potionEffects);
 
     @Accessor
     int getReapplicationDelay();

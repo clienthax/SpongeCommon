@@ -27,17 +27,17 @@ package org.spongepowered.common.mixin.optimization.block;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockObserver;
-import net.minecraft.block.BlockPistonBase;
-import net.minecraft.block.BlockRedstoneComparator;
-import net.minecraft.block.BlockRedstoneDiode;
-import net.minecraft.block.BlockRedstoneRepeater;
-import net.minecraft.block.BlockRedstoneTorch;
-import net.minecraft.block.BlockRedstoneWire;
+import net.minecraft.block.ObserverBlock;
+import net.minecraft.block.PistonBlock;
+import net.minecraft.block.ComparatorBlock;
+import net.minecraft.block.RedstoneDiodeBlock;
+import net.minecraft.block.RepeaterBlock;
+import net.minecraft.block.RedstoneTorchBlock;
+import net.minecraft.block.RedstoneWireBlock;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.world.IBlockAccess;
@@ -59,7 +59,7 @@ import java.util.Set;
 import javax.annotation.Nullable;
 
 @SuppressWarnings({"deprecation", "ConstantConditions"})
-@Mixin(value = BlockRedstoneWire.class, priority = 1001)
+@Mixin(value = RedstoneWireBlock.class, priority = 1001)
 public abstract class BlockRedstoneWireMixin_Panda extends Block {
 
     protected BlockRedstoneWireMixin_Panda(final Material materialIn) {
@@ -76,20 +76,20 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
     /** Ordered arrays of the facings; Needed for the update order.
      *  I went with a vertical-first order here, but vertical last would work to.
      *  However it should be avoided to update the vertical axis between the horizontal ones as this would cause unneeded directional behavior. **/
-    private static final EnumFacing[] facingsHorizontal = {EnumFacing.WEST, EnumFacing.EAST, EnumFacing.NORTH, EnumFacing.SOUTH};
-    private static final EnumFacing[] facingsVertical = {EnumFacing.DOWN, EnumFacing.UP};
-    private static final EnumFacing[] facings = ArrayUtils.addAll(facingsVertical, facingsHorizontal);
+    private static final Direction[] facingsHorizontal = {Direction.WEST, Direction.EAST, Direction.NORTH, Direction.SOUTH};
+    private static final Direction[] facingsVertical = {Direction.DOWN, Direction.UP};
+    private static final Direction[] facings = ArrayUtils.addAll(facingsVertical, facingsHorizontal);
 
     /** Offsets for all surrounding blocks that need to receive updates **/
     private static final Vec3i[] surroundingBlocksOffset;
     static {
         final Set<Vec3i> set = Sets.newLinkedHashSet();
-        for (final EnumFacing facing : facings) {
+        for (final Direction facing : facings) {
             set.add(((EnumFacingBridge) (Object) facing).bridge$getDirectionVec());
         }
-        for (final EnumFacing facing1 : facings) {
+        for (final Direction facing1 : facings) {
             final Vec3i v1 = ((EnumFacingBridge) (Object) facing1).bridge$getDirectionVec();
-            for (final EnumFacing facing2 : facings) {
+            for (final Direction facing2 : facings) {
                 final Vec3i v2 = ((EnumFacingBridge) (Object) facing2).bridge$getDirectionVec();
                 // TODO Adding an add-method to Vec3i would be nicer of course
                 set.add(new Vec3i(v1.getX() + v2.getX(), v1.getY() + v2.getY(), v1.getZ() + v2.getZ()));
@@ -101,10 +101,10 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
 
     @Shadow private boolean canProvidePower;
     @Shadow protected abstract int getMaxCurrentStrength(World worldIn, BlockPos pos, int strength);
-    @Shadow protected abstract boolean isPowerSourceAt(IBlockAccess worldIn, BlockPos pos, EnumFacing side);
+    @Shadow protected abstract boolean isPowerSourceAt(IBlockAccess worldIn, BlockPos pos, Direction side);
 
     @Inject(method = "updateSurroundingRedstone", at = @At("HEAD"), cancellable = true)
-    private void onUpdateSurroundingRedstone(final World worldIn, final BlockPos pos, final IBlockState state, final CallbackInfoReturnable<IBlockState> cir) {
+    private void onUpdateSurroundingRedstone(final World worldIn, final BlockPos pos, final BlockState state, final CallbackInfoReturnable<BlockState> cir) {
         if (!worldIn.isRemote) {
             this.updateSurroundingRedstone(worldIn, pos);
             cir.setReturnValue(state);
@@ -113,7 +113,7 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
 
     @Inject(method = "calculateCurrentChanges", at = @At("HEAD"), cancellable = true)
     private void onCalculateCurrentChanges(
-        final World worldIn, final BlockPos pos1, final BlockPos pos2, final IBlockState state, final CallbackInfoReturnable<IBlockState> cir) {
+        final World worldIn, final BlockPos pos1, final BlockPos pos2, final BlockState state, final CallbackInfoReturnable<BlockState> cir) {
         if (!worldIn.isRemote) {
             this.calculateCurrentChanges(worldIn, pos1);
             cir.setReturnValue(state);
@@ -156,7 +156,7 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
 
         // Execute updates
         for (final BlockPos posi : blocksNeedingUpdate) {
-            worldIn.notifyNeighborsOfStateChange(posi, (BlockRedstoneWire) (Object) this, false);
+            worldIn.notifyNeighborsOfStateChange(posi, (RedstoneWireBlock) (Object) this, false);
         }
     }
 
@@ -178,8 +178,8 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
 
         while (!this.panda$turnOff.isEmpty()) {
             final BlockPos pos = this.panda$turnOff.remove(0);
-            final IBlockState state = worldIn.getBlockState(pos);
-            final int oldPower = state.getValue(BlockRedstoneWire.POWER);
+            final BlockState state = worldIn.getBlockState(pos);
+            final int oldPower = state.getValue(RedstoneWireBlock.POWER);
             this.canProvidePower = false;
             final int blockPower = worldIn.getRedstonePowerFromNeighbors(pos);
             this.canProvidePower = true;
@@ -207,8 +207,8 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
         // Now all needed wires are turned off. Time to turn them on again if there is a power source.
         while (!this.panda$turnOn.isEmpty()) {
             final BlockPos pos = this.panda$turnOn.remove(0);
-            final IBlockState state = worldIn.getBlockState(pos);
-            final int oldPower = state.getValue(BlockRedstoneWire.POWER);
+            final BlockState state = worldIn.getBlockState(pos);
+            final int oldPower = state.getValue(RedstoneWireBlock.POWER);
             this.canProvidePower = false;
             final int blockPower = worldIn.getRedstonePowerFromNeighbors(pos);
             this.canProvidePower = true;
@@ -239,9 +239,9 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
      * @param otherPower Power of the wire next to it
      */
     private void addWireToList(final World worldIn, final BlockPos pos, final int otherPower) {
-        final IBlockState state = worldIn.getBlockState(pos);
+        final BlockState state = worldIn.getBlockState(pos);
         if (state.getBlock() == this) {
-            final int power = state.getValue(BlockRedstoneWire.POWER);
+            final int power = state.getValue(RedstoneWireBlock.POWER);
             // Could get powered stronger by the neighbor?
             if (power < (otherPower - 1) && !this.panda$turnOn.contains(pos)) {
                 // Mark for turn on check.
@@ -266,25 +266,25 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
      * @param pos Position of the wire
      */
     private void checkSurroundingWires(final World worldIn, final BlockPos pos) {
-        final IBlockState state = worldIn.getBlockState(pos);
+        final BlockState state = worldIn.getBlockState(pos);
         int ownPower = 0;
         if (state.getBlock() == this) {
-            ownPower = state.getValue(BlockRedstoneWire.POWER);
+            ownPower = state.getValue(RedstoneWireBlock.POWER);
         }
         // Check wires on the same layer first as they appear closer to the wire
-        for (final EnumFacing facing : facingsHorizontal) {
+        for (final Direction facing : facingsHorizontal) {
             final BlockPos offsetPos = pos.offset(facing);
             if (facing.getAxis().isHorizontal()) {
                 this.addWireToList(worldIn, offsetPos, ownPower);
             }
         }
-        for (final EnumFacing facingVertical : facingsVertical) {
+        for (final Direction facingVertical : facingsVertical) {
             final BlockPos offsetPos = pos.offset(facingVertical);
             final boolean solidBlock = worldIn.getBlockState(offsetPos).isBlockNormalCube();
-            for (final EnumFacing facingHorizontal : facingsHorizontal) {
+            for (final Direction facingHorizontal : facingsHorizontal) {
                 // wire can travel upwards if the block on top doesn't cut the wire (is non-solid)
                 // it can travel down if the block below is solid and the block "diagonal" doesn't cut off the wire (is non-solid) 
-                if ((facingVertical == EnumFacing.UP && !solidBlock) || (facingVertical == EnumFacing.DOWN && solidBlock && !worldIn.getBlockState(offsetPos.offset(facingHorizontal)).isBlockNormalCube())) {
+                if ((facingVertical == Direction.UP && !solidBlock) || (facingVertical == Direction.DOWN && solidBlock && !worldIn.getBlockState(offsetPos.offset(facingHorizontal)).isBlockNormalCube())) {
                     this.addWireToList(worldIn, offsetPos.offset(facingHorizontal), ownPower);
                 }
             }
@@ -302,7 +302,7 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
      */
     private int getSurroundingWirePower(final World worldIn, final BlockPos pos) {
         int wirePower = 0;
-        for (final EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL) {
+        for (final Direction enumfacing : Direction.Plane.HORIZONTAL) {
             final BlockPos offsetPos = pos.offset(enumfacing);
             // Wires on the same layer
             wirePower = this.getMaxCurrentStrength(worldIn, offsetPos, wirePower);
@@ -329,24 +329,24 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
      * @param set Set to add the update positions too
      */
     private void addBlocksNeedingUpdate(final World worldIn, final BlockPos pos, final Set<BlockPos> set) {
-        final List<EnumFacing> connectedSides = this.getSidesToPower(worldIn, pos);
+        final List<Direction> connectedSides = this.getSidesToPower(worldIn, pos);
         // Add the blocks next to the wire first (closest first order)
-        for (final EnumFacing facing : facings) {
+        for (final Direction facing : facings) {
             final BlockPos offsetPos = pos.offset(facing);
             // canConnectTo() is not the nicest solution here as it returns true for e.g. the front of a repeater
             // canBlockBePowereFromSide catches these cases
-            if (connectedSides.contains(facing.getOpposite()) || facing == EnumFacing.DOWN
+            if (connectedSides.contains(facing.getOpposite()) || facing == Direction.DOWN
                     || (facing.getAxis().isHorizontal() && canConnectToBlock(worldIn.getBlockState(offsetPos), facing, worldIn, pos))) {
                 if (this.canBlockBePoweredFromSide(worldIn.getBlockState(offsetPos), facing, true))
                     set.add(offsetPos);
             }
         }
         // Later add blocks around the surrounding blocks that get powered
-        for (final EnumFacing facing : facings) {
+        for (final Direction facing : facings) {
             final BlockPos offsetPos = pos.offset(facing);
-            if (connectedSides.contains(facing.getOpposite()) || facing == EnumFacing.DOWN) {
+            if (connectedSides.contains(facing.getOpposite()) || facing == Direction.DOWN) {
                 if (worldIn.getBlockState(offsetPos).isNormalCube()) {
-                    for (final EnumFacing facing1 : facings) {
+                    for (final Direction facing1 : facings) {
                         if (this.canBlockBePoweredFromSide(worldIn.getBlockState(offsetPos.offset(facing1)), facing1, false))
                             set.add(offsetPos.offset(facing1));
                     }
@@ -376,18 +376,18 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
      * @param isWire     True if it's powered by a wire directly, False if through a block
      * @return           True if the block can change based on the power level it gets on the given side, false otherwise
      */
-    private boolean canBlockBePoweredFromSide(final IBlockState state, final EnumFacing side, final boolean isWire) {
-        if (state.getBlock() instanceof BlockPistonBase && state.getValue(BlockPistonBase.FACING) == side.getOpposite()) {
+    private boolean canBlockBePoweredFromSide(final BlockState state, final Direction side, final boolean isWire) {
+        if (state.getBlock() instanceof PistonBlock && state.getValue(PistonBlock.FACING) == side.getOpposite()) {
             return false;
         }
-        if (state.getBlock() instanceof BlockRedstoneDiode && state.getValue(BlockRedstoneDiode.FACING) != side.getOpposite()) {
+        if (state.getBlock() instanceof RedstoneDiodeBlock && state.getValue(RedstoneDiodeBlock.FACING) != side.getOpposite()) {
             return isWire
-                   && state.getBlock() instanceof BlockRedstoneComparator
-                   && state.getValue(BlockRedstoneComparator.FACING).getAxis() != side.getAxis()
+                   && state.getBlock() instanceof ComparatorBlock
+                   && state.getValue(ComparatorBlock.FACING).getAxis() != side.getAxis()
                    && side.getAxis().isHorizontal();
         }
-        if (state.getBlock() instanceof BlockRedstoneTorch) {
-            return !isWire && state.getValue(BlockRedstoneTorch.FACING) == side;
+        if (state.getBlock() instanceof RedstoneTorchBlock) {
+            return !isWire && state.getValue(RedstoneTorchBlock.FACING) == side;
         }
         return true;
     }
@@ -400,23 +400,23 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
      * @param pos Position of the wire
      * @return List of all facings that can get powered by this wire
      */
-    private List<EnumFacing> getSidesToPower(final World worldIn, final BlockPos pos) {
-        final List<EnumFacing> retval = Lists.newArrayList();
-        for (final EnumFacing facing : facingsHorizontal) {
+    private List<Direction> getSidesToPower(final World worldIn, final BlockPos pos) {
+        final List<Direction> retval = Lists.newArrayList();
+        for (final Direction facing : facingsHorizontal) {
             if (isPowerSourceAt(worldIn, pos, facing))
                 retval.add(facing);
         }
         if (retval.isEmpty())
             return Lists.newArrayList(facingsHorizontal);
-        final boolean northsouth = retval.contains(EnumFacing.NORTH) || retval.contains(EnumFacing.SOUTH);
-        final boolean eastwest = retval.contains(EnumFacing.EAST) || retval.contains(EnumFacing.WEST);
+        final boolean northsouth = retval.contains(Direction.NORTH) || retval.contains(Direction.SOUTH);
+        final boolean eastwest = retval.contains(Direction.EAST) || retval.contains(Direction.WEST);
         if (northsouth) {
-            retval.remove(EnumFacing.EAST);
-            retval.remove(EnumFacing.WEST);
+            retval.remove(Direction.EAST);
+            retval.remove(Direction.WEST);
         }
         if (eastwest) {
-            retval.remove(EnumFacing.NORTH);
-            retval.remove(EnumFacing.SOUTH);
+            retval.remove(Direction.NORTH);
+            retval.remove(Direction.SOUTH);
         }
         return retval;
     }
@@ -444,8 +444,8 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
      * @param state Old state
      * @param power Power it should get set to
      */
-    private void setWireState(final World worldIn, final BlockPos pos, IBlockState state, final int power) {
-        state = state.withProperty(BlockRedstoneWire.POWER, power);
+    private void setWireState(final World worldIn, final BlockPos pos, BlockState state, final int power) {
+        state = state.withProperty(RedstoneWireBlock.POWER, power);
         worldIn.setBlockState(pos, state, 2);
         this.panda$updatedRedstoneWire.add(pos);
     }
@@ -460,7 +460,7 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
      */
     @Override
     @Overwrite
-    public void onBlockAdded(final World worldIn, final BlockPos pos, final IBlockState state) {
+    public void onBlockAdded(final World worldIn, final BlockPos pos, final BlockState state) {
         if (!worldIn.isRemote) {
             this.updateSurroundingRedstone(worldIn, pos);
             for (final Vec3i vec : surroundingBlocksOffset) {
@@ -478,7 +478,7 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
      */
     @Override
     @Overwrite
-    public void breakBlock(final World worldIn, final BlockPos pos, final IBlockState state) {
+    public void breakBlock(final World worldIn, final BlockPos pos, final BlockState state) {
         super.breakBlock(worldIn, pos, state);
         if (!worldIn.isRemote) {
             this.updateSurroundingRedstone(worldIn, pos);
@@ -500,12 +500,12 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
     @SuppressWarnings("deprecation")
     @Override
     @Overwrite
-    public int getWeakPower(final IBlockState blockState, final IBlockAccess blockAccess, final BlockPos pos, final EnumFacing side) {
+    public int getWeakPower(final BlockState blockState, final IBlockAccess blockAccess, final BlockPos pos, final Direction side) {
         if (!this.canProvidePower) {
             return 0;
         } else {
-            if (side == EnumFacing.UP || this.getSidesToPower((World) blockAccess, pos).contains(side)) {
-                return blockState.getValue(BlockRedstoneWire.POWER);
+            if (side == Direction.UP || this.getSidesToPower((World) blockAccess, pos).contains(side)) {
+                return blockState.getValue(RedstoneWireBlock.POWER);
             } else {
                 return 0;
             }
@@ -513,18 +513,18 @@ public abstract class BlockRedstoneWireMixin_Panda extends Block {
     }
 
     // Forge adds 2 params to canConnectTo so we need to copy method in order to access it
-    private static boolean canConnectToBlock(final IBlockState blockState, @Nullable final EnumFacing side, final IBlockAccess world, final BlockPos pos) {
+    private static boolean canConnectToBlock(final BlockState blockState, @Nullable final Direction side, final IBlockAccess world, final BlockPos pos) {
         final Block block = blockState.getBlock();
 
         if (block == Blocks.REDSTONE_WIRE) {
             return true;
         }
         if (Blocks.UNPOWERED_REPEATER.isSameDiode(blockState)) {
-            final EnumFacing enumfacing = blockState.getValue(BlockRedstoneRepeater.FACING);
+            final Direction enumfacing = blockState.getValue(RepeaterBlock.FACING);
             return enumfacing == side || enumfacing.getOpposite() == side;
         }
         if (Blocks.OBSERVER == blockState.getBlock()) {
-            return side == blockState.getValue(BlockObserver.FACING);
+            return side == blockState.getValue(ObserverBlock.FACING);
         }
         return SpongeImplHooks.canConnectRedstone(block, blockState, world, pos, side);
     }

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.tileentity;
 
-import net.minecraft.tileentity.TileEntityBanner;
+import net.minecraft.tileentity.BannerTileEntity;
 import org.spongepowered.api.block.tileentity.Banner;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
@@ -33,7 +33,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import java.util.List;
 
 @NonnullByDefault
-@Mixin(TileEntityBanner.class)
+@Mixin(BannerTileEntity.class)
 public abstract class TileEntityBannerMixin_API extends TileEntityMixin_API implements Banner {
 
     @Override

@@ -24,11 +24,11 @@
  */
 package org.spongepowered.common.event.tracking.context;
 
-import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.item.ItemEntity;
 
 import java.util.UUID;
 
-public final class EntityItemEntityDropsSupplier extends CapturedMultiMapSupplier<UUID, EntityItem> {
+public final class EntityItemEntityDropsSupplier extends CapturedMultiMapSupplier<UUID, ItemEntity> {
 
     public EntityItemEntityDropsSupplier() {
     }

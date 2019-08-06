@@ -29,9 +29,9 @@ import net.minecraft.util.math.ChunkPos;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.gen.MapGenBase;
-import net.minecraft.world.gen.structure.MapGenStructure;
-import net.minecraft.world.gen.structure.StructureBoundingBox;
-import net.minecraft.world.gen.structure.StructureStart;
+import net.minecraft.world.gen.feature.Structure;
+import net.minecraft.util.math.MutableBoundingBox;
+import net.minecraft.world.gen.feature.StructureStart;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Overwrite;
 import org.spongepowered.asm.mixin.Shadow;
@@ -39,7 +39,7 @@ import org.spongepowered.common.bridge.world.chunk.ChunkProviderBridge;
 
 import java.util.Random;
 
-@Mixin(MapGenStructure.class)
+@Mixin(Structure.class)
 public abstract class MapGenStructureMixin extends MapGenBase {
 
     private static boolean impl$isGeneratingStructures = false;
@@ -78,7 +78,7 @@ public abstract class MapGenStructureMixin extends MapGenBase {
         {
             if (structurestart.isSizeableStructure() && structurestart.isValidForPostProcess(chunkCoord) && structurestart.getBoundingBox().intersectsWith(i, j, i + 15, j + 15))
             {
-                structurestart.generateStructure(worldIn, randomIn, new StructureBoundingBox(i, j, i + 15, j + 15));
+                structurestart.generateStructure(worldIn, randomIn, new MutableBoundingBox(i, j, i + 15, j + 15));
                 structurestart.notifyPostProcessAt(chunkCoord);
                 flag = true;
                 this.setStructureStart(structurestart.getChunkPosX(), structurestart.getChunkPosZ(), structurestart);

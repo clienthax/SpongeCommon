@@ -24,24 +24,24 @@
  */
 package org.spongepowered.common.mixin.core.network.play.server;
 
-import net.minecraft.network.play.server.SPacketScoreboardObjective;
-import net.minecraft.scoreboard.IScoreCriteria;
+import net.minecraft.network.play.server.SScoreboardObjectivePacket;
+import net.minecraft.scoreboard.ScoreCriteria;
 import net.minecraft.scoreboard.ScoreObjective;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(SPacketScoreboardObjective.class)
+@Mixin(SScoreboardObjectivePacket.class)
 public abstract class SPacketScoreboardObjectiveMixin {
 
     @Redirect(
         method = "<init>(Lnet/minecraft/scoreboard/ScoreObjective;I)V",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/scoreboard/IScoreCriteria;getRenderType()Lnet/minecraft/scoreboard/IScoreCriteria$EnumRenderType;"
+            target = "Lnet/minecraft/scoreboard/ScoreCriteria;getRenderType()Lnet/minecraft/scoreboard/ScoreCriteria$EnumRenderType;"
         )
     )
-    private IScoreCriteria.EnumRenderType spongeImpl$UseScoreObjectiveRenderType(final IScoreCriteria iScoreCriteria, final ScoreObjective objective,
+    private ScoreCriteria.EnumRenderType spongeImpl$UseScoreObjectiveRenderType(final ScoreCriteria iScoreCriteria, final ScoreObjective objective,
         final int action) {
         return objective.getRenderType();
     }

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.item.inventory;
 
-import net.minecraft.inventory.Container;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.IInventory;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.event.item.inventory.InteractInventoryEvent;

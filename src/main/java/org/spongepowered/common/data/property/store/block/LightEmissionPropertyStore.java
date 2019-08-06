@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.property.store.block;
 
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.data.property.block.LightEmissionProperty;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.common.data.property.store.common.AbstractBlockPropertyStore;
@@ -40,7 +40,7 @@ public class LightEmissionPropertyStore extends AbstractBlockPropertyStore<Light
     }
 
     @Override
-    protected Optional<LightEmissionProperty> getForBlock(@Nullable Location<?> location, IBlockState block) {
+    protected Optional<LightEmissionProperty> getForBlock(@Nullable Location<?> location, BlockState block) {
         return Optional.of(new LightEmissionProperty(block.getLightValue()));
     }
 

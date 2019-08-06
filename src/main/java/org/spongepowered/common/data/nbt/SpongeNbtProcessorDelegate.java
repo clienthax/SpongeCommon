@@ -25,7 +25,7 @@
 package org.spongepowered.common.data.nbt;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.manipulator.DataManipulator;
@@ -55,7 +55,7 @@ public class SpongeNbtProcessorDelegate<M extends DataManipulator<M, I>, I exten
     }
 
     @Override
-    public boolean isCompatible(NBTTagCompound compound) {
+    public boolean isCompatible(CompoundNBT compound) {
         for (NbtDataProcessor<M, I> processor : this.processors) {
             if (processor.isCompatible(compound)) {
                 return true;
@@ -65,7 +65,7 @@ public class SpongeNbtProcessorDelegate<M extends DataManipulator<M, I>, I exten
     }
 
     @Override
-    public Optional<M> readFrom(NBTTagCompound compound) {
+    public Optional<M> readFrom(CompoundNBT compound) {
         for (NbtDataProcessor<M, I> processor : this.processors) {
             final Optional<M> returnVal = processor.readFrom(compound);
             if (returnVal.isPresent()) {
@@ -87,9 +87,9 @@ public class SpongeNbtProcessorDelegate<M extends DataManipulator<M, I>, I exten
     }
 
     @Override
-    public Optional<NBTTagCompound> storeToCompound(NBTTagCompound compound, M manipulator) {
+    public Optional<CompoundNBT> storeToCompound(CompoundNBT compound, M manipulator) {
         for (NbtDataProcessor<M, I> processor : this.processors) {
-            final Optional<NBTTagCompound> returnVal = processor.storeToCompound(compound, manipulator);
+            final Optional<CompoundNBT> returnVal = processor.storeToCompound(compound, manipulator);
             if (returnVal.isPresent()) {
                 return returnVal;
             }
@@ -109,7 +109,7 @@ public class SpongeNbtProcessorDelegate<M extends DataManipulator<M, I>, I exten
     }
 
     @Override
-    public DataTransactionResult remove(NBTTagCompound data) {
+    public DataTransactionResult remove(CompoundNBT data) {
         return DataTransactionResult.failNoData();
     }
 

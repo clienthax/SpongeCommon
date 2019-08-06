@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.type;
 
-import net.minecraft.block.BlockNote;
+import net.minecraft.block.NoteBlock;
 import org.spongepowered.api.data.type.InstrumentType;
 import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.common.SpongeCatalogType;
@@ -37,7 +37,7 @@ public class SpongeInstrumentType extends SpongeCatalogType implements Instrumen
     public SpongeInstrumentType(String id, String name, int internalId) {
         super(id);
         this.name = name;
-        this.soundType = (SoundType) BlockNote.INSTRUMENTS.get(internalId);
+        this.soundType = (SoundType) NoteBlock.INSTRUMENTS.get(internalId);
     }
 
     @Override

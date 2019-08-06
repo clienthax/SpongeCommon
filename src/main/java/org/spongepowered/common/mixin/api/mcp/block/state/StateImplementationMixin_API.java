@@ -33,8 +33,8 @@ import com.google.common.collect.ImmutableSet;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.IProperty;
 import net.minecraft.block.state.BlockStateBase;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.IStringSerializable;
 import org.spongepowered.api.block.BlockSnapshot;
 import org.spongepowered.api.block.BlockState;
@@ -115,7 +115,7 @@ public abstract class StateImplementationMixin_API extends BlockStateBase implem
     @Override
     public BlockSnapshot snapshotFor(final Location<World> location) {
         final SpongeBlockSnapshotBuilder builder = new SpongeBlockSnapshotBuilder()
-            .blockState((IBlockState) (Object) this)
+            .blockState((BlockState) (Object) this)
             .position(location.getBlockPosition())
             .worldId(location.getExtent().getUniqueId());
         if (this.block.hasTileEntity() && location.getBlockType().equals(this.block)) {
@@ -124,7 +124,7 @@ public abstract class StateImplementationMixin_API extends BlockStateBase implem
             for (final DataManipulator<?, ?> manipulator : ((CustomDataHolderBridge) tileEntity).bridge$getCustomManipulators()) {
                 builder.add(manipulator);
             }
-            final NBTTagCompound compound = new NBTTagCompound();
+            final CompoundNBT compound = new CompoundNBT();
             ((net.minecraft.tileentity.TileEntity) tileEntity).writeToNBT(compound);
             builder.unsafeNbt(compound);
         }

@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockSponge;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.SpongeBlock;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -40,11 +40,11 @@ import org.spongepowered.common.data.manipulator.immutable.ImmutableSpongeWetDat
 import java.util.List;
 import java.util.Optional;
 
-@Mixin(BlockSponge.class)
+@Mixin(SpongeBlock.class)
 public abstract class BlockSpongeMixin extends BlockMixin {
 
-    private ImmutableWetData impl$getWetData(final IBlockState blockState) {
-        final boolean isWet = blockState.getValue(BlockSponge.WET);
+    private ImmutableWetData impl$getWetData(final BlockState blockState) {
+        final boolean isWet = blockState.getValue(SpongeBlock.WET);
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeWetData.class, isWet);
     }
 
@@ -54,26 +54,26 @@ public abstract class BlockSpongeMixin extends BlockMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableWetData) {
             final boolean isWet = ((ImmutableWetData) manipulator).wet().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockSponge.WET, isWet));
+            return Optional.of((BlockState) blockState.withProperty(SpongeBlock.WET, isWet));
         }
         return super.bridge$getStateWithData(blockState, manipulator);
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.IS_WET)) {
             final boolean isWet = (Boolean) value;
-            return Optional.of((BlockState) blockState.withProperty(BlockSponge.WET, isWet));
+            return Optional.of((BlockState) blockState.withProperty(SpongeBlock.WET, isWet));
         }
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
     @SuppressWarnings("RedundantTypeArguments") // some java compilers will not calculate this generic correctly
     @Override
-    public List<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public List<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getWetData(blockState));
     }
 

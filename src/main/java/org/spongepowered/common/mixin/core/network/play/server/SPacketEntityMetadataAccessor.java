@@ -25,14 +25,14 @@
 package org.spongepowered.common.mixin.core.network.play.server;
 
 import net.minecraft.network.datasync.EntityDataManager;
-import net.minecraft.network.play.server.SPacketEntityMetadata;
-import net.minecraft.network.play.server.SPacketEntityStatus;
+import net.minecraft.network.play.server.SEntityMetadataPacket;
+import net.minecraft.network.play.server.SEntityStatusPacket;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 import java.util.List;
 
-@Mixin(SPacketEntityMetadata.class)
+@Mixin(SEntityMetadataPacket.class)
 public interface SPacketEntityMetadataAccessor {
 
     @Accessor("entityId") int accessor$getEntityId();

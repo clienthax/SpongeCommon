@@ -27,7 +27,7 @@ package org.spongepowered.common.util.gen;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import com.flowpowered.math.vector.Vector3i;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.world.chunk.ChunkPrimer;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.util.DiscreteTransform3;
@@ -75,7 +75,7 @@ public final class ChunkPrimerBuffer extends AbstractBlockBuffer implements Muta
     @Override
     public boolean setBlock(int x, int y, int z, BlockState block) {
         checkRange(x, y, z);
-        this.chunkPrimer.setBlockState(x & 0xf, y, z & 0xF, (IBlockState) block);
+        this.chunkPrimer.setBlockState(x & 0xf, y, z & 0xF, (BlockState) block);
         return true;
     }
 

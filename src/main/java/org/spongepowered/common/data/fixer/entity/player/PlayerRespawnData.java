@@ -26,8 +26,8 @@ package org.spongepowered.common.data.fixer.entity.player;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.collect.Maps;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.datafix.IFixableData;
 import org.spongepowered.api.util.RespawnLocation;
 import org.spongepowered.common.data.util.DataVersions;
@@ -44,7 +44,7 @@ public class PlayerRespawnData implements IFixableData {
     }
 
     @Override
-    public NBTTagCompound fixTagCompound(NBTTagCompound compound) {
+    public CompoundNBT fixTagCompound(CompoundNBT compound) {
         final Map<UUID, RespawnLocation> spawnLocations = Maps.newHashMap();
 
         if (compound.hasKey(Constants.Sponge.User.USER_SPAWN_X, Constants.NBT.TAG_ANY_NUMERIC)
@@ -57,11 +57,11 @@ public class PlayerRespawnData implements IFixableData {
 //            spawnLocations.put(key, RespawnLocation.builder().world(key).position(pos).build());
             // This is the point where we need to check the old data, if it is available.
         }
-        NBTTagList spawnlist = compound.getTagList(Constants.Sponge.User.USER_SPAWN_LIST, Constants.NBT.TAG_COMPOUND);
+        ListNBT spawnlist = compound.getTagList(Constants.Sponge.User.USER_SPAWN_LIST, Constants.NBT.TAG_COMPOUND);
         // This is legacy forge versions, not sure how forge is going to be saving it from now on, but
         // we can at least start moving all of this to our own compound and overwrite as necessary
         for (int i = 0; i < spawnlist.tagCount(); i++) {
-            NBTTagCompound spawndata = spawnlist.getCompoundTagAt(i);
+            CompoundNBT spawndata = spawnlist.getCompoundTagAt(i);
 //            UUID uuid = WorldPropertyRegistryModule.dimIdToUuid(spawndata.getInteger(NbtDataUtil.USER_SPAWN_DIM));
 //            if (uuid != null) {
 //                spawnLocations.put(uuid, RespawnLocation.builder().world(uuid).position(

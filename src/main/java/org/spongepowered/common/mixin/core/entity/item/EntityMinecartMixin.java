@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.core.entity.item;
 
 import com.flowpowered.math.vector.Vector3d;
-import net.minecraft.entity.item.EntityMinecart;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.item.minecart.AbstractMinecartEntity;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.DamageSource;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.vehicle.minecart.Minecart;
@@ -49,7 +49,7 @@ import org.spongepowered.common.util.VectorSerializer;
 
 import java.util.ArrayList;
 
-@Mixin(EntityMinecart.class)
+@Mixin(AbstractMinecartEntity.class)
 public abstract class EntityMinecartMixin extends EntityMixin implements EntityMinecartBridge {
 
     private double impl$maxSpeed = Constants.Entity.Minecart.DEFAULT_MAX_SPEED;
@@ -86,12 +86,12 @@ public abstract class EntityMinecartMixin extends EntityMixin implements EntityM
         return this.impl$derailedMod.getZ();
     }
 
-    @Redirect(method = "applyDrag", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/EntityMinecart;isBeingRidden()Z"))
-    private boolean onIsRidden(final EntityMinecart self) {
+    @Redirect(method = "applyDrag", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/AbstractMinecartEntity;isBeingRidden()Z"))
+    private boolean onIsRidden(final AbstractMinecartEntity self) {
         return !this.impl$slowWhenEmpty || isBeingRidden();
     }
 
-    @Inject(method = "attackEntityFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/EntityMinecart;removePassengers()V"),
+    @Inject(method = "attackEntityFrom", at = @At(value = "INVOKE", target = "Lnet/minecraft/entity/item/AbstractMinecartEntity;removePassengers()V"),
       cancellable = true)
     private void onAttackEntityFrom(final DamageSource source, final float amount, final CallbackInfoReturnable<Boolean> cir) {
         try (final CauseStackManager.StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
@@ -105,7 +105,7 @@ public abstract class EntityMinecartMixin extends EntityMixin implements EntityM
     }
 
     @Override
-    public void spongeImpl$readFromSpongeCompound(final NBTTagCompound compound) {
+    public void spongeImpl$readFromSpongeCompound(final CompoundNBT compound) {
         super.spongeImpl$readFromSpongeCompound(compound);
         if (compound.hasKey(Constants.Entity.Minecart.MAX_SPEED)) {
             this.impl$maxSpeed = compound.getDouble(Constants.Entity.Minecart.MAX_SPEED);
@@ -122,7 +122,7 @@ public abstract class EntityMinecartMixin extends EntityMixin implements EntityM
     }
 
     @Override
-    public void spongeImpl$writeToSpongeCompound(final NBTTagCompound compound) {
+    public void spongeImpl$writeToSpongeCompound(final CompoundNBT compound) {
         super.spongeImpl$writeToSpongeCompound(compound);
         compound.setDouble(Constants.Entity.Minecart.MAX_SPEED, this.impl$maxSpeed);
         compound.setBoolean(Constants.Entity.Minecart.SLOW_WHEN_EMPTY, this.impl$slowWhenEmpty);

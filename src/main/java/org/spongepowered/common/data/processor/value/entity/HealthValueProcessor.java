@@ -26,7 +26,7 @@ package org.spongepowered.common.data.processor.value.entity;
 
 import static org.spongepowered.common.data.util.ComparatorUtil.doubleComparator;
 
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -39,10 +39,10 @@ import org.spongepowered.common.registry.type.event.DamageSourceRegistryModule;
 
 import java.util.Optional;
 
-public class HealthValueProcessor extends AbstractSpongeValueProcessor<EntityLivingBase, Double, MutableBoundedValue<Double>> {
+public class HealthValueProcessor extends AbstractSpongeValueProcessor<LivingEntity, Double, MutableBoundedValue<Double>> {
 
     public HealthValueProcessor() {
-        super(EntityLivingBase.class, Keys.HEALTH);
+        super(LivingEntity.class, Keys.HEALTH);
     }
 
     @Override
@@ -57,12 +57,12 @@ public class HealthValueProcessor extends AbstractSpongeValueProcessor<EntityLiv
     }
 
     @Override
-    protected boolean set(EntityLivingBase container, Double value) {
+    protected boolean set(LivingEntity container, Double value) {
         return false;
     }
 
     @Override
-    protected Optional<Double> getVal(EntityLivingBase container) {
+    protected Optional<Double> getVal(LivingEntity container) {
         return Optional.of((double) container.getHealth());
     }
 
@@ -73,9 +73,9 @@ public class HealthValueProcessor extends AbstractSpongeValueProcessor<EntityLiv
 
     @Override
     public Optional<MutableBoundedValue<Double>> getApiValueFromContainer(ValueContainer<?> container) {
-        if (container instanceof EntityLivingBase) {
-            final double health = ((EntityLivingBase) container).getHealth();
-            final double maxHealth = ((EntityLivingBase) container).getMaxHealth();
+        if (container instanceof LivingEntity) {
+            final double health = ((LivingEntity) container).getHealth();
+            final double maxHealth = ((LivingEntity) container).getMaxHealth();
             return Optional.of(SpongeValueFactory.boundedBuilder(Keys.HEALTH)
                 .minimum(0D)
                 .maximum(maxHealth)
@@ -88,15 +88,15 @@ public class HealthValueProcessor extends AbstractSpongeValueProcessor<EntityLiv
 
     @Override
     public boolean supports(ValueContainer<?> container) {
-        return container instanceof EntityLivingBase;
+        return container instanceof LivingEntity;
     }
 
     @Override
     public DataTransactionResult offerToStore(ValueContainer<?> container, Double value) {
         final ImmutableBoundedValue<Double> proposedValue = constructImmutableValue(value);
-        if (container instanceof EntityLivingBase) {
+        if (container instanceof LivingEntity) {
             final DataTransactionResult.Builder builder = DataTransactionResult.builder();
-            final EntityLivingBase livingbase = (EntityLivingBase) container;
+            final LivingEntity livingbase = (LivingEntity) container;
             final double maxHealth = livingbase.getMaxHealth();
             final ImmutableBoundedValue<Double> newHealthValue = SpongeValueFactory.boundedBuilder(Keys.HEALTH)
                 .defaultValue(maxHealth)

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.realtime.entity.item;
 
-import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.item.ExperienceOrbEntity;
 import org.spongepowered.asm.lib.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -35,7 +35,7 @@ import org.spongepowered.common.bridge.world.WorldBridge;
 import org.spongepowered.common.bridge.RealTimeTrackingBridge;
 import org.spongepowered.common.mixin.realtime.entity.EntityMixin_RealTime;
 
-@Mixin(EntityXPOrb.class)
+@Mixin(ExperienceOrbEntity.class)
 public abstract class EntityXPOrbMixin_RealTime extends EntityMixin_RealTime {
 
     @Shadow public int delayBeforeCanPickup;
@@ -45,7 +45,7 @@ public abstract class EntityXPOrbMixin_RealTime extends EntityMixin_RealTime {
         method = "onUpdate",
         at = @At(
             value = "FIELD",
-            target = "Lnet/minecraft/entity/item/EntityXPOrb;delayBeforeCanPickup:I",
+            target = "Lnet/minecraft/entity/item/ExperienceOrbEntity;delayBeforeCanPickup:I",
             opcode = Opcodes.PUTFIELD
         ),
         slice = @Slice(
@@ -55,11 +55,11 @@ public abstract class EntityXPOrbMixin_RealTime extends EntityMixin_RealTime {
             ),
             to = @At(
                 value = "INVOKE",
-                target = "Lnet/minecraft/entity/item/EntityXPOrb;hasNoGravity()Z"
+                target = "Lnet/minecraft/entity/item/ExperienceOrbEntity;hasNoGravity()Z"
             )
         )
     )
-    private void realTimeImpl$adjustForRealTimePickupDelay(final EntityXPOrb self, final int modifier) {
+    private void realTimeImpl$adjustForRealTimePickupDelay(final ExperienceOrbEntity self, final int modifier) {
         if (((WorldBridge) this.world).bridge$isFake()) {
             this.delayBeforeCanPickup = modifier;
             return;
@@ -71,13 +71,13 @@ public abstract class EntityXPOrbMixin_RealTime extends EntityMixin_RealTime {
     @Redirect(
         method = "onUpdate",
         at = @At(value = "FIELD",
-            target = "Lnet/minecraft/entity/item/EntityXPOrb;xpOrbAge:I",
+            target = "Lnet/minecraft/entity/item/ExperienceOrbEntity;xpOrbAge:I",
             opcode = Opcodes.PUTFIELD
         ),
         slice = @Slice(
             from = @At(
                 value = "FIELD",
-                target = "Lnet/minecraft/entity/item/EntityXPOrb;xpColor:I",
+                target = "Lnet/minecraft/entity/item/ExperienceOrbEntity;xpColor:I",
                 opcode = Opcodes.PUTFIELD
             ),
             to = @At(
@@ -86,7 +86,7 @@ public abstract class EntityXPOrbMixin_RealTime extends EntityMixin_RealTime {
             )
         )
     )
-    private void realTimeImpl$adjustForRealTimeAge(final EntityXPOrb self, final int modifier) {
+    private void realTimeImpl$adjustForRealTimeAge(final ExperienceOrbEntity self, final int modifier) {
         if (((WorldBridge) this.world).bridge$isFake()) {
             this.xpOrbAge = modifier;
             return;

@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockRedstoneComparator;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.ComparatorBlock;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
 import org.spongepowered.api.data.key.Keys;
@@ -42,11 +42,11 @@ import org.spongepowered.common.data.manipulator.immutable.block.ImmutableSponge
 
 import java.util.Optional;
 
-@Mixin(BlockRedstoneComparator.class)
+@Mixin(ComparatorBlock.class)
 public abstract class BlockRedstoneComparatorMixin extends BlockMixin {
 
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>builder()
                 .addAll(super.bridge$getManipulators(blockState))
                 .add(impl$getComparatorTypeFor(blockState))
@@ -61,39 +61,39 @@ public abstract class BlockRedstoneComparatorMixin extends BlockMixin {
 
     @SuppressWarnings("ConstantConditions")
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableComparatorData) {
-            final BlockRedstoneComparator.Mode comparatorType =
-                    (BlockRedstoneComparator.Mode) (Object) ((ImmutableComparatorData) manipulator).type().get();
-            return Optional.of((BlockState) blockState.withProperty(BlockRedstoneComparator.MODE, comparatorType));
+            final ComparatorBlock.Mode comparatorType =
+                    (ComparatorBlock.Mode) (Object) ((ImmutableComparatorData) manipulator).type().get();
+            return Optional.of((BlockState) blockState.withProperty(ComparatorBlock.MODE, comparatorType));
         }
         if (manipulator instanceof ImmutablePoweredData) {
-            return Optional.of((BlockState) blockState.withProperty(BlockRedstoneComparator.POWERED, ((ImmutablePoweredData) manipulator).powered()
+            return Optional.of((BlockState) blockState.withProperty(ComparatorBlock.POWERED, ((ImmutablePoweredData) manipulator).powered()
                     .get()));
         }
         return super.bridge$getStateWithData(blockState, manipulator);
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.COMPARATOR_TYPE)) {
-            final BlockRedstoneComparator.Mode comparatorType = (BlockRedstoneComparator.Mode) value;
-            return Optional.of((BlockState) blockState.withProperty(BlockRedstoneComparator.MODE, comparatorType));
+            final ComparatorBlock.Mode comparatorType = (ComparatorBlock.Mode) value;
+            return Optional.of((BlockState) blockState.withProperty(ComparatorBlock.MODE, comparatorType));
         }
         if (key.equals(Keys.POWERED)) {
-            return Optional.of((BlockState) blockState.withProperty(BlockRedstoneComparator.POWERED, (Boolean) value));
+            return Optional.of((BlockState) blockState.withProperty(ComparatorBlock.POWERED, (Boolean) value));
         }
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
     @SuppressWarnings("ConstantConditions")
-    private ImmutableComparatorData impl$getComparatorTypeFor(final IBlockState blockState) {
+    private ImmutableComparatorData impl$getComparatorTypeFor(final BlockState blockState) {
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeComparatorData.class,
-                (ComparatorType) (Object) blockState.getValue(BlockRedstoneComparator.MODE));
+                (ComparatorType) (Object) blockState.getValue(ComparatorBlock.MODE));
     }
 
-    private ImmutablePoweredData impl$getIsPoweredFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePoweredData.class, blockState.getValue(BlockRedstoneComparator.POWERED));
+    private ImmutablePoweredData impl$getIsPoweredFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongePoweredData.class, blockState.getValue(ComparatorBlock.POWERED));
     }
 
 }

@@ -26,7 +26,7 @@ package org.spongepowered.common.data.processor.value.entity;
 
 import static org.spongepowered.common.data.util.ComparatorUtil.intComparator;
 
-import net.minecraft.entity.EntityAgeable;
+import net.minecraft.entity.AgeableEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -37,10 +37,10 @@ import org.spongepowered.common.data.value.SpongeValueFactory;
 
 import java.util.Optional;
 
-public class AgeValueProcessor extends AbstractSpongeValueProcessor<EntityAgeable, Integer, MutableBoundedValue<Integer>> {
+public class AgeValueProcessor extends AbstractSpongeValueProcessor<AgeableEntity, Integer, MutableBoundedValue<Integer>> {
 
     public AgeValueProcessor() {
-        super(EntityAgeable.class, Keys.AGE);
+        super(AgeableEntity.class, Keys.AGE);
     }
 
     @Override
@@ -55,13 +55,13 @@ public class AgeValueProcessor extends AbstractSpongeValueProcessor<EntityAgeabl
     }
 
     @Override
-    protected boolean set(EntityAgeable container, Integer value) {
+    protected boolean set(AgeableEntity container, Integer value) {
         container.setGrowingAge(value);
         return true;
     }
 
     @Override
-    protected Optional<Integer> getVal(EntityAgeable container) {
+    protected Optional<Integer> getVal(AgeableEntity container) {
         return Optional.of(container.getGrowingAge());
     }
 
@@ -73,7 +73,7 @@ public class AgeValueProcessor extends AbstractSpongeValueProcessor<EntityAgeabl
     @Override
     public Optional<MutableBoundedValue<Integer>> getApiValueFromContainer(ValueContainer<?> container) {
         if (this.supports(container)) {
-            Optional<Integer> value = this.getVal((EntityAgeable) container);
+            Optional<Integer> value = this.getVal((AgeableEntity) container);
             if (value.isPresent()) {
                 return Optional.of(this.constructValue(value.get()));
             }
@@ -83,7 +83,7 @@ public class AgeValueProcessor extends AbstractSpongeValueProcessor<EntityAgeabl
 
     @Override
     public boolean supports(ValueContainer<?> container) {
-        return container instanceof EntityAgeable;
+        return container instanceof AgeableEntity;
     }
 
     @Override
@@ -100,7 +100,7 @@ public class AgeValueProcessor extends AbstractSpongeValueProcessor<EntityAgeabl
                     .asImmutable();
             final ImmutableBoundedValue<Integer> oldAgeValue = getApiValueFromContainer(container).get().asImmutable();
             try {
-                ((EntityAgeable) container).setGrowingAge(value);
+                ((AgeableEntity) container).setGrowingAge(value);
             } catch (Exception e) {
                 return DataTransactionResult.errorResult(newAgeValue);
             }

@@ -25,11 +25,11 @@
 package org.spongepowered.common.item.inventory.util;
 
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.inventory.InventoryLargeChest;
+import net.minecraft.inventory.CraftingInventory;
+import net.minecraft.inventory.DoubleSidedInventory;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.tileentity.TileEntityChest;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.tileentity.ChestTileEntity;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
@@ -56,24 +56,24 @@ public final class InventoryUtil {
     private InventoryUtil() {}
 
     @SuppressWarnings("rawtypes")
-    public static CraftingGridInventory toSpongeInventory(InventoryCrafting inv) {
+    public static CraftingGridInventory toSpongeInventory(CraftingInventory inv) {
         IInventoryFabric fabric = new IInventoryFabric(inv);
         CraftingGridInventoryLensImpl lens = new CraftingGridInventoryLensImpl(0, inv.getWidth(), inv.getHeight(), inv.getWidth(), SlotLensImpl::new);
 
         return new CraftingGridInventoryAdapter(fabric, lens);
     }
 
-    public static InventoryCrafting toNativeInventory(CraftingGridInventory inv) {
+    public static CraftingInventory toNativeInventory(CraftingGridInventory inv) {
         Fabric fabric = ((CraftingGridInventoryAdapter) inv).bridge$getFabric();
         for (Object inventory : fabric.allInventories()) {
-            if (inventory instanceof InventoryCrafting) {
-                return ((InventoryCrafting) inventory);
+            if (inventory instanceof CraftingInventory) {
+                return ((CraftingInventory) inventory);
             }
         }
 
         // Gather Debug Info...
         StringBuilder sb = new StringBuilder();
-        sb.append("Invalid CraftingGridInventory. Could not find InventoryCrafting.\n")
+        sb.append("Invalid CraftingGridInventory. Could not find CraftingInventory.\n")
           .append("Fabric was: ")
           .append(fabric.getClass().getSimpleName()).append(" Name: ")
           .append(fabric.getDisplayName() == null ? "unknown" : fabric.getDisplayName().get())
@@ -85,21 +85,21 @@ public final class InventoryUtil {
         throw new IllegalStateException(sb.toString());
     }
 
-    public static Optional<Inventory> getDoubleChestInventory(TileEntityChest chest) {
+    public static Optional<Inventory> getDoubleChestInventory(ChestTileEntity chest) {
         // BlockChest#getContainer(World, BlockPos, boolean) without isBlocked() check
-        for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL) {
+        for (Direction enumfacing : Direction.Plane.HORIZONTAL) {
             BlockPos blockpos = chest.getPos().offset(enumfacing);
 
             TileEntity tileentity1 = chest.getWorld().getTileEntity(blockpos);
 
-            if (tileentity1 instanceof TileEntityChest && tileentity1.getBlockType() == chest.getBlockType()) {
+            if (tileentity1 instanceof ChestTileEntity && tileentity1.getBlockType() == chest.getBlockType()) {
 
-                InventoryLargeChest inventory;
+                DoubleSidedInventory inventory;
 
-                if (enumfacing != EnumFacing.WEST && enumfacing != EnumFacing.NORTH) {
-                    inventory = new InventoryLargeChest("container.chestDouble", chest, (TileEntityChest) tileentity1);
+                if (enumfacing != Direction.WEST && enumfacing != Direction.NORTH) {
+                    inventory = new DoubleSidedInventory("container.chestDouble", chest, (ChestTileEntity) tileentity1);
                 } else {
-                    inventory = new InventoryLargeChest("container.chestDouble", (TileEntityChest) tileentity1, chest);
+                    inventory = new DoubleSidedInventory("container.chestDouble", (ChestTileEntity) tileentity1, chest);
                 }
 
                 return Optional.of((Inventory) inventory);
@@ -115,8 +115,8 @@ public final class InventoryUtil {
 
     public static Inventory toInventory(Object inventory, @Nullable Object forgeItemHandler) {
         if (forgeItemHandler == null) {
-            if (inventory instanceof TileEntityChest) {
-                inventory = getDoubleChestInventory(((TileEntityChest) inventory)).orElse(((Inventory) inventory));
+            if (inventory instanceof ChestTileEntity) {
+                inventory = getDoubleChestInventory(((ChestTileEntity) inventory)).orElse(((Inventory) inventory));
             }
             if (inventory instanceof Inventory) {
                 return ((Inventory) inventory);

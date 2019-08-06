@@ -25,10 +25,10 @@
 package org.spongepowered.common.data.processor.data.item;
 
 import com.google.common.collect.Lists;
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.item.ImmutableStoredEnchantmentData;
@@ -62,11 +62,11 @@ public class StoredEnchantmentDataProcessor extends
     @Override
     protected boolean set(ItemStack entity, List<Enchantment> value) {
         if (!entity.hasTagCompound()) {
-            entity.setTagCompound(new NBTTagCompound());
+            entity.setTagCompound(new CompoundNBT());
         }
-        NBTTagList list = new NBTTagList();
+        ListNBT list = new ListNBT();
         for (Enchantment enchantment : value) {
-            NBTTagCompound tag = new NBTTagCompound();
+            CompoundNBT tag = new CompoundNBT();
             tag.setShort(Constants.Item.ITEM_ENCHANTMENT_ID, (short) net.minecraft.enchantment.Enchantment.getEnchantmentID((net.minecraft.enchantment.Enchantment) enchantment.getType()));
             tag.setShort(Constants.Item.ITEM_ENCHANTMENT_LEVEL, (short) enchantment.getLevel());
             list.appendTag(tag);
@@ -81,9 +81,9 @@ public class StoredEnchantmentDataProcessor extends
             return Optional.empty();
         }
         List<Enchantment> list = Lists.newArrayList();
-        NBTTagList tags = entity.getTagCompound().getTagList(Constants.Item.ITEM_STORED_ENCHANTMENTS_LIST, Constants.NBT.TAG_COMPOUND);
+        ListNBT tags = entity.getTagCompound().getTagList(Constants.Item.ITEM_STORED_ENCHANTMENTS_LIST, Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tags.tagCount(); i++) {
-            NBTTagCompound tag = tags.getCompoundTagAt(i);
+            CompoundNBT tag = tags.getCompoundTagAt(i);
             list.add(new SpongeEnchantment(
                     (EnchantmentType) net.minecraft.enchantment.Enchantment.getEnchantmentByID(tag.getShort(Constants.Item.ITEM_ENCHANTMENT_ID)),
                     tag.getShort(Constants.Item.ITEM_ENCHANTMENT_LEVEL)));

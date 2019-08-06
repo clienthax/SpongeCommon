@@ -26,9 +26,9 @@ package org.spongepowered.common.mixin.entitycollisions;
 
 import com.google.common.base.Predicate;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
 import org.spongepowered.api.block.BlockType;
@@ -57,11 +57,11 @@ public class ChunkMixin_Collisions {
     private void collisionsImpl$checkForCollisionRules(final Entity entityIn, final AxisAlignedBB aabb, final List<Entity> listToFill,
         final Predicate<? super Entity> predicate, final CallbackInfo ci) {
         // ignore players and entities with parts (ex. EnderDragon)
-        if (this.world.isRemote || entityIn == null || entityIn instanceof EntityPlayer || entityIn.getParts() != null) {
+        if (this.world.isRemote || entityIn == null || entityIn instanceof PlayerEntity || entityIn.getParts() != null) {
             return;
         }
-        // Run hook in EntityLivingBase to support maxEntityCramming
-        if (entityIn != null && entityIn instanceof EntityLivingBase && ((CollisionsCapability) entityIn).collision$isRunningCollideWithNearby()) {
+        // Run hook in LivingEntity to support maxEntityCramming
+        if (entityIn != null && entityIn instanceof LivingEntity && ((CollisionsCapability) entityIn).collision$isRunningCollideWithNearby()) {
             return;
         }
 
@@ -77,7 +77,7 @@ public class ChunkMixin_Collisions {
         final List<T> listToFill, final Predicate<? super T> p_177430_4_, final CallbackInfo ci) {
         // ignore player checks
         // ignore item check (ex. Hoppers)
-        if (this.world.isRemote || EntityPlayer.class.isAssignableFrom(entityClass) || EntityItem.class == entityClass) {
+        if (this.world.isRemote || PlayerEntity.class.isAssignableFrom(entityClass) || ItemEntity.class == entityClass) {
             return;
         }
 

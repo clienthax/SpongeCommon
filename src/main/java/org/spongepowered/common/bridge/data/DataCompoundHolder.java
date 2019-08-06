@@ -24,19 +24,19 @@
  */
 package org.spongepowered.common.bridge.data;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.common.util.Constants;
 
 public interface DataCompoundHolder {
 
     boolean data$hasRootCompound();
 
-    NBTTagCompound data$getRootCompound();
+    CompoundNBT data$getRootCompound();
 
-    default NBTTagCompound data$getSpongeCompound() {
-        final NBTTagCompound data = this.data$getRootCompound();
+    default CompoundNBT data$getSpongeCompound() {
+        final CompoundNBT data = this.data$getRootCompound();
         if (!data.hasKey(Constants.Sponge.SPONGE_DATA, Constants.NBT.TAG_COMPOUND)) {
-            data.setTag(Constants.Sponge.SPONGE_DATA, new NBTTagCompound());
+            data.setTag(Constants.Sponge.SPONGE_DATA, new CompoundNBT());
         }
         return data.getCompoundTag(Constants.Sponge.SPONGE_DATA);
     }

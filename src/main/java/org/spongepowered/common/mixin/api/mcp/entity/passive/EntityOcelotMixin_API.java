@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.passive;
 
-import net.minecraft.entity.passive.EntityOcelot;
+import net.minecraft.entity.passive.OcelotEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.OcelotData;
@@ -43,7 +43,7 @@ import org.spongepowered.common.util.Constants;
 
 import java.util.Collection;
 
-@Mixin(EntityOcelot.class)
+@Mixin(OcelotEntity.class)
 public abstract class EntityOcelotMixin_API extends EntityTameableMixin_API implements Ocelot {
 
     @Shadow public abstract int getTameSkin();

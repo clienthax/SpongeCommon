@@ -29,8 +29,8 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.reflect.TypeToken;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.block.BlockState;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.datafix.DataFixer;
@@ -170,11 +170,11 @@ public class LegacySchematicTranslator implements DataTranslator<Schematic> {
                 // fixers.
                 final DataView upgraded;
 
-                NBTTagCompound tileNbt = NbtTranslator.getInstance().translate(tile);
+                CompoundNBT tileNbt = NbtTranslator.getInstance().translate(tile);
                 tileNbt = VANILLA_FIXER.process(FixTypes.BLOCK_ENTITY, tileNbt, 0);
                 upgraded = NbtTranslator.getInstance().translate(tileNbt);
 
-                if (type!= null && SpongeImplHooks.hasBlockTileEntity(((Block) state.getType()), (IBlockState) state)) {
+                if (type!= null && SpongeImplHooks.hasBlockTileEntity(((Block) state.getType()), (BlockState) state)) {
                     TileEntityArchetype archetype = new SpongeTileEntityArchetypeBuilder()
                         .state(state)
                         .tileData(upgraded)
@@ -196,7 +196,7 @@ public class LegacySchematicTranslator implements DataTranslator<Schematic> {
                 if (type != null) {
                     final DataView upgraded;
 
-                    NBTTagCompound entityNbt = NbtTranslator.getInstance().translate(entity);
+                    CompoundNBT entityNbt = NbtTranslator.getInstance().translate(entity);
                     entityNbt = VANILLA_FIXER.process(FixTypes.ENTITY, entityNbt, 0);
                     upgraded = NbtTranslator.getInstance().translate(entityNbt);
                     upgraded.set(Queries.POSITION, new Vector3i(x - offsetX, y - offsetY, z - offsetZ));

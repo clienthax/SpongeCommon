@@ -24,11 +24,11 @@
  */
 package org.spongepowered.common.mixin.api.mcp.tileentity;
 
-import net.minecraft.block.BlockJukebox;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.JukeboxBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemRecord;
+import net.minecraft.item.MusicDiscItem;
 import org.spongepowered.api.block.tileentity.Jukebox;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.RepresentedItemData;
@@ -41,7 +41,7 @@ import org.spongepowered.common.util.Constants;
 
 import java.util.List;
 
-@Mixin(BlockJukebox.TileEntityJukebox.class)
+@Mixin(JukeboxBlock.TileEntityJukebox.class)
 public abstract class TileEntityJukeboxMixin_API extends TileEntityMixin_API implements Jukebox {
 
     @Shadow public abstract net.minecraft.item.ItemStack getRecord();
@@ -63,25 +63,25 @@ public abstract class TileEntityJukeboxMixin_API extends TileEntityMixin_API imp
     @SuppressWarnings("deprecation")
     @Override
     public void ejectRecord() {
-        final IBlockState block = this.world.getBlockState(this.pos);
+        final BlockState block = this.world.getBlockState(this.pos);
         if (block.getBlock() == Blocks.JUKEBOX) {
             // TODO - Mixin 0.8 accessors
             ((BlockJukeboxBridge) block.getBlock()).accessor$dropRecordItem(this.world, this.pos, block);
-            this.world.setBlockState(this.pos, block.withProperty(BlockJukebox.HAS_RECORD, false), Constants.BlockChangeFlags.NOTIFY_CLIENTS);
+            this.world.setBlockState(this.pos, block.withProperty(JukeboxBlock.HAS_RECORD, false), Constants.BlockChangeFlags.NOTIFY_CLIENTS);
         }
     }
 
     @Override
     public void insertRecord(final ItemStack record) {
         final net.minecraft.item.ItemStack itemStack = ItemStackUtil.toNative(record);
-        if (!(itemStack.getItem() instanceof ItemRecord)) {
+        if (!(itemStack.getItem() instanceof MusicDiscItem)) {
             return;
         }
-        final IBlockState block = this.world.getBlockState(this.pos);
+        final BlockState block = this.world.getBlockState(this.pos);
         if (block.getBlock() == Blocks.JUKEBOX) {
-            // Don't use BlockJukebox#insertRecord - it looses item data
+            // Don't use JukeboxBlock#insertRecord - it looses item data
             this.setRecord(itemStack);
-            this.world.setBlockState(this.pos, block.withProperty(BlockJukebox.HAS_RECORD, true), Constants.BlockChangeFlags.NOTIFY_CLIENTS);
+            this.world.setBlockState(this.pos, block.withProperty(JukeboxBlock.HAS_RECORD, true), Constants.BlockChangeFlags.NOTIFY_CLIENTS);
         }
     }
 

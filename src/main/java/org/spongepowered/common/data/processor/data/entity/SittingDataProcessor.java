@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.passive.EntityTameable;
+import net.minecraft.entity.passive.TameableEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableSittingData;
@@ -40,20 +40,20 @@ import org.spongepowered.common.data.value.mutable.SpongeValue;
 import java.util.Optional;
 
 public class SittingDataProcessor
-        extends AbstractEntitySingleDataProcessor<EntityTameable, Boolean, Value<Boolean>, SittingData, ImmutableSittingData> {
+        extends AbstractEntitySingleDataProcessor<TameableEntity, Boolean, Value<Boolean>, SittingData, ImmutableSittingData> {
 
     public SittingDataProcessor() {
-        super(EntityTameable.class, Keys.IS_SITTING);
+        super(TameableEntity.class, Keys.IS_SITTING);
     }
 
     @Override
-    protected boolean set(EntityTameable entity, Boolean value) {
+    protected boolean set(TameableEntity entity, Boolean value) {
         entity.setSitting(value);
         return true;
     }
 
     @Override
-    protected Optional<Boolean> getVal(EntityTameable entity) {
+    protected Optional<Boolean> getVal(TameableEntity entity) {
         return Optional.of(entity.isSitting());
     }
 

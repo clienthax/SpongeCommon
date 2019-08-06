@@ -30,17 +30,17 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ListMultimap;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockEventData;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.block.Blocks;
 import net.minecraft.server.management.PlayerChunkMapEntry;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.DamageSource;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import net.minecraft.world.chunk.Chunk;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.block.BlockSnapshot;
@@ -213,7 +213,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
      * </p>
      *
      * <p>Note that the {@link PhaseTracker} is only provided for easy access
-     * to the {@link WorldServer}, {@link WorldServerBridge}, and
+     * to the {@link ServerWorld}, {@link WorldServerBridge}, and
      * {@link World} instances.</p>
      *
      * @param phaseContext The context of the current state being unwound
@@ -266,7 +266,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
      * @param entityitem The item to be dropped
      * @return True if we are capturing, false if we are to let the item spawn
      */
-    default boolean spawnItemOrCapture(C phaseContext, Entity entity, EntityItem entityitem) {
+    default boolean spawnItemOrCapture(C phaseContext, Entity entity, ItemEntity entityitem) {
         if (this.doesCaptureEntityDrops(phaseContext)) {
             if (this.tracksEntitySpecificDrops()) {
                 // We are capturing per entity drop
@@ -323,7 +323,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
      * @param currentDepth The current processing depth, to prevenet stack overflows
      */
     default void performPostBlockNotificationsAndNeighborUpdates(C context,
-        IBlockState newState, SpongeBlockChangeFlag changeFlag,
+        BlockState newState, SpongeBlockChangeFlag changeFlag,
         int currentDepth) {
 
     }
@@ -387,7 +387,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
         return true;
     }
     /**
-     * Gets whether this state specifically supports splitting up {@link Block#dropBlockAsItem(net.minecraft.world.World, BlockPos, IBlockState, int)}
+     * Gets whether this state specifically supports splitting up {@link Block#dropBlockAsItem(net.minecraft.world.World, BlockPos, BlockState, int)}
      * drops as some blocks may drop multiple items at once. In some cases, the individual block
      * transactions can be associated directly with captured item/entity spawns. In other
      * cases, we cannot safely perform these captures as some mods may be expecting those items to
@@ -497,7 +497,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
      * <p>If this and {@link #doesBulkBlockCapture(PhaseContext)} both return {@code false}, vanilla
      * mechanics will take place, and no tracking or capturing is taking place unless otherwise
      * noted by
-     * {@link #associateNeighborStateNotifier(PhaseContext, BlockPos, Block, BlockPos, WorldServer, PlayerTracker.Type)}</p>
+     * {@link #associateNeighborStateNotifier(PhaseContext, BlockPos, Block, BlockPos, ServerWorld, PlayerTracker.Type)}</p>
      *
      * @return True by default, false for things like world gen
      * @param context
@@ -543,7 +543,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
 
     /**
      * Gets whether this state will already consider any captures or extra processing for a
-     * {@link Block#updateTick(net.minecraft.world.World, BlockPos, IBlockState, Random)}. Again usually
+     * {@link Block#updateTick(net.minecraft.world.World, BlockPos, BlockState, Random)}. Again usually
      * considered for world generation or post states or block restorations.
      *
      * @param context The phase data currently present
@@ -567,7 +567,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
 
     /**
      * Gets whether this state will specifically ignore attempting to merge {@link ItemStack}s
-     * within capture lists and avoid creating the {@link EntityItem} speicifcally. In some cases
+     * within capture lists and avoid creating the {@link ItemEntity} speicifcally. In some cases
      * however, these items need to be directly created as entities for them to be acted upon
      * during the phase process and therefor cannot be captured. Examples can include where
      * mods are attempting to modify the captured entities by providing their own form of a
@@ -592,8 +592,8 @@ public interface IPhaseState<C extends PhaseContext<C>> {
      * @param flags
      * @return
      */
-    default boolean shouldCaptureBlockChangeOrSkip(C phaseContext, BlockPos pos, IBlockState currentState,
-        IBlockState newState, BlockChangeFlag flags) {
+    default boolean shouldCaptureBlockChangeOrSkip(C phaseContext, BlockPos pos, BlockState currentState,
+        BlockState newState, BlockChangeFlag flags) {
         return true;
     }
 
@@ -696,7 +696,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
      * @param notifier The tracker type (owner or notifier)
      */
     default void associateNeighborStateNotifier(C unwindingContext, @Nullable BlockPos sourcePos, Block block, BlockPos notifyPos,
-        WorldServer minecraftWorld, PlayerTracker.Type notifier) {
+        ServerWorld minecraftWorld, PlayerTracker.Type notifier) {
 
     }
 
@@ -723,7 +723,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
      * @param phaseContext the block tick context being entered
      */
     default void appendNotifierPreBlockTick(WorldServerBridge mixinWorld, BlockPos pos, C context, BlockTickContext phaseContext) {
-        final Chunk chunk = ((WorldServer) mixinWorld).getChunk(pos);
+        final Chunk chunk = ((ServerWorld) mixinWorld).getChunk(pos);
         final ChunkBridge mixinChunk = (ChunkBridge) chunk;
         if (chunk != null && !chunk.isEmpty()) {
             mixinChunk.bridge$getBlockOwner(pos).ifPresent(phaseContext::owner);
@@ -752,7 +752,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
      * @param playerIn
      * @param context
      */
-    default void capturePlayerUsingStackToBreakBlock(ItemStack itemStack, EntityPlayerMP playerIn, C context) {
+    default void capturePlayerUsingStackToBreakBlock(ItemStack itemStack, ServerPlayerEntity playerIn, C context) {
 
     }
 
@@ -812,11 +812,11 @@ public interface IPhaseState<C extends PhaseContext<C>> {
     }
 
     default void capturesNeighborNotifications(C context, WorldServerBridge mixinWorld, BlockPos notifyPos, Block sourceBlock,
-                                               IBlockState iblockstate, BlockPos sourcePos) {
+                                               BlockState iblockstate, BlockPos sourcePos) {
     }
     /**
-     * Specifically captures a block change by {@link ChunkMixin#bridge$setBlockState(BlockPos, IBlockState, IBlockState, BlockChangeFlag)}
-     * such that the change of a {@link IBlockState} will be appropriately logged, along with any changes of tile entities being removed
+     * Specifically captures a block change by {@link ChunkMixin#bridge$setBlockState(BlockPos, BlockState, BlockState, BlockChangeFlag)}
+     * such that the change of a {@link BlockState} will be appropriately logged, along with any changes of tile entities being removed
      * or added, likewise, this will avoid duplicating transactions later after the fact, in the event that multiple changes are taking
      * place, including but not withstanding, tile entity replacements after the fact.
      *
@@ -829,7 +829,7 @@ public interface IPhaseState<C extends PhaseContext<C>> {
      * @return
      */
     @Nullable
-    default BlockTransaction.ChangeBlock captureBlockChange(C phaseContext, BlockPos pos, SpongeBlockSnapshot originalBlockSnapshot, IBlockState newState,
+    default BlockTransaction.ChangeBlock captureBlockChange(C phaseContext, BlockPos pos, SpongeBlockSnapshot originalBlockSnapshot, BlockState newState,
         BlockChangeFlag flags, @Nullable TileEntity tileEntity) {
         if (!this.doesBulkBlockCapture(phaseContext)) {
             phaseContext.setSingleSnapshot(originalBlockSnapshot);
@@ -883,8 +883,8 @@ public interface IPhaseState<C extends PhaseContext<C>> {
 
     }
 
-    default BlockChange associateBlockChangeWithSnapshot(C phaseContext, IBlockState newState, Block newBlock,
-        IBlockState currentState, SpongeBlockSnapshot snapshot,
+    default BlockChange associateBlockChangeWithSnapshot(C phaseContext, BlockState newState, Block newBlock,
+        BlockState currentState, SpongeBlockSnapshot snapshot,
         Block originalBlock) {
         if (newBlock == Blocks.AIR) {
             return BlockChange.BREAK;

@@ -26,14 +26,14 @@ package org.spongepowered.common.mixin.core.world;
 
 import com.google.common.base.MoreObjects;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
-import net.minecraft.block.state.pattern.BlockPattern;
+import net.minecraft.block.pattern.BlockPattern;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.util.Direction;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.Teleporter;
-import net.minecraft.world.WorldServer;
+import net.minecraft.world.ServerWorld;
 import org.spongepowered.api.event.entity.MoveEntityEvent;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.PortalAgent;
@@ -60,7 +60,7 @@ public class TeleporterMixin implements TeleporterBridge {
     private boolean impl$createNetherPortal = true;
     private PortalAgentType impl$portalAgentType = PortalAgentRegistryModule.getInstance().validatePortalAgent(this);
 
-    @Shadow @Final private WorldServer world;
+    @Shadow @Final private ServerWorld world;
     @Shadow @Final private Random random;
     @Shadow @Final private Long2ObjectMap<Teleporter.PortalPosition> destinationCoordinateCache;
 
@@ -136,8 +136,8 @@ public class TeleporterMixin implements TeleporterBridge {
         double yTarget;
         double zTarget = portalLocation.getZ() + 0.5D;
         BlockPattern.PatternHelper blockpattern$patternhelper = Blocks.PORTAL.createPatternHelper(this.world, blockPos);
-        boolean flag1 = blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == EnumFacing.AxisDirection.NEGATIVE;
-        double d2 = blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X ? (double) blockpattern$patternhelper.getFrontTopLeft().getZ()
+        boolean flag1 = blockpattern$patternhelper.getForwards().rotateY().getAxisDirection() == Direction.AxisDirection.NEGATIVE;
+        double d2 = blockpattern$patternhelper.getForwards().getAxis() == Direction.Axis.X ? (double) blockpattern$patternhelper.getFrontTopLeft().getZ()
                 : (double) blockpattern$patternhelper.getFrontTopLeft().getX();
         yTarget = blockpattern$patternhelper.getFrontTopLeft().getY() + 1
                 - entityIn.getLastPortalVec().y * blockpattern$patternhelper.getHeight();
@@ -146,7 +146,7 @@ public class TeleporterMixin implements TeleporterBridge {
             ++d2;
         }
 
-        if (blockpattern$patternhelper.getForwards().getAxis() == EnumFacing.Axis.X) {
+        if (blockpattern$patternhelper.getForwards().getAxis() == Direction.Axis.X) {
             zTarget = d2 + (1.0D - entityIn.getLastPortalVec().x) * blockpattern$patternhelper.getWidth()
                     * blockpattern$patternhelper.getForwards().rotateY().getAxisDirection().getOffset();
         } else {
@@ -214,7 +214,7 @@ public class TeleporterMixin implements TeleporterBridge {
     public void bridge$placeEntity(net.minecraft.world.World world, Entity entity, float yaw) {
         boolean didPort;
 
-        if (entity instanceof EntityPlayerMP) {
+        if (entity instanceof ServerPlayerEntity) {
             this.placeInPortal(entity, yaw);
             didPort = true;
         } else {

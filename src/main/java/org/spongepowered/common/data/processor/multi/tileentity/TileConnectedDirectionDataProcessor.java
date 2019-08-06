@@ -26,7 +26,7 @@ package org.spongepowered.common.data.processor.multi.tileentity;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
-import net.minecraft.tileentity.TileEntityChest;
+import net.minecraft.tileentity.ChestTileEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -44,10 +44,10 @@ import java.util.Optional;
 import java.util.Set;
 
 public class TileConnectedDirectionDataProcessor
-        extends AbstractTileEntityDataProcessor<TileEntityChest, ConnectedDirectionData, ImmutableConnectedDirectionData> {
+        extends AbstractTileEntityDataProcessor<ChestTileEntity, ConnectedDirectionData, ImmutableConnectedDirectionData> {
 
     public TileConnectedDirectionDataProcessor() {
-        super(TileEntityChest.class);
+        super(ChestTileEntity.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -67,19 +67,19 @@ public class TileConnectedDirectionDataProcessor
     }
 
     @Override
-    protected boolean doesDataExist(TileEntityChest chest) {
+    protected boolean doesDataExist(ChestTileEntity chest) {
         chest.checkForAdjacentChests();
         return chest.adjacentChestXNeg != null || chest.adjacentChestXPos != null
                 || chest.adjacentChestZNeg != null || chest.adjacentChestZPos != null;
     }
 
     @Override
-    protected boolean set(TileEntityChest chest, Map<Key<?>, Object> keyValues) {
+    protected boolean set(ChestTileEntity chest, Map<Key<?>, Object> keyValues) {
         return false;
     }
 
     @Override
-    protected Map<Key<?>, ?> getValues(TileEntityChest chest) {
+    protected Map<Key<?>, ?> getValues(ChestTileEntity chest) {
         Map<Key<?>, Object> values = Maps.newHashMap();
         Set<Direction> directions = Sets.newHashSet();
         values.put(Keys.CONNECTED_DIRECTIONS, directions);

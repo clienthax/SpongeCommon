@@ -26,12 +26,12 @@ package org.spongepowered.common.mixin.api.entity;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
-import net.minecraft.entity.item.EntityArmorStand;
-import net.minecraft.entity.monster.AbstractSkeleton;
-import net.minecraft.entity.monster.EntityGiantZombie;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.util.EnumHand;
+import net.minecraft.entity.item.ArmorStandEntity;
+import net.minecraft.entity.monster.AbstractSkeletonEntity;
+import net.minecraft.entity.monster.GiantEntity;
+import net.minecraft.entity.monster.ZombieEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.util.Hand;
 import org.spongepowered.api.data.type.HandType;
 import org.spongepowered.api.entity.ArmorEquipable;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -45,19 +45,19 @@ import java.util.Optional;
 import javax.annotation.Nullable;
 
 // All living implementors of ArmorEquipable
-@Mixin({EntityArmorStand.class, EntityGiantZombie.class, EntityPlayerMP.class, AbstractSkeleton.class, EntityZombie.class, EntityHuman.class})
+@Mixin({ArmorStandEntity.class, GiantEntity.class, ServerPlayerEntity.class, AbstractSkeletonEntity.class, ZombieEntity.class, EntityHuman.class})
 public abstract class ArmorEquippableMixin_API extends EntityLivingBaseMixin_API implements ArmorEquipable {
 
     @Override
     public Optional<ItemStack> getItemInHand(HandType handType) {
         checkNotNull(handType, "HandType cannot be null!");
-        final net.minecraft.item.ItemStack nmsItem = this.getHeldItem((EnumHand) (Object) handType);
+        final net.minecraft.item.ItemStack nmsItem = this.getHeldItem((Hand) (Object) handType);
         return Optional.of(ItemStackUtil.fromNative(nmsItem));
     }
 
     @Override
     public void setItemInHand(HandType handType, @Nullable ItemStack itemInHand) {
         checkNotNull(handType, "HandType cannot be null!");
-        this.setHeldItem((EnumHand) (Object) handType, ItemStackUtil.toNative(itemInHand).copy());
+        this.setHeldItem((Hand) (Object) handType, ItemStackUtil.toNative(itemInHand).copy());
     }
 }

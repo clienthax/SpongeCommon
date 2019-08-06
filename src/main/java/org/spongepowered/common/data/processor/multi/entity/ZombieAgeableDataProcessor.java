@@ -27,7 +27,7 @@ package org.spongepowered.common.data.processor.multi.entity;
 import static org.spongepowered.common.data.util.DataUtil.getData;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.ZombieEntity;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
 import org.spongepowered.api.data.DataTransactionResult;
@@ -41,10 +41,10 @@ import org.spongepowered.common.data.processor.common.AbstractEntityDataProcesso
 import java.util.Map;
 import java.util.Optional;
 
-public class ZombieAgeableDataProcessor extends AbstractEntityDataProcessor<EntityZombie, AgeableData, ImmutableAgeableData> {
+public class ZombieAgeableDataProcessor extends AbstractEntityDataProcessor<ZombieEntity, AgeableData, ImmutableAgeableData> {
 
     public ZombieAgeableDataProcessor() {
-        super(EntityZombie.class);
+        super(ZombieEntity.class);
     }
 
     @Override
@@ -53,21 +53,21 @@ public class ZombieAgeableDataProcessor extends AbstractEntityDataProcessor<Enti
     }
 
     @Override
-    protected boolean doesDataExist(EntityZombie entity) {
+    protected boolean doesDataExist(ZombieEntity entity) {
         return true;
     }
 
     @Override
-    protected boolean set(EntityZombie entityCast, Map<Key<?>, Object> keyValues) {
+    protected boolean set(ZombieEntity entityCast, Map<Key<?>, Object> keyValues) {
         boolean adult = (Boolean) keyValues.get(Keys.IS_ADULT);
 
-        EntityZombie entity = entityCast;
+        ZombieEntity entity = entityCast;
         entity.setChild(!adult);
         return true;
     }
 
     @Override
-    protected Map<Key<?>, ?> getValues(EntityZombie entity) {
+    protected Map<Key<?>, ?> getValues(ZombieEntity entity) {
         int age;
         boolean adult;
         age = entity.isChild() ? Integer.MIN_VALUE : Integer.MAX_VALUE;

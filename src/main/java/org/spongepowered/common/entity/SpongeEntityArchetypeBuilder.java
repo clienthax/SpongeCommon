@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import static com.google.common.base.Preconditions.checkState;
 import static org.spongepowered.api.entity.EntityTypes.UNKNOWN;
 
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataView;
 import org.spongepowered.api.data.key.Key;
@@ -52,7 +52,7 @@ public class SpongeEntityArchetypeBuilder extends AbstractDataBuilder<EntityArch
 
     EntityType entityType = UNKNOWN;
     DataContainer entityData;
-    NBTTagCompound compound;
+    CompoundNBT compound;
 
     public SpongeEntityArchetypeBuilder() {
         super(EntityArchetype.class, DataVersions.EntityArchetype.BASE_VERSION);
@@ -107,7 +107,7 @@ public class SpongeEntityArchetypeBuilder extends AbstractDataBuilder<EntityArch
         checkNotNull(entity, "Cannot build an EntityArchetype for a null entity!");
         this.entityType = checkNotNull(entity.getType(), "Entity is returning a null EntityType!");
         final net.minecraft.entity.Entity minecraftEntity = (net.minecraft.entity.Entity) entity;
-        final NBTTagCompound compound = new NBTTagCompound();
+        final CompoundNBT compound = new CompoundNBT();
         minecraftEntity.writeToNBT(compound);
         compound.setString(Constants.Sponge.EntityArchetype.ENTITY_ID, entity.getType().getId());
         compound.removeTag(Constants.UUID);

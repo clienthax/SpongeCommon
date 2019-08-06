@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.world;
 
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.Difficulty;
 import org.spongepowered.api.text.translation.Translation;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.api.world.difficulty.Difficulty;
@@ -37,7 +37,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.common.text.translation.SpongeTranslation;
 
 @NonnullByDefault
-@Mixin(EnumDifficulty.class)
+@Mixin(Difficulty.class)
 public class EnumDifficultyMixin_API implements Difficulty {
 
     @Shadow @Final private int id;

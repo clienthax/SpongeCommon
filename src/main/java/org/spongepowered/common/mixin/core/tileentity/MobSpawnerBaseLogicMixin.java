@@ -27,9 +27,9 @@ package org.spongepowered.common.mixin.core.tileentity;
 import com.flowpowered.math.vector.Vector3d;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.tileentity.MobSpawnerBaseLogic;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
+import net.minecraft.world.spawner.AbstractSpawner;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.WeightedSpawnerEntity;
 import net.minecraft.world.World;
@@ -62,7 +62,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
-@Mixin(MobSpawnerBaseLogic.class)
+@Mixin(AbstractSpawner.class)
 public abstract class MobSpawnerBaseLogicMixin implements MobSpawnerBaseLogicBridge {
 
     @Shadow private int spawnDelay;
@@ -80,7 +80,7 @@ public abstract class MobSpawnerBaseLogicMixin implements MobSpawnerBaseLogicBri
      * being recursively read from compound, this needs to remain static and
      * isolated as it's own method.
      *
-     * This is close to a verbatim copy of {@link AnvilChunkLoader#readWorldEntityPos(NBTTagCompound, World, double, double, double, boolean)}
+     * This is close to a verbatim copy of {@link AnvilChunkLoader#readWorldEntityPos(CompoundNBT, World, double, double, double, boolean)}
      * with the added bonus of throwing events before entities are constructed with appropriate causes.
      *
      * Redirects to throw a ConstructEntityEvent.PRE
@@ -96,11 +96,11 @@ public abstract class MobSpawnerBaseLogicMixin implements MobSpawnerBaseLogicBri
     @Redirect(method = "updateSpawner",
         at = @At(
             value = "INVOKE",
-            target = "Lnet/minecraft/world/chunk/storage/AnvilChunkLoader;readWorldEntityPos(Lnet/minecraft/nbt/NBTTagCompound;Lnet/minecraft/world/World;DDDZ)Lnet/minecraft/entity/Entity;"
+            target = "Lnet/minecraft/world/chunk/storage/AnvilChunkLoader;readWorldEntityPos(Lnet/minecraft/nbt/CompoundNBT;Lnet/minecraft/world/World;DDDZ)Lnet/minecraft/entity/Entity;"
         )
     )
     private Entity impl$ThrowEventAndConstruct(
-        final NBTTagCompound compound, final World world, final double x, final double y, final double z, final boolean doesNotForceSpawn) {
+        final CompoundNBT compound, final World world, final double x, final double y, final double z, final boolean doesNotForceSpawn) {
         final String entityTypeString = compound.getString(Constants.Entity.ENTITY_TYPE_ID);
         final Class<? extends Entity> clazz = SpongeImplHooks.getEntityClass(new ResourceLocation(entityTypeString));
         if (clazz == null) {
@@ -150,7 +150,7 @@ public abstract class MobSpawnerBaseLogicMixin implements MobSpawnerBaseLogicBri
 
 
         if (compound.hasKey(Constants.Entity.PASSENGERS, Constants.NBT.TAG_LIST)) {
-            final NBTTagList passengerList = compound.getTagList(Constants.Entity.PASSENGERS, Constants.NBT.TAG_COMPOUND);
+            final ListNBT passengerList = compound.getTagList(Constants.Entity.PASSENGERS, Constants.NBT.TAG_COMPOUND);
 
             for (int i = 0; i < passengerList.tagCount(); i++) {
                 final Entity passenger = impl$ThrowEventAndConstruct(passengerList.getCompoundTagAt(i), world, x, y, z, doesNotForceSpawn);

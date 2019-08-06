@@ -24,11 +24,11 @@
  */
 package org.spongepowered.common.mixin.core.entity.item;
 
-import net.minecraft.entity.item.EntityFireworkRocket;
+import net.minecraft.entity.item.FireworkRocketEntity;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
-@Mixin(EntityFireworkRocket.class)
+@Mixin(FireworkRocketEntity.class)
 public interface EntityFireworkRocketAccessor {
 
     @Accessor("lifetime")

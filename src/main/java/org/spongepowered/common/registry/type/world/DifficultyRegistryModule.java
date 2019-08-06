@@ -27,7 +27,7 @@ package org.spongepowered.common.registry.type.world;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.world.EnumDifficulty;
+import net.minecraft.world.Difficulty;
 import org.spongepowered.api.registry.AlternateCatalogRegistryModule;
 import org.spongepowered.api.registry.util.AdditionalRegistration;
 import org.spongepowered.api.registry.util.RegisterCatalog;
@@ -74,15 +74,15 @@ public final class DifficultyRegistryModule implements AlternateCatalogRegistryM
 
     @Override
     public void registerDefaults() {
-        this.difficultyMappings.put("minecraft:peaceful", (Difficulty) (Object) EnumDifficulty.PEACEFUL);
-        this.difficultyMappings.put("minecraft:easy", (Difficulty) (Object) EnumDifficulty.EASY);
-        this.difficultyMappings.put("minecraft:normal", (Difficulty) (Object) EnumDifficulty.NORMAL);
-        this.difficultyMappings.put("minecraft:hard", (Difficulty) (Object) EnumDifficulty.HARD);
+        this.difficultyMappings.put("minecraft:peaceful", (Difficulty) (Object) Difficulty.PEACEFUL);
+        this.difficultyMappings.put("minecraft:easy", (Difficulty) (Object) Difficulty.EASY);
+        this.difficultyMappings.put("minecraft:normal", (Difficulty) (Object) Difficulty.NORMAL);
+        this.difficultyMappings.put("minecraft:hard", (Difficulty) (Object) Difficulty.HARD);
     }
 
     @AdditionalRegistration
     public void additional() {
-        for (EnumDifficulty difficulty : EnumDifficulty.values()) {
+        for (Difficulty difficulty : Difficulty.values()) {
             if (!this.difficultyMappings.containsValue(difficulty)) {
                 // TODO This doesn't have the modid...
                 this.difficultyMappings.put(difficulty.name(), (Difficulty) (Object) difficulty);

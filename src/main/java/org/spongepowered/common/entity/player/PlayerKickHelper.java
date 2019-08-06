@@ -25,9 +25,9 @@
 package org.spongepowered.common.entity.player;
 
 import com.google.common.util.concurrent.Futures;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.NetHandlerPlayServer;
-import net.minecraft.network.play.server.SPacketDisconnect;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.network.play.ServerPlayNetHandler;
+import net.minecraft.network.play.server.SDisconnectPacket;
 import net.minecraft.util.text.ITextComponent;
 
 /**
@@ -41,14 +41,14 @@ public class PlayerKickHelper {
 
     /**
      * A {@link ITextComponent}-friendly version of
-     * {@link NetHandlerPlayServer#kickPlayerFromServer(String)}. This
+     * {@link ServerPlayNetHandler#kickPlayerFromServer(String)}. This
      * duplicates the code of that kick implementation pretty much exactly
      *
      * @param ply The player to kick
      * @param component The kick message
      */
-    public static void kickPlayer(final EntityPlayerMP ply, final ITextComponent component) {
-        ply.connection.getNetworkManager().sendPacket(new SPacketDisconnect(component),
+    public static void kickPlayer(final ServerPlayerEntity ply, final ITextComponent component) {
+        ply.connection.getNetworkManager().sendPacket(new SDisconnectPacket(component),
                 future -> ply.connection.getNetworkManager().closeChannel(component));
         ply.connection.getNetworkManager().disableAutoRead();
         // fix this getServer.

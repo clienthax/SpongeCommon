@@ -25,8 +25,8 @@
 package org.spongepowered.common.data.util;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.item.EntityItemFrame;
+import net.minecraft.entity.item.ItemEntity;
+import net.minecraft.entity.item.ItemFrameEntity;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 
@@ -35,13 +35,13 @@ import java.util.Optional;
 public class EntityDataUtil {
 
     public static Optional<ItemStackSnapshot> getRepresentedItemFrom(Entity entity) {
-        if (entity instanceof EntityItemFrame) {
-            final ItemStack itemStack = ((EntityItemFrame) entity).getDisplayedItem();
+        if (entity instanceof ItemFrameEntity) {
+            final ItemStack itemStack = ((ItemFrameEntity) entity).getDisplayedItem();
             if (!itemStack.isEmpty()) {
                 return Optional.of(((org.spongepowered.api.item.inventory.ItemStack) itemStack).createSnapshot());
             }
-        } else if (entity instanceof EntityItem) {
-            return Optional.of(((org.spongepowered.api.item.inventory.ItemStack) ((EntityItem) entity).getItem()).createSnapshot());
+        } else if (entity instanceof ItemEntity) {
+            return Optional.of(((org.spongepowered.api.item.inventory.ItemStack) ((ItemEntity) entity).getItem()).createSnapshot());
         }
         return Optional.empty();
     }

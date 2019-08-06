@@ -26,10 +26,10 @@ package org.spongepowered.common.data.processor.data.item;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityList;
-import net.minecraft.init.Items;
+import net.minecraft.item.Items;
 import net.minecraft.item.ItemMonsterPlacer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -62,8 +62,8 @@ public class SpawnableDataProcessor extends AbstractItemSingleDataProcessor<Enti
     public boolean set(ItemStack itemStack, EntityType value) {
         final ResourceLocation name = EntityList.getKey((Class<? extends Entity>) value.getEntityClass());
         if (EntityList.ENTITY_EGGS.containsKey(name)) {
-            final NBTTagCompound mainCompound = NbtDataUtil.getOrCreateCompound(itemStack);
-            final NBTTagCompound subCompound = NbtDataUtil.getOrCreateSubCompound(mainCompound, Constants.TileEntity.Spawner.SPAWNABLE_ENTITY_TAG);
+            final CompoundNBT mainCompound = NbtDataUtil.getOrCreateCompound(itemStack);
+            final CompoundNBT subCompound = NbtDataUtil.getOrCreateSubCompound(mainCompound, Constants.TileEntity.Spawner.SPAWNABLE_ENTITY_TAG);
             subCompound.setString(Constants.Entity.ENTITY_TYPE_ID, name.toString());
             return true;
         }

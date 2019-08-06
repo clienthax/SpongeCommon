@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.multi.entity;
 
-import net.minecraft.entity.EntityAreaEffectCloud;
+import net.minecraft.entity.AreaEffectCloudEntity;
 import net.minecraft.util.EnumParticleTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.DataHolder;
@@ -48,10 +48,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class AreaEffectCloudDataProcessor extends AbstractEntityDataProcessor<EntityAreaEffectCloud, AreaEffectCloudData, ImmutableAreaEffectCloudData> {
+public class AreaEffectCloudDataProcessor extends AbstractEntityDataProcessor<AreaEffectCloudEntity, AreaEffectCloudData, ImmutableAreaEffectCloudData> {
 
     public AreaEffectCloudDataProcessor() {
-        super(EntityAreaEffectCloud.class);
+        super(AreaEffectCloudEntity.class);
     }
 
     @Override
@@ -60,13 +60,13 @@ public class AreaEffectCloudDataProcessor extends AbstractEntityDataProcessor<En
     }
 
     @Override
-    protected boolean doesDataExist(EntityAreaEffectCloud dataHolder) {
+    protected boolean doesDataExist(AreaEffectCloudEntity dataHolder) {
         return true;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    protected boolean set(EntityAreaEffectCloud dataHolder, Map<Key<?>, Object> keyValues) {
+    protected boolean set(AreaEffectCloudEntity dataHolder, Map<Key<?>, Object> keyValues) {
         final int age = (int) keyValues.get(Keys.AREA_EFFECT_CLOUD_AGE);
         final Color color = (Color) keyValues.get(Keys.AREA_EFFECT_CLOUD_COLOR);
         final double radius = (double) keyValues.get(Keys.AREA_EFFECT_CLOUD_RADIUS);
@@ -97,7 +97,7 @@ public class AreaEffectCloudDataProcessor extends AbstractEntityDataProcessor<En
     }
 
     @Override
-    protected Map<Key<?>, ?> getValues(EntityAreaEffectCloud dataHolder) {
+    protected Map<Key<?>, ?> getValues(AreaEffectCloudEntity dataHolder) {
         final HashMap<Key<?>, Object> map = new HashMap<>();
         map.put(Keys.AREA_EFFECT_CLOUD_AGE, dataHolder.ticksExisted);
         map.put(Keys.AREA_EFFECT_CLOUD_COLOR, Color.ofRgb(dataHolder.getColor()));

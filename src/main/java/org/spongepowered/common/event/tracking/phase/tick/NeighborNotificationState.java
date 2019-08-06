@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.event.tracking.phase.tick;
 
-import net.minecraft.entity.item.EntityXPOrb;
+import net.minecraft.entity.item.ExperienceOrbEntity;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.event.CauseStackManager.StackFrame;
@@ -95,7 +95,7 @@ class NeighborNotificationState extends LocationBasedTickPhaseState<NeighborNoti
         }
         try (StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
             frame.pushCause(locatableBlock);
-            if (entity instanceof EntityXPOrb) {
+            if (entity instanceof ExperienceOrbEntity) {
                 frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.EXPERIENCE);
                 final ArrayList<Entity> entities = new ArrayList<>(1);
                 entities.add(entity);

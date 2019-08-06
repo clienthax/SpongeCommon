@@ -29,7 +29,7 @@ import net.minecraft.block.BlockDoubleStoneSlab;
 import net.minecraft.block.BlockDoubleStoneSlabNew;
 import net.minecraft.block.BlockStoneSlab;
 import net.minecraft.block.BlockStoneSlabNew;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import org.spongepowered.api.data.manipulator.ImmutableDataManipulator;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableSeamlessData;
 import org.spongepowered.api.data.manipulator.immutable.block.ImmutableSlabData;
@@ -45,7 +45,7 @@ public abstract class BlockDoubleStoneSlabMixin extends BlockStoneSlabMixin {
 
     @SuppressWarnings("RedundantTypeArguments") // some java compilers will not calculate this generic correctly
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.<ImmutableDataManipulator<?, ?>>of(impl$getSlabTypeFor(blockState), impl$getIsSeamlessFor(blockState));
     }
 
@@ -55,7 +55,7 @@ public abstract class BlockDoubleStoneSlabMixin extends BlockStoneSlabMixin {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private ImmutableSlabData impl$getSlabTypeFor(final IBlockState blockState) {
+    private ImmutableSlabData impl$getSlabTypeFor(final BlockState blockState) {
         return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeSlabData.class,
                 blockState.getBlock() instanceof BlockStoneSlab
                         ? (SlabType) (Object) blockState.getValue(BlockStoneSlab.VARIANT)
@@ -64,7 +64,7 @@ public abstract class BlockDoubleStoneSlabMixin extends BlockStoneSlabMixin {
                                 : SlabTypes.COBBLESTONE);
     }
 
-    private ImmutableSeamlessData impl$getIsSeamlessFor(final IBlockState blockState) {
+    private ImmutableSeamlessData impl$getIsSeamlessFor(final BlockState blockState) {
         if (blockState.getBlock() instanceof BlockStoneSlab) {
             return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeSeamlessData.class, blockState.getValue(BlockStoneSlab.SEAMLESS));
         }

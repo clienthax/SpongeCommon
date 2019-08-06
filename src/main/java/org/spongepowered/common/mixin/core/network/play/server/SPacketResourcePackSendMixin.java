@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.core.network.play.server;
 
-import net.minecraft.network.play.server.SPacketResourcePackSend;
+import net.minecraft.network.play.server.SSendResourcePackPacket;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,7 +36,7 @@ import org.spongepowered.common.resourcepack.SpongeResourcePack;
 
 import java.net.URISyntaxException;
 
-@Mixin(SPacketResourcePackSend.class)
+@Mixin(SSendResourcePackPacket.class)
 public abstract class SPacketResourcePackSendMixin implements SPacketResourcePackSendBridge {
 
     @Shadow private String url;

@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.data.entity;
 
-import net.minecraft.entity.passive.EntityParrot;
+import net.minecraft.entity.passive.ParrotEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.immutable.entity.ImmutableParrotData;
@@ -44,20 +44,20 @@ import org.spongepowered.common.registry.type.entity.ParrotVariantRegistryModule
 import java.util.Optional;
 
 public class ParrotDataProcessor extends
-        AbstractEntitySingleDataProcessor<EntityParrot, ParrotVariant, Value<ParrotVariant>, ParrotData, ImmutableParrotData> {
+        AbstractEntitySingleDataProcessor<ParrotEntity, ParrotVariant, Value<ParrotVariant>, ParrotData, ImmutableParrotData> {
 
     public ParrotDataProcessor() {
-        super(EntityParrot.class, Keys.PARROT_VARIANT);
+        super(ParrotEntity.class, Keys.PARROT_VARIANT);
     }
 
     @Override
-    protected boolean set(EntityParrot dataHolder, ParrotVariant value) {
+    protected boolean set(ParrotEntity dataHolder, ParrotVariant value) {
         dataHolder.setVariant(((SpongeParrotVariant)value).type);
         return true;
     }
 
     @Override
-    protected Optional<ParrotVariant> getVal(EntityParrot dataHolder) {
+    protected Optional<ParrotVariant> getVal(ParrotEntity dataHolder) {
         return Optional.of(ParrotVariantRegistryModule.PARROT_VARIANT_IDMAP.get(dataHolder.getVariant()));
     }
 

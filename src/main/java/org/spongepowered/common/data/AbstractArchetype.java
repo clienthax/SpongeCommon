@@ -27,7 +27,7 @@ package org.spongepowered.common.data;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 import com.google.common.base.MoreObjects;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.CompoundNBT;
 import org.spongepowered.api.CatalogType;
 import org.spongepowered.api.data.Archetype;
 import org.spongepowered.api.data.DataHolder;
@@ -58,9 +58,9 @@ import java.util.stream.Collectors;
 public abstract class AbstractArchetype<C extends CatalogType, S extends LocatableSnapshot<S>, E> implements Archetype<S, E> {
 
     protected final C type;
-    protected NBTTagCompound data;
+    protected CompoundNBT data;
 
-    protected AbstractArchetype(C type, NBTTagCompound data) {
+    protected AbstractArchetype(C type, CompoundNBT data) {
         this.type = type;
         this.data = data;
     }
@@ -77,7 +77,7 @@ public abstract class AbstractArchetype<C extends CatalogType, S extends Locatab
     @Override
     public void setRawData(DataView container) throws InvalidDataException {
         checkNotNull(container, "Raw data cannot be null!");
-        final NBTTagCompound copy = NbtTranslator.getInstance().translateData(container);
+        final CompoundNBT copy = NbtTranslator.getInstance().translateData(container);
         DataUtil.getValidators(this.getValidationType()).validate(copy);
         this.data = copy;
     }
@@ -134,7 +134,7 @@ public abstract class AbstractArchetype<C extends CatalogType, S extends Locatab
                             .map(manipulator -> (DataManipulator) function.merge(manipulator, valueContainer))
                             .orElse(valueContainer);
 
-                    final Optional<NBTTagCompound> optional = processor.storeToCompound(this.data, newManipulator);
+                    final Optional<CompoundNBT> optional = processor.storeToCompound(this.data, newManipulator);
                     if (optional.isPresent()) {
                         this.data = optional.get();
                     }
@@ -252,7 +252,7 @@ public abstract class AbstractArchetype<C extends CatalogType, S extends Locatab
         return MoreObjects.toStringHelper(this).add("type", this.type).add("data", this.data).toString();
     }
 
-    public NBTTagCompound getCompound() {
+    public CompoundNBT getCompound() {
         return this.data;
     }
 }

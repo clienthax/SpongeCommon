@@ -25,8 +25,8 @@
 package org.spongepowered.common.mixin.core.block;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.block.BlockRedstoneWire;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.RedstoneWireBlock;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.IStringSerializable;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.key.Key;
@@ -50,11 +50,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-@Mixin(BlockRedstoneWire.class)
+@Mixin(RedstoneWireBlock.class)
 public abstract class BlockRedstoneWireMixin extends BlockMixin {
 
     @Override
-    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final IBlockState blockState) {
+    public ImmutableList<ImmutableDataManipulator<?, ?>> bridge$getManipulators(final BlockState blockState) {
         return ImmutableList.of(impl$getPowerFor(blockState), impl$getConnectedDirectionData(blockState), impl$getWireAttachmentData(blockState));
     }
 
@@ -65,7 +65,7 @@ public abstract class BlockRedstoneWireMixin extends BlockMixin {
     }
 
     @Override
-    public Optional<BlockState> bridge$getStateWithData(final IBlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
+    public Optional<BlockState> bridge$getStateWithData(final BlockState blockState, final ImmutableDataManipulator<?, ?> manipulator) {
         if (manipulator instanceof ImmutableRedstonePoweredData) {
             return Optional.of((BlockState) blockState);
         }
@@ -79,7 +79,7 @@ public abstract class BlockRedstoneWireMixin extends BlockMixin {
     }
 
     @Override
-    public <E> Optional<BlockState> bridge$getStateWithValue(final IBlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
+    public <E> Optional<BlockState> bridge$getStateWithValue(final BlockState blockState, final Key<? extends BaseValue<E>> key, final E value) {
         if (key.equals(Keys.POWER)) {
             return Optional.of((BlockState) blockState);
         }
@@ -92,16 +92,16 @@ public abstract class BlockRedstoneWireMixin extends BlockMixin {
         return super.bridge$getStateWithValue(blockState, key, value);
     }
 
-    private ImmutableRedstonePoweredData impl$getPowerFor(final IBlockState blockState) {
-        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeRedstonePoweredData.class, blockState.getValue(BlockRedstoneWire.POWER));
+    private ImmutableRedstonePoweredData impl$getPowerFor(final BlockState blockState) {
+        return ImmutableDataCachingUtil.getManipulator(ImmutableSpongeRedstonePoweredData.class, blockState.getValue(RedstoneWireBlock.POWER));
     }
 
-    private ImmutableConnectedDirectionData impl$getConnectedDirectionData(final IBlockState blockState) {
+    private ImmutableConnectedDirectionData impl$getConnectedDirectionData(final BlockState blockState) {
         final Set<Direction> directions = new HashSet<>();
-        final IStringSerializable north = blockState.getValue(BlockRedstoneWire.NORTH);
-        final IStringSerializable east = blockState.getValue(BlockRedstoneWire.EAST);
-        final IStringSerializable west = blockState.getValue(BlockRedstoneWire.WEST);
-        final IStringSerializable south = blockState.getValue(BlockRedstoneWire.SOUTH);
+        final IStringSerializable north = blockState.getValue(RedstoneWireBlock.NORTH);
+        final IStringSerializable east = blockState.getValue(RedstoneWireBlock.EAST);
+        final IStringSerializable west = blockState.getValue(RedstoneWireBlock.WEST);
+        final IStringSerializable south = blockState.getValue(RedstoneWireBlock.SOUTH);
         if (!north.getName().matches("none")) {
             directions.add(Direction.NORTH);
         }
@@ -118,12 +118,12 @@ public abstract class BlockRedstoneWireMixin extends BlockMixin {
     }
 
     @SuppressWarnings("ConstantConditions")
-    private ImmutableWireAttachmentData impl$getWireAttachmentData(final IBlockState blockState) {
+    private ImmutableWireAttachmentData impl$getWireAttachmentData(final BlockState blockState) {
         final Map<Direction, WireAttachmentType> data = new HashMap<>();
-        data.put(Direction.NORTH, (WireAttachmentType) (Object) blockState.getValue(BlockRedstoneWire.NORTH));
-        data.put(Direction.SOUTH, (WireAttachmentType) (Object) blockState.getValue(BlockRedstoneWire.SOUTH));
-        data.put(Direction.EAST, (WireAttachmentType) (Object) blockState.getValue(BlockRedstoneWire.EAST));
-        data.put(Direction.WEST, (WireAttachmentType) (Object) blockState.getValue(BlockRedstoneWire.WEST));
+        data.put(Direction.NORTH, (WireAttachmentType) (Object) blockState.getValue(RedstoneWireBlock.NORTH));
+        data.put(Direction.SOUTH, (WireAttachmentType) (Object) blockState.getValue(RedstoneWireBlock.SOUTH));
+        data.put(Direction.EAST, (WireAttachmentType) (Object) blockState.getValue(RedstoneWireBlock.EAST));
+        data.put(Direction.WEST, (WireAttachmentType) (Object) blockState.getValue(RedstoneWireBlock.WEST));
         return new ImmutableSpongeWireAttachmentData(data);
     }
 }

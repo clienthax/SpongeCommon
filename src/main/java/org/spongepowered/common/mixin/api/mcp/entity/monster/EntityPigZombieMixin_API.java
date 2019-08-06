@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.api.mcp.entity.monster;
 
-import net.minecraft.entity.monster.EntityPigZombie;
+import net.minecraft.entity.monster.ZombiePigmanEntity;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.entity.AngerableData;
@@ -38,7 +38,7 @@ import org.spongepowered.common.data.value.SpongeValueFactory;
 
 import java.util.Collection;
 
-@Mixin(EntityPigZombie.class)
+@Mixin(ZombiePigmanEntity.class)
 public abstract class EntityPigZombieMixin_API extends EntityZombieMixin_API implements ZombiePigman {
 
     @Shadow private int angerLevel;

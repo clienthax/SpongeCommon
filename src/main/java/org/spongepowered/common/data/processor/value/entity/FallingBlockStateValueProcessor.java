@@ -24,8 +24,8 @@
  */
 package org.spongepowered.common.data.processor.value.entity;
 
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.item.EntityFallingBlock;
+import net.minecraft.block.BlockState;
+import net.minecraft.entity.item.FallingBlockEntity;
 import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
@@ -52,7 +52,7 @@ public class FallingBlockStateValueProcessor extends AbstractSpongeValueProcesso
 
     @Override
     protected boolean set(final EntityFallingBlockAccessor container, final BlockState value) {
-        container.accessor$setFallBlockState((IBlockState) value);
+        container.accessor$setFallBlockState((BlockState) value);
         return true;
     }
 

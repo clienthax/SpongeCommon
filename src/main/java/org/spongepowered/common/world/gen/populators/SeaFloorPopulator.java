@@ -29,7 +29,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 import com.flowpowered.math.vector.Vector3i;
 import com.google.common.base.MoreObjects;
 import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.spongepowered.api.block.BlockState;
@@ -90,7 +90,7 @@ public class SeaFloorPopulator implements SeaFloor {
                     for (int y = pos.getY() - depth; y <= pos.getY() + depth; ++y) {
                         BlockPos blockpos1 = new BlockPos(x, y, z);
                         if (this.check.test((BlockState) world.getBlockState(blockpos1))) {
-                            world.setBlockState(blockpos1, (IBlockState) this.block, 2);
+                            world.setBlockState(blockpos1, (BlockState) this.block, 2);
                         }
                     }
                 }

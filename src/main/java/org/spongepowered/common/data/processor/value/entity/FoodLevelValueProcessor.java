@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.data.processor.value.entity;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import org.spongepowered.api.data.DataTransactionResult;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.data.value.ValueContainer;
@@ -36,10 +36,10 @@ import org.spongepowered.common.util.Constants;
 
 import java.util.Optional;
 
-public class FoodLevelValueProcessor extends AbstractSpongeValueProcessor<EntityPlayer, Integer, MutableBoundedValue<Integer>> {
+public class FoodLevelValueProcessor extends AbstractSpongeValueProcessor<PlayerEntity, Integer, MutableBoundedValue<Integer>> {
 
     public FoodLevelValueProcessor() {
-        super(EntityPlayer.class, Keys.FOOD_LEVEL);
+        super(PlayerEntity.class, Keys.FOOD_LEVEL);
     }
 
     @Override
@@ -53,13 +53,13 @@ public class FoodLevelValueProcessor extends AbstractSpongeValueProcessor<Entity
     }
 
     @Override
-    protected boolean set(EntityPlayer container, Integer value) {
+    protected boolean set(PlayerEntity container, Integer value) {
         container.getFoodStats().setFoodLevel(value);
         return true;
     }
 
     @Override
-    protected Optional<Integer> getVal(EntityPlayer container) {
+    protected Optional<Integer> getVal(PlayerEntity container) {
         return Optional.of(container.getFoodStats().getFoodLevel());
     }
 

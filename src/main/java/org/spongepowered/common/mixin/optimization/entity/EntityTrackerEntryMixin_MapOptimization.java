@@ -26,9 +26,9 @@ package org.spongepowered.common.mixin.optimization.entity;
 
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityTrackerEntry;
-import net.minecraft.entity.item.EntityItemFrame;
+import net.minecraft.entity.item.ItemFrameEntity;
 import net.minecraft.item.Item;
-import net.minecraft.item.ItemMap;
+import net.minecraft.item.FilledMapItem;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
@@ -45,7 +45,7 @@ public abstract class EntityTrackerEntryMixin_MapOptimization {
     @Shadow @Final private Entity trackedEntity;
 
     /**
-     * When processing an EntitYItemFrame containing an ItemMap, we call
+     * When processing an EntitYItemFrame containing an FilledMapItem, we call
      * bridge$updateItemFrameDecoration on its correspoding MapDAta
      *
      * <p>We always return 'null' here in order to prevent the original 'if' block from executing.</p>
@@ -59,8 +59,8 @@ public abstract class EntityTrackerEntryMixin_MapOptimization {
             target = "Lnet/minecraft/item/ItemStack;getItem()Lnet/minecraft/item/Item;",
             ordinal = 0))
     private Item mapOptimization$onGetItem(final ItemStack itemStack) {
-        if (itemStack.getItem() instanceof ItemMap) {
-            ((OptimizedMapDataBridge) ((ItemMap) itemStack.getItem()).getMapData(itemStack, this.trackedEntity.world)).mapOptimizationBridge$updateItemFrameDecoration((EntityItemFrame) this.trackedEntity);
+        if (itemStack.getItem() instanceof FilledMapItem) {
+            ((OptimizedMapDataBridge) ((FilledMapItem) itemStack.getItem()).getMapData(itemStack, this.trackedEntity.world)).mapOptimizationBridge$updateItemFrameDecoration((ItemFrameEntity) this.trackedEntity);
         }
         return null;
     }

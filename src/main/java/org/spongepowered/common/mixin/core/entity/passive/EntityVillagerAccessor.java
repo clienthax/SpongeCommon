@@ -24,13 +24,13 @@
  */
 package org.spongepowered.common.mixin.core.entity.passive;
 
-import net.minecraft.entity.passive.EntityVillager;
+import net.minecraft.entity.merchant.villager.VillagerEntity;
 import net.minecraft.village.MerchantRecipeList;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 import org.spongepowered.asm.mixin.gen.Invoker;
 
-@Mixin(EntityVillager.class)
+@Mixin(VillagerEntity.class)
 public interface EntityVillagerAccessor {
 
     @Accessor("buyingList") MerchantRecipeList accessor$getBuyingList();
